@@ -1,0 +1,17 @@
+---
+description: Composable, accessible React UI components
+globs: "src/**/*.{tsx,css}"
+alwaysApply: false
+---
+
+# Composable UI
+
+- Build features from semantic, focused components with clear props and explicit state ownership.
+- Prefer children, slots and composition over deeply nested conditional variants and many boolean flags.
+- Separate reusable primitives (layout, buttons, typography) from business-specific components (event cards, booking forms).
+- Use a single source for brand colors, spacing and type roles; avoid one-off design values without reason.
+- Keep responsive behavior within the component design. Test narrow/mobile, tablet and desktop.
+- Support keyboard operation, focus-visible, reduced motion, sufficient contrast, semantic headings and accessible form feedback.
+- Implement real loading, empty, error, success and disabled states for interactive workflows.
+- Use stable keys and semantic link/button elements. Don't use click handlers on decorative containers.
+- Avoid expensive client components where server components can render the same result.

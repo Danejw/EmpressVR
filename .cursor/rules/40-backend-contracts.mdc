@@ -1,0 +1,15 @@
+---
+description: Payment, database, and calendar safety rules
+globs: "src/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Integration contracts
+
+- Never expose Stripe secret keys, Supabase service-role keys or Google OAuth secrets to client code.
+- Validate data at all server boundaries; authorize every read/write. Supabase RLS is required for user-accessible tables.
+- Stripe fulfillment and subscription status come from signature-verified webhooks, not redirect pages. Make webhook processing idempotent.
+- Store minimal personal data. Document retention, privacy impact, and sensitive fields.
+- For booking, prevent race conditions and double bookings using database invariants/transactions. Calendar availability reads alone do not reserve a slot.
+- Use time-zone-aware timestamps and distinguish events, appointments, class capacity and paid bookings.
+- Keep provider-specific integration code behind domain interfaces so we can switch hosts without rewriting business logic.

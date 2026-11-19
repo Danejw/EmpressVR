@@ -1,0 +1,21 @@
+---
+description: DRY and SOLID principles for TypeScript, React and server modules
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# DRY + SOLID
+
+**DRY:** One authoritative implementation per business rule. Search for existing helpers, tokens, types and components before adding code. Extract repeated behavior when it is a stable, meaningful concept; do not over-abstract incidental repetition.
+
+**S — Single responsibility:** Each module/component has one clear reason to change. Split data access, business behavior and UI presentation when it improves clarity.
+
+**O — Open/closed:** Prefer extension through typed composition and configuration over editing every caller. Avoid plugin systems for hypothetical extension points.
+
+**L — Liskov substitution:** Implementations sharing an interface must preserve its contract, including errors, loading and data invariants.
+
+**I — Interface segregation:** Small task-oriented types beat huge service interfaces. Expose only what callers require.
+
+**D — Dependency inversion:** Domain logic depends on interfaces and pure functions. Stripe, Supabase and Google Calendar adapters stay at integration boundaries.
+
+Every abstraction needs an actual second use case or clear module boundary. Simplicity wins.

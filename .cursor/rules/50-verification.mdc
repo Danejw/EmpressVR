@@ -1,0 +1,13 @@
+---
+description: Test and evidence requirements when implementing behavior
+alwaysApply: true
+---
+
+# Verification before declaring completion
+
+- Start from a clear change scope and acceptance criteria.
+- Run lint, TypeScript checks, unit tests and production build for meaningful changes when execution is possible.
+- Test actual booking and checkout flows in sandbox/test mode, including errors, duplicate requests, cancellations and webhook retries.
+- Verify public-facing changes in a browser at mobile and desktop widths.
+- Record which commands and scenarios passed, failed, or could not be executed. Never invent verification.
+- Existing Squarespace pages and payments remain operational until content comparison, transaction reconciliation and explicit go-live approval.

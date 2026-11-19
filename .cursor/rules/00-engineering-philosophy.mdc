@@ -1,0 +1,16 @@
+---
+description: EmpressVR engineering principles for every change
+alwaysApply: true
+---
+
+# Engineering philosophy
+
+Build software that is **simple, modular, composable, reusable, interoperable, portable, verifiable and compoundable**.
+
+1. Inspect the actual code and existing components before making changes.
+2. Make the smallest coherent change that solves the requirement; avoid speculative frameworks, abstractions and dependencies.
+3. Preserve behavior and extend existing modules rather than creating competing implementations.
+4. Keep clear domain boundaries: content, commerce and scheduling. Cross-domain behavior is orchestrated, not duplicated.
+5. Validate assumptions against tests, official documentation, provider responses and actual runtime behavior.
+6. Provide concise evidence of what changed, what was tested, and what is still unverified.
+7. Respect the user's approved scope. Never execute paid transactions, real donor migrations or destructive changes without authorization.

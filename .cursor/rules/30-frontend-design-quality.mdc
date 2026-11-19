@@ -1,0 +1,18 @@
+---
+description: Brand-led frontend visual and UX quality
+globs: "src/**/*.{tsx,css}"
+alwaysApply: false
+---
+
+# Frontend design quality
+
+Before building a substantial screen:
+1. Identify user goals, primary action and expected information hierarchy.
+2. Read `docs/brand.md` and any supplied visual references. Use EmpressVR's navy, magenta, green and cosmic visual character deliberately.
+3. Pick a coherent layout rhythm, typography scale, responsive behavior and interaction states.
+4. Use generous spacing, purposeful contrast, reusable patterns and readable line lengths. Avoid generic dashboard cards, arbitrary gradients, excessive decorations and repetitive "AI-generated" visuals.
+5. Check color contrast, keyboard navigation, mobile clipping, loading and error states.
+6. Compare a browser screenshot with the intended design and revise if possible. Report visual verification status honestly.
+7. Preserve accurate content and labels from the client. Placeholders remain clearly marked until migration.
+
+Prioritize clarity and distinct brand identity over visual trends. Reference: https://github.com/anthropics/skills/tree/main/skills/frontend-design
