@@ -6,7 +6,9 @@ alwaysApply: false
 
 # Frontend design quality
 
-Before building a substantial screen:
+Before building a substantial screen, load `.skills/frontend-design/SKILL.md` and the licensed `.skills/anthropic-frontend-design/SKILL.md` when available.
+
+Then:
 1. Identify user goals, primary action and expected information hierarchy.
 2. Read `docs/brand.md` and any supplied visual references. Use EmpressVR's navy, magenta, green and cosmic visual character deliberately.
 3. Pick a coherent layout rhythm, typography scale, responsive behavior and interaction states.
