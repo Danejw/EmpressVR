@@ -1,27 +1,34 @@
-# EmpressVR agent skills
+# EmpressVR official agent skills
 
-The nine stack-specific SKILL.md files are original project playbooks based on trusted official guidance. Anthropic's official frontend-design skill is also vendored under `.skills/anthropic-frontend-design/` with its Apache-2.0 license and source provenance. No paid Auglet content is included.
+All installed `SKILL.md` packages are **copied from first-party publishers without rewriting their instructions**. Cursor automatically discovers skills under `.cursor/skills/`, the canonical installation directory. The former handwritten skill stubs have been removed.
 
-Load only the skills relevant to the task, and read their linked official references for implementation details. These files live under `.skills` as requested. Cursor's automatically recognized project rules are under `.cursor/rules/*.mdc`; refer to this directory via `AGENTS.md`.
+| Skill directory | Maintainer | Primary role | Original source |
+| --- | --- | --- | --- |
+| `frontend-design` | Anthropic | Brand-led UI/UX design | https://github.com/anthropics/skills/tree/main/skills/frontend-design |
+| `vercel-react-best-practices` | Vercel | React and Next.js performance, rendering, data loading | https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices |
+| `vercel-composition-patterns` | Vercel | Reusable React composition | https://github.com/vercel-labs/agent-skills/tree/main/skills/composition-patterns |
+| `web-design-guidelines` | Vercel | UI and accessibility auditing | https://github.com/vercel-labs/agent-skills/tree/main/skills/web-design-guidelines |
+| `deploy-to-vercel` | Vercel | Preview and deployment workflows | https://github.com/vercel-labs/agent-skills/tree/main/skills/deploy-to-vercel |
+| `next-dev-loop` | Next.js / Vercel | Development server and runtime verification | https://github.com/vercel/next.js/tree/canary/skills/next-dev-loop |
+| `supabase` | Supabase | Supabase integration, troubleshooting, services | https://github.com/supabase/agent-skills/tree/main/skills/supabase |
+| `supabase-postgres-best-practices` | Supabase | Postgres queries, RLS, transactions, indexing and migration | https://github.com/supabase/agent-skills/tree/main/skills/supabase-postgres-best-practices |
+| `stripe-best-practices` | Stripe | Checkout, billing, subscriptions, webhook security | https://github.com/stripe/ai/tree/main/skills/stripe-best-practices |
+| `gws-calendar` | Google Workspace | Google Calendar operations through gws CLI | https://github.com/googleworkspace/cli/tree/main/skills/gws-calendar |
+| `gws-shared` | Google Workspace | Required Google Workspace CLI authentication and command conventions | https://github.com/googleworkspace/cli/tree/main/skills/gws-shared |
+| `gws-calendar-insert` | Google Workspace | Google Calendar event creation with gws CLI | https://github.com/googleworkspace/cli/tree/main/skills/gws-calendar-insert |
+| `gws-calendar-agenda` | Google Workspace | Calendar agenda with gws CLI | https://github.com/googleworkspace/cli/tree/main/skills/gws-calendar-agenda |
 
-| Skill | Trigger |
-| --- | --- |
-| frontend-design | EmpressVR-specific visual design, UX/UI and brand quality |
-| anthropic-frontend-design | Licensed official Anthropic design skill (load alongside project brand rules) |
-| react | React component design, state, performance |
-| nextjs | App Router, server/client architecture, routing |
-| typescript | Types, API contracts, validation |
-| tailwind | Tokens, utility styling, responsive CSS |
-| supabase | Database, storage, migrations, RLS |
-| stripe | Checkout, payments, donation, subscriptions |
-| google-calendar | Booking, scheduling, sync, capacity |
-| vercel | Builds, previews, env variables, portability |
+## Coverage and limitations
 
-Useful upstream expert sources (some are linked; Anthropic frontend-design is vendored):
-- Anthropic: https://github.com/anthropics/skills/tree/main/skills/frontend-design
-- Vercel: https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices
-- Vercel composition: https://github.com/vercel-labs/agent-skills/tree/main/skills/composition-patterns
-- Supabase: https://github.com/supabase/agent-skills/tree/main/skills/supabase-postgres-best-practices
-- Auglet paid philosophies pack: https://auglet.com/browse/philosophies-architectural-ui-principles-for-ai-software
+- React and Next.js: official Vercel skills plus version-matched docs bundled with Next.js.
+- Supabase: original complete Postgres reference library, plus the Supabase general skill.
+- Stripe: original first-party references for payments, billing, tax, Connect and security.
+- UI: Anthropic frontend design skill and Vercel's official web design audit. Always combine with `docs/brand.md`.
+- Google Calendar: `gws-calendar` operates the Google Workspace CLI and requires installing/authenticating `gws`. **This is not an API implementation guide for the custom scheduling backend**. Read https://developers.google.com/workspace/calendar/api/guides/overview for that code.
+- TypeScript: no verified generic first-party Microsoft/TypeScript agent skill found for this stack. Use strict TypeScript, lint and official docs: https://www.typescriptlang.org/docs/.
+- Tailwind CSS: no verified generic first-party Tailwind Labs agent skill found. Use official Tailwind docs: https://tailwindcss.com/docs/.
+- Vercel Hobby is noncommercial-only. A production commercial deployment requires permitted hosting.
 
-The Auglet pack's full content was not accessible and is not included in this repository. DRY, SOLID and composability rules were authored independently.
+No paid Auglet philosophical-pack files are included. The separately authored `.cursor/rules/` are project rules for DRY, SOLID, composability and quality, **not marketed as official skills**.
+
+Source packs were inspected and installed on 2026-11-18. Vendored copies do not auto-update. Compare and update from each first-party publisher periodically.
