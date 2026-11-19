@@ -30,7 +30,8 @@ This initial scaffold has not been dependency-installed or built in this environ
 - `src/components` shared visual components
 - `src/features` content, commerce and scheduling modules
 - `.cursor/rules` enforced agent development principles
-- `.skills` on-demand expert development playbooks
+- `.cursor/skills` original first-party agent skill packages automatically discovered by Cursor
+- `.skills/README.md` source registry, update guidance and honest coverage gaps
 - `docs` architecture, brand, migration plan and inventory
 
 ## Implementation status

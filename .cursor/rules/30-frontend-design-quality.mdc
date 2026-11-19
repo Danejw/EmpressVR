@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Frontend design quality
 
-Before building a substantial screen, load `.skills/frontend-design/SKILL.md` and the licensed `.skills/anthropic-frontend-design/SKILL.md` when available.
+Before building a substantial screen, load the verified Anthropic `.cursor/skills/frontend-design/SKILL.md` and Vercel `.cursor/skills/web-design-guidelines/SKILL.md` where appropriate. Use `.cursor/skills/vercel-composition-patterns/SKILL.md` when building reusable interfaces.
 
 Then:
 1. Identify user goals, primary action and expected information hierarchy.
