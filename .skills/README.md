@@ -17,12 +17,16 @@ All installed `SKILL.md` packages are **copied from first-party publishers witho
 | `gws-shared` | Google Workspace | Required Google Workspace CLI authentication and command conventions | https://github.com/googleworkspace/cli/tree/main/skills/gws-shared |
 | `gws-calendar-insert` | Google Workspace | Google Calendar event creation with gws CLI | https://github.com/googleworkspace/cli/tree/main/skills/gws-calendar-insert |
 | `gws-calendar-agenda` | Google Workspace | Calendar agenda with gws CLI | https://github.com/googleworkspace/cli/tree/main/skills/gws-calendar-agenda |
+| `security-guidance` | OWASP | Security-first coding based on OWASP ASVS 5.0 | https://github.com/OWASP/secure-agent-playbook/tree/main/plugins/code-security-skills/skills/security-guidance |
+| `playwright-cli` | Microsoft | Browser interaction, screenshots and workflow testing | https://github.com/microsoft/playwright-cli/tree/main/skills/playwright-cli |
 
 ## Coverage and limitations
 
 - React and Next.js: official Vercel skills plus version-matched docs bundled with Next.js.
 - Supabase: original complete Postgres reference library, plus the Supabase general skill.
 - Stripe: original first-party references for payments, billing, tax, Connect and security.
+- Security: OWASP Security Guidance is installed with the 80-section ASVS 5.0 reference library at `security-guidance/data/asvs/`, the original CC BY 4.0 license, and attribution for the CC BY-SA 4.0 ASVS data. Load it for user input, API endpoints, payment security, secrets, personal information, and database access.
+- Browser verification: Microsoft Playwright CLI skill is installed with all 10 official references. The real `playwright-cli` binary and compatible browser need to be installed on a developer machine (`npm install -g @playwright/cli@latest`). Skill installation alone does not set up the browser or automated e2e tests.
 - UI: Anthropic frontend design skill and Vercel's official web design audit. Always combine with `docs/brand.md`.
 - Google Calendar: `gws-calendar` operates the Google Workspace CLI and requires installing/authenticating `gws`. **This is not an API implementation guide for the custom scheduling backend**. Read https://developers.google.com/workspace/calendar/api/guides/overview for that code.
 - TypeScript: no verified generic first-party Microsoft/TypeScript agent skill found for this stack. Use strict TypeScript, lint and official docs: https://www.typescriptlang.org/docs/.

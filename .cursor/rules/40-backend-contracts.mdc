@@ -6,6 +6,8 @@ alwaysApply: false
 
 # Integration contracts
 
+For security-sensitive changes, read the official OWASP `.cursor/skills/security-guidance/SKILL.md` and the appropriate ASVS reference files before coding.
+
 - Never expose Stripe secret keys, Supabase service-role keys or Google OAuth secrets to client code.
 - Validate data at all server boundaries; authorize every read/write. Supabase RLS is required for user-accessible tables.
 - Stripe fulfillment and subscription status come from signature-verified webhooks, not redirect pages. Make webhook processing idempotent.
