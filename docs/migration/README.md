@@ -22,7 +22,7 @@ The initial public URL map contained 49 URLs, including the canonical home page 
 
 The project is still under construction. Most long-form pages use a generic template. Several original embeds and dynamic widgets (e.g. events calendar, donation forms, subscription buttons, cart, forms, scheduling) are retained only as text or links; these are not yet operational new-site functionality.
 
-Image URLs still reference Squarespace's CDN. Download licensed originals to `public/` before independence/cutover, and replace URLs using a structured mapping.
+All 160 known public source media references have been imported into `public/media` with stable IDs, hashes, and future Storage keys. Original Squarespace URLs remain as provenance and fallback. Validate image rights and original quality with the client before cutover.
 
 Store items: three displayed as Sold Out in the capture; the Fox Mask listing is £5. Purchase actions point to the existing store. Existing booking/donation pages include links to the original operational flows.
 
@@ -36,8 +36,12 @@ Legal pages and the public company footer were copied from the live site. They m
 4. Connect Supabase and Google Calendar; test slot concurrency, booking confirmations, rescheduling and cancellation, notifications and access controls.
 5. Integrate Stripe in test mode; verify orders, digital file delivery, donations, recurring billing, signed webhooks, refunds, duplicate events, historical subscriptions and merchant accounts.
 6. Ensure old Squarespace payments/bookings keep working until explicit launch authorization. Never switch DNS before all critical flows pass.
-7. Run CI and browser smoke/regression tests. Ensure commercial production hosting is licensed appropriately. The present branch has no configured public preview deployment.
+7. Run CI and browser smoke/regression tests. Ensure commercial production hosting is licensed appropriately. The feature branch has a successful public GitHub Pages design preview; it is not production hosting.
 
-## Next priority
+## Current readiness and next priority
 
-Create an eligible preview deployment and do a **side-by-side visual audit**. Fix above-the-fold discrepancies and image crops first. Then complete custom pages, real media migration, checkout and scheduling.
+The design preview and desktop/mobile browser smoke checks are working. The November 20 content audit found one blank source page (`/blog`), 138 Markdown image references with empty alt text, and no broken local links. Some empty descriptions may be decorative; review the actual image context and write accurate alt text only where needed. Do not invent source content to hide audit findings.
+
+Search metadata now includes canonical URLs for major routes, a generated sitemap from imported published pages, and a production robots.txt. The public GitHub Pages preview is explicitly `noindex` and disallows crawler access. The blank blog and placeholder page are omitted from the sitemap and individually marked `noindex`.
+
+The user reports the current visuals are acceptable for this iteration. Prioritize resolving source-backed content/accessibility gaps, recording missing client exports, and keeping CI green. Production go-live still requires final client content and legal verification, approval of historical events/media rights, operational commerce and booking integrations, and explicit cutover authorization. Supabase setup is deferred.
