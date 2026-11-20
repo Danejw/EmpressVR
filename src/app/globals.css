@@ -161,3 +161,21 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* Store grid follows the current site's product-first presentation. */
+.store-page { padding-block: 72px 120px; }
+.store-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding-bottom: 30px; border-bottom: 1px solid #daddec; }
+.store-heading h1 { margin: 0; }
+.store-heading > a { text-decoration: underline; text-underline-offset: .25em; }
+.store-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 35px; margin-top: 48px; }
+.store-card { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1fr); gap: 24px; padding-bottom: 35px; border-bottom: 1px solid #e2e3ef; }
+.store-card-image { overflow: hidden; background: #daddec; display: flex; align-items: center; justify-content: center; min-height: 250px; }
+.store-card-image img { display: block; height: 100%; width: 100%; object-fit: cover; }
+.store-card-details { display: flex; align-items: flex-start; flex-direction: column; }
+.store-card-details h2 { font-size: clamp(1.5rem, 2vw, 2.15rem); margin: 0 0 13px; }
+.store-card-details p { font-size: .88rem; line-height: 1.6; margin: 0 0 15px; }
+.store-card-details strong { margin-block: auto 8px; }
+.store-card-details .availability { text-transform: uppercase; letter-spacing: .05em; font-size: .83rem; color: #5b637a; font-weight: 600; }
+.store-detail-link { display: inline-block; text-decoration: underline; text-underline-offset: 4px; margin-top: 12px; font-size: .86rem; }
+@media (max-width: 1100px) { .store-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .store-card { grid-template-columns: 1fr; } .store-card-image { min-height: 240px; } .store-page { padding-block: 45px 80px; } }
