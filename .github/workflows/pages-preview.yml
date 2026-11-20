@@ -1,0 +1,54 @@
+name: GitHub Pages Preview
+
+on:
+  push:
+    branches:
+      - feat/squarespace-faithful-rebuild
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: empressvr-pages-preview
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/feat/squarespace-faithful-rebuild'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install supported npm
+        run: npm install --global npm@11.21.1
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Export static preview
+        run: npm run build
+        env:
+          GITHUB_PAGES_PREVIEW: 'true'
+      - name: Preserve Next.js underscore paths
+        run: touch out/.nojekyll
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload static preview
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    if: github.ref == 'refs/heads/feat/squarespace-faithful-rebuild'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        name: Publish branch preview
+        uses: actions/deploy-pages@v4
