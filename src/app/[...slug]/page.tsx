@@ -15,9 +15,14 @@ export const dynamicParams = false;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const markdown = await readLegacyPage(slug.join("__"));
+  const key = slug.join("__");
+  const markdown = await readLegacyPage(key);
   const title = markdown?.match(/^#{1,3} (.+)$/m)?.[1]?.replaceAll("*", "") || slug.at(-1)?.replaceAll("-", " ") || "EmpressVR";
-  return { title, alternates: { canonical: "/" + slug.join("/") } };
+  return {
+    title,
+    alternates: { canonical: "/" + slug.join("/") },
+    ...(key === "blog" || key === "coming-soon" ? { robots: { index: false, follow: false } } : {}),
+  };
 }
 
 export default async function ArchivedPage({ params }: Props) {
