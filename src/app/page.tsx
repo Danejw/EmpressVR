@@ -1,7 +1,11 @@
 import { LegacyMarkdown } from "@/components/legacy-markdown";
 import { readLegacyPage, sourceImages } from "@/lib/legacy-pages";
 
-function withoutMedia(markdown: string): string {\n  return markdown.replace(/^!\\[[^\\]]*\\]\\([^)]*\\)\\s*$/gm, "").trim();\n}\n\nfunction between(text: string, start: string, end?: string): string {
+function withoutMedia(markdown: string): string {
+  return markdown.split("\n").filter((line) => !line.trimStart().startsWith("![](")).join("\n").trim();
+}
+
+function between(text: string, start: string, end?: string): string {
   const from = text.indexOf(start);
   if (from < 0) return "";
   const to = end ? text.indexOf(end, from + start.length) : -1;
