@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { LegacyMarkdown } from "@/components/legacy-markdown";
 import { MediaImage } from "@/components/media-image";
 import { getTeamMembers, getSiteMediaId } from "@/features/content/repository";
 import { listLegacySlugs,readLegacyPage } from "@/lib/legacy-pages";
+
+export const metadata: Metadata = {
+  title: "Who We Are",
+  description: "Meet the people and co-operative members of EmpressVR.",
+  alternates: { canonical: "/who-we-are" },
+};
 
 export default async function WhoWeAre() {
   const original = await readLegacyPage("who-we-are") || "";
