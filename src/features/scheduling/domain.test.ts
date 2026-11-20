@@ -28,8 +28,6 @@ function fixture(override: Partial<Slot> = {}) {
   };
   return { catalog, store, last: () => last };
 }
-const rejectsCode = (code: string) => (error: unknown) =>
-  error instanceof BookingRuleError && error.code === code;
 
 describe("booking requests and lifecycle", () => {
   it("uses authoritative slot limits and stores a bounded 15-minute hold", async () => {
@@ -53,13 +51,13 @@ describe("booking requests and lifecycle", () => {
     ]) {
       const f = fixture(override);
       await expect(requestBookingHold(request, f.catalog, f.store, clock))
-        .rejects.toSatisfy(rejectsCode("unavailable"));
+        .rejects.toMatchObject({ code: "unavailable" });
     }
     const f = fixture({ offeringId: "other_offering" });
     await expect(requestBookingHold(request, f.catalog, f.store, clock))
-      .rejects.toSatisfy(rejectsCode("mismatched_offering"));
+      .rejects.toMatchObject({ code: "mismatched_offering" });
     await expect(requestBookingHold(request, { getSlot: async () => null }, f.store, clock))
-      .rejects.toSatisfy(rejectsCode("unavailable"));
+      .rejects.toMatchObject({ code: "unavailable" });
   });
 
   it("checks capacities, time zones and canonical timestamps", async () => {
@@ -69,7 +67,7 @@ describe("booking requests and lifecycle", () => {
     ]) {
       const f = fixture(override);
       await expect(requestBookingHold(request, f.catalog, f.store, clock))
-        .rejects.toSatisfy(rejectsCode("invalid_slot"));
+        .rejects.toMatchObject({ code: "invalid_slot" });
     }
   });
 
@@ -80,9 +78,9 @@ describe("booking requests and lifecycle", () => {
         .rejects.toBeInstanceOf(BookingRuleError);
     }
     await expect(requestBookingHold({ ...request, idempotencyKey: "short" }, f.catalog, f.store, clock))
-      .rejects.toSatisfy(rejectsCode("invalid_input"));
+      .rejects.toMatchObject({ code: "invalid_input" });
     await expect(requestBookingHold(request, f.catalog, f.store, clock, 0))
-      .rejects.toSatisfy(rejectsCode("invalid_configuration"));
+      .rejects.toMatchObject({ code: "invalid_configuration" });
   });
 
   it("cannot confirm paid bookings without a matching trusted paid order", async () => {
@@ -146,6 +144,6 @@ describe("booking requests and lifecycle", () => {
     await expect(requestBookingHold(
       { ...request, attendeeRef: "user_3", idempotencyKey: "idempotency_key_003" },
       catalog, store, clock,
-    )).rejects.toSatisfy(rejectsCode("full"));
+    )).rejects.toMatchObject({ code: "full" });
   });
 });
