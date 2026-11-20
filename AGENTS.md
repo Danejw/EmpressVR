@@ -1,5 +1,7 @@
 # EmpressVR agent instructions
 
+For **every UI, content, navigation or visual change**, read `docs/brand.md` before writing code. It contains the brand identity, design taste, approved palette, typography, page patterns, source references and approval boundaries.
+
 Read `docs/architecture.md`, `docs/implementation-plan.md`, `docs/brand.md`, and the relevant **official publisher-authored** `.cursor/skills/*/SKILL.md` before changing a feature. See `.skills/README.md` for skill provenance and coverage. Apply `.cursor/rules/*.mdc` for project-specific decisions.
 
 Principles: simple, modular, composable, reusable, interoperable, verifiable, portable and compoundable.

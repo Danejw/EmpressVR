@@ -32,7 +32,8 @@ This initial scaffold has not been dependency-installed or built in this environ
 - `.cursor/rules` enforced agent development principles
 - `.cursor/skills` original first-party agent skill packages automatically discovered by Cursor
 - `.skills/README.md` source registry, update guidance and honest coverage gaps
-- `docs` architecture, brand, migration plan and inventory
+- `docs/brand.md` source-backed EmpressVR brand identity, design taste, typography, colors and UI review checklist
+- `docs` architecture, migration plan and inventory
 
 ## Implementation status
 

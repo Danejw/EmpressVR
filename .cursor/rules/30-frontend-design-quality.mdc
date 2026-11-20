@@ -10,7 +10,7 @@ Before building a substantial screen, load the verified Anthropic `.cursor/skill
 
 Then:
 1. Identify user goals, primary action and expected information hierarchy.
-2. Read `docs/brand.md` and any supplied visual references. Use EmpressVR's navy, magenta, green and cosmic visual character deliberately.
+2. Treat `docs/brand.md` as the canonical design and voice reference. Honor the exact palette, typography, logo requirements, human-centered tone, source visual references, and explicit split between guide facts and proposed interpretation. Use the source PDF when evaluating specific visuals.
 3. Pick a coherent layout rhythm, typography scale, responsive behavior and interaction states.
 4. Use generous spacing, purposeful contrast, reusable patterns and readable line lengths. Avoid generic dashboard cards, arbitrary gradients, excessive decorations and repetitive "AI-generated" visuals.
 5. Check color contrast, keyboard navigation, mobile clipping, loading and error states.
