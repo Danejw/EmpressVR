@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import robots from "./robots";
 import sitemap from "./sitemap";
-import { getPages } from "@/features/content/repository";
+import { getPages } from "../features/content/repository";
 
 const previousPreview = process.env.GITHUB_PAGES_PREVIEW;
 
