@@ -14,8 +14,10 @@ https://danejw.github.io/EmpressVR/
 
 1. Open https://github.com/Danejw/EmpressVR/settings/pages
 2. Under **Build and deployment → Source**, select **GitHub Actions**.
-3. Open https://github.com/Danejw/EmpressVR/actions/workflows/pages-preview.yml
-4. Inspect the first successful deployment to confirm the published URL.
+3. Open https://github.com/Danejw/EmpressVR/settings/environments and select **empressvr-preview**.
+4. Under **Deployment branches and tags**, select **Selected branches and tags** and add the exact allowed branch **feat/squarespace-faithful-rebuild**. Save the protection rule. This is necessary because GitHub currently rejects non-main Pages deployments that lack an environment branch allowlist.
+5. Open https://github.com/Danejw/EmpressVR/actions/workflows/pages-preview.yml and rerun the last unsuccessful workflow (or push a commit to the feature branch).
+6. Inspect the resulting successful deployment to confirm the published URL.
 
 After this setup, each push to the rebuild branch rebuilds and republishes
 the preview. The preview is public because the repository is public.
