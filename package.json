@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "audit:content": "node scripts/audit-content.mjs"
   },
   "dependencies": {
     "next": "16.4.6",
