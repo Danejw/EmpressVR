@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { siteSections } from "./site-sections";
 
-describe("site sections", () => {
-  it("uses distinct route names", () => {
-    const slugs = siteSections.map((section) => section.slug);
+describe("original Squarespace navigation", () => {
+  it("uses unique page slugs", () => {
+    const slugs = siteSections.map(({ slug }) => slug);
     expect(new Set(slugs).size).toBe(slugs.length);
-    expect(slugs).toContain("events");
-    expect(slugs).toContain("store");
+    expect(slugs).toEqual(["who-we-are", "projects", "community", "education", "store"]);
   });
 });
