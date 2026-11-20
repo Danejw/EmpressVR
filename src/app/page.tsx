@@ -1,38 +1,80 @@
-import Link from "next/link";
+import { LegacyMarkdown } from "@/components/legacy-markdown";
+import { readLegacyPage, sourceImages } from "@/lib/legacy-pages";
 
-const areas = [
-  { title: "Create", description: "Community-powered immersive experiences.", href: "/projects", color: "pink" },
-  { title: "Connect", description: "Belong to a curious, welcoming creative community.", href: "/community", color: "green" },
-  { title: "Explore", description: "Grow your skills in VR and storytelling.", href: "/education", color: "blue" }
-];
+function between(text: string, start: string, end?: string): string {
+  const from = text.indexOf(start);
+  if (from < 0) return "";
+  const to = end ? text.indexOf(end, from + start.length) : -1;
+  return text.slice(from, to >= 0 ? to : undefined).trim();
+}
 
-export default function Home() {
-  return (
-    <>
-      <section className="hero">
-        <div className="page-container hero-inner">
-          <p className="eyebrow">COMMUNITY-POWERED IMMERSIVE STORYTELLING</p>
-          <h1>More voices.<br /><em>More worlds.</em></h1>
-          <p className="hero-copy">We are EmpressVR. A co-operative creating space for artists, technologists and storytellers to shape immersive futures together.</p>
-          <Link className="primary-link" href="/projects">Explore our projects <span aria-hidden="true">↗</span></Link>
-          <div className="hero-glow" aria-hidden="true" />
+export default async function Home() {
+  const source = (await readLegacyPage("home")) || "";
+  const images = sourceImages(source);
+  const fundraiser = between(source, "## The November", "# Welcome to the Metaverse");
+  const hero = between(source, "# Welcome to the Metaverse", "## TechAlchemy 2026:");
+  const techAlchemy = between(source, "## TechAlchemy 2026:", "### Global Community");
+  const community = between(source, "### Global Community", "EmpressVR was named after");
+  const tarot = between(source, "EmpressVR was named after", "### What does the Empress stand for?");
+  const mission = between(source, "### What does the Empress stand for?", "#### Join our mailing list");
+
+  return <>
+    <section className="home-fundraiser" aria-label="Current fundraising campaign">
+      <div className="page-container feature-layout">
+        <div className="feature-image">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={images[0]} alt="EmpressVR Community Growth Flywheel" />
         </div>
-      </section>
-      <section className="page-container areas" aria-label="Explore EmpressVR">
-        {areas.map((area) => (
-          <Link className={`area-card ${area.color}`} key={area.title} href={area.href}>
-            <span className="card-eyebrow">DISCOVER</span>
-            <h2>{area.title}</h2>
-            <p>{area.description}</p>
-            <span className="card-arrow" aria-hidden="true">↗</span>
-          </Link>
-        ))}
-      </section>
-      <section className="page-container intro">
-        <span className="section-kicker">OUR PURPOSE</span>
-        <h2>Amplifying diverse voices in immersive storytelling.</h2>
-        <p>We believe powerful creative experiences grow through community, care, collaboration and experimentation.</p>
-      </section>
-    </>
-  );
+        <LegacyMarkdown markdown={fundraiser.replace(/^!\[[^\]]*\]\([^)]*\)\s*/m, "")} className="feature-copy" />
+      </div>
+    </section>
+
+    <section className="home-hero">
+      <div className="hero-layout">
+        <div className="hero-message">
+          <LegacyMarkdown markdown={hero} />
+        </div>
+        <div className="hero-art">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={images[1]} alt="Colorful EmpressVR metaverse character" />
+        </div>
+      </div>
+    </section>
+
+    <section className="home-tech">
+      <div className="page-container feature-layout">
+        <LegacyMarkdown markdown={techAlchemy} className="feature-copy" />
+        <div className="feature-image poster-frame">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={images[2]} alt="TechAlchemy 2026: A Bristol Immersive Showcase poster" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <section className="home-community">
+      <div className="page-container community-layout">
+        <LegacyMarkdown markdown={community.replace(/^!\[[^\]]*\]\([^)]*\)\s*/gm, "")} />
+        <div className="community-art">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={images[3]} alt="EmpressVR immersive creative community" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <section className="home-tarot">
+      <div className="page-container tarot-layout">
+        <div className="tarot-art">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={images[4]} alt="The Empress tarot card" loading="lazy" />
+        </div>
+        <LegacyMarkdown markdown={tarot} />
+      </div>
+    </section>
+
+    <section className="home-mission">
+      <div className="page-container">
+        <LegacyMarkdown markdown={mission} />
+      </div>
+    </section>
+  </>;
 }
