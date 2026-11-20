@@ -2,7 +2,7 @@
 
 Next.js + TypeScript website rebuild for Empress Immersive LTD.
 
-The active development work is on `feat/squarespace-faithful-rebuild`. It recreates the public Squarespace website using archived source copy and genuine site images. Do not merge until visual, content, commerce and booking cutover checks are complete.
+The active development work is on `feat/squarespace-faithful-rebuild`. It recreates the public Squarespace website using archived source copy and genuine site images. The feature branch can be reviewed on GitHub Pages; keep the live Squarespace site and checkout unchanged. Do not merge this branch until the remaining content, commerce and booking cutover checks are complete.
 
 ## Get started
 
@@ -22,9 +22,12 @@ npm run lint
 npm run typecheck
 npm run test
 npm run build
+npm run content:validate
+npm run audit:content
+npm run test:e2e
 ```
 
-This initial scaffold has not been dependency-installed or built in this environment. After running `npm install`, commit `package-lock.json` and use `npm ci` in CI for reproducible installs.
+GitHub Actions runs the checks above, including desktop/mobile Playwright tests. A committed `package-lock.json` and `npm ci` are still needed for fully reproducible dependency installs.
 
 ## Project structure
 
@@ -39,6 +42,6 @@ This initial scaffold has not been dependency-installed or built in this environ
 
 ## Implementation status
 
-On the feature branch, the home, projects, team, store, header and footer are source-backed reproductions. Other public pages render through reusable content templates. **No production Stripe, Supabase, or Google Calendar integration is implemented yet.** Source text snapshots have been imported from public Squarespace pages, but they have not been fully proofread against the live CMS export. The existing site should remain live until content, bookings, and payments are independently verified.
+On the feature branch, the home, projects, team, store, header and footer are source-backed reproductions. Other public pages render through reusable content templates. The local catalog includes 48 source snapshots, 7 projects, 9 team members, 4 products, 7 archived events and 160 imported public media assets. A future Supabase schema and export are prepared but not applied. The public preview is excluded from search indexing; live commerce and booking flows still use Squarespace. **No production Stripe, Supabase, or Google Calendar integration is implemented yet.** The source snapshots still require client verification, including the empty blog and image descriptions. Keep the existing site live until content, bookings and payments are independently verified.
 
 Vercel Hobby is noncommercial-only. Use it only where eligible for development and previews. Select permitted commercial hosting before launching the business website.
