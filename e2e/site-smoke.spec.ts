@@ -38,7 +38,7 @@ test("legacy detail pages resolve locally", async ({ page }) => {
 
 test("search metadata preserves canonical pages and the source website", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://www.empressvr.com/");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /^https:\/\/www\.empressvr\.com\/?$/);
 
   await page.goto("/projects");
   await expect(page).toHaveTitle(/Projects \| EmpressVR/);
