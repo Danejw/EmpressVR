@@ -14,7 +14,9 @@ for(const route of ["/","/projects","/who-we-are","/store","/education","/roboti
       expect(url,"a nonlocal image was left on "+route).toMatch(/^\/media\/[a-f0-9]{64}\.(webp|gif)$/);
     }
     await images.first().scrollIntoViewIfNeeded();
-    await expect.poll(async()=>images.first().evaluate((img)=>img.complete&&img.naturalWidth>0))
-      .toBe(true);
+    await expect.poll(async()=>images.first().evaluate((img)=>{
+      const image=img as HTMLImageElement;
+      return image.complete&&image.naturalWidth>0;
+    })).toBe(true);
   });
 }
