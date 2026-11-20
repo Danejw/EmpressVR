@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { MediaImage } from "@/components/media-image";
 import { getProjects } from "@/features/content/repository";
 import { listLegacySlugs } from "@/lib/legacy-pages";
+
+export const metadata: Metadata = {
+  title: "Projects",
+  description: "Explore EmpressVR immersive projects and collaborations.",
+  alternates: { canonical: "/projects" },
+};
 
 export default async function Projects() {
   const imported = new Set(await listLegacySlugs());
