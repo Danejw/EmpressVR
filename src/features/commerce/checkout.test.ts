@@ -19,8 +19,6 @@ const catalog: CheckoutCatalog = {
     joiningFeeMinor: 100, quarterlyAmountMinor: 1300,
   }),
 };
-const rejectsCode = (code: string) => (error: unknown) =>
-  error instanceof CheckoutRuleError && error.code === code;
 
 describe("checkout quotes from trusted catalog records", () => {
   it("derives the existing £5 Fox Mask price from the catalog", async () => {
@@ -35,11 +33,11 @@ describe("checkout quotes from trusted catalog records", () => {
   it("rejects sold-out and over-limit purchases", async () => {
     const unavailable = { ...catalog, getProduct: async () => ({ ...product, available: false }) };
     await expect(quoteCheckout({ kind: "product", productId: "fox_mask", quantity: 1 }, unavailable))
-      .rejects.toSatisfy(rejectsCode("unavailable"));
+      .rejects.toMatchObject({ code: "unavailable" });
     await expect(quoteCheckout({ kind: "product", productId: "fox_mask", quantity: 4 }, catalog))
-      .rejects.toSatisfy(rejectsCode("unavailable"));
+      .rejects.toMatchObject({ code: "unavailable" });
     await expect(quoteCheckout({ kind: "product", productId: "fox_mask", quantity: -1 }, catalog))
-      .rejects.toSatisfy(rejectsCode("invalid_request"));
+      .rejects.toMatchObject({ code: "invalid_request" });
   });
 
   it("only permits authorized contribution amounts and cadence", async () => {
@@ -60,7 +58,7 @@ describe("checkout quotes from trusted catalog records", () => {
     }
     await expect(quoteCheckout({
       kind: "donation", campaignId: "fun_raiser", amountMinor: 500, cadence: "weekly",
-    }, catalog)).rejects.toSatisfy(rejectsCode("invalid_request"));
+    }, catalog)).rejects.toMatchObject({ code: "invalid_request" });
   });
 
   it("separates one-time joining fee from the ongoing quarterly fee", async () => {
@@ -88,10 +86,10 @@ describe("checkout quotes from trusted catalog records", () => {
   it("refuses unknown offers, invalid prices and unauthorized checkout modes", async () => {
     const unknown = { ...catalog, getProduct: async () => null };
     await expect(quoteCheckout({ kind: "product", productId: "fox_mask", quantity: 1 }, unknown))
-      .rejects.toSatisfy(rejectsCode("unavailable"));
+      .rejects.toMatchObject({ code: "unavailable" });
     const invalid = { ...catalog, getProduct: async () => ({ ...product, unitAmountMinor: 0 }) };
     await expect(quoteCheckout({ kind: "product", productId: "fox_mask", quantity: 1 }, invalid))
-      .rejects.toSatisfy(rejectsCode("invalid_amount"));
+      .rejects.toMatchObject({ code: "invalid_amount" });
     const blocked = {
       ...catalog, getMembershipPlan: async () => ({
         id: "user_member", currency: "GBP", acceptingApplications: false,
@@ -99,6 +97,6 @@ describe("checkout quotes from trusted catalog records", () => {
       }),
     };
     await expect(quoteCheckout({ kind: "membership", membershipPlanId: "user_member" }, blocked))
-      .rejects.toSatisfy(rejectsCode("unavailable"));
+      .rejects.toMatchObject({ code: "unavailable" });
   });
 });
