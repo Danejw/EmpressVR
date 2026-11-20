@@ -32,6 +32,10 @@ jobs:
         run: npm run build
         env:
           GITHUB_PAGES_PREVIEW: 'true'
+      - name: Verify preview cannot be indexed
+        run: |
+          grep -q "noindex" out/index.html
+          grep -q "Disallow: /" out/robots.txt
       - name: Preserve Next.js underscore paths
         run: touch out/.nojekyll
       - name: Configure GitHub Pages
