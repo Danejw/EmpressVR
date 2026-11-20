@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { MediaImage } from "@/components/media-image";
 import { getProducts } from "@/features/content/repository";
+
+export const metadata: Metadata = {
+  title: "Store",
+  description: "Browse EmpressVR creative products and classes.",
+  alternates: { canonical: "/store" },
+};
 
 export default function Store() {
   return <section className="store-page">
