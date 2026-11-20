@@ -1,7 +1,7 @@
 import { LegacyMarkdown } from "@/components/legacy-markdown";
 import { readLegacyPage, sourceImages } from "@/lib/legacy-pages";
 
-function between(text: string, start: string, end?: string): string {
+function withoutMedia(markdown: string): string {\n  return markdown.replace(/^!\\[[^\\]]*\\]\\([^)]*\\)\\s*$/gm, "").trim();\n}\n\nfunction between(text: string, start: string, end?: string): string {
   const from = text.indexOf(start);
   if (from < 0) return "";
   const to = end ? text.indexOf(end, from + start.length) : -1;
@@ -25,14 +25,14 @@ export default async function Home() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={images[0]} alt="EmpressVR Community Growth Flywheel" />
         </div>
-        <LegacyMarkdown markdown={fundraiser.replace(/^!\[[^\]]*\]\([^)]*\)\s*/m, "")} className="feature-copy" />
+        <LegacyMarkdown markdown={withoutMedia(fundraiser)} className="feature-copy" />
       </div>
     </section>
 
     <section className="home-hero">
       <div className="hero-layout">
         <div className="hero-message">
-          <LegacyMarkdown markdown={hero} />
+          <LegacyMarkdown markdown={withoutMedia(hero)} />
         </div>
         <div className="hero-art">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -43,7 +43,7 @@ export default async function Home() {
 
     <section className="home-tech">
       <div className="page-container feature-layout">
-        <LegacyMarkdown markdown={techAlchemy} className="feature-copy" />
+        <LegacyMarkdown markdown={withoutMedia(techAlchemy)} className="feature-copy" />
         <div className="feature-image poster-frame">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={images[2]} alt="TechAlchemy 2026: A Bristol Immersive Showcase poster" loading="lazy" />
@@ -53,7 +53,7 @@ export default async function Home() {
 
     <section className="home-community">
       <div className="page-container community-layout">
-        <LegacyMarkdown markdown={community.replace(/^!\[[^\]]*\]\([^)]*\)\s*/gm, "")} />
+        <LegacyMarkdown markdown={withoutMedia(community)} />
         <div className="community-art">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={images[3]} alt="EmpressVR immersive creative community" loading="lazy" />

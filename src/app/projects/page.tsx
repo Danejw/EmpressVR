@@ -15,7 +15,7 @@ export default async function Projects() {
   const original = await readLegacyPage("projects") || "";
   const images = sourceImages(original);
   const imported = new Set(await listLegacySlugs());
-  return <main className="projects-page">
+  return <section className="projects-page" aria-label="EmpressVR projects">
     <div className="project-grid">
       {entries.map((entry, index) => {
         const href = imported.has(entry.slug) ? "/" + entry.slug : "https://www.empressvr.com/" + entry.slug;
@@ -33,5 +33,5 @@ export default async function Projects() {
         </article>;
       })}
     </div>
-  </main>;
+  </section>;
 }
