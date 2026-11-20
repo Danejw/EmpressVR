@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { LegacyMarkdown } from "@/components/legacy-markdown";
 import { MediaImage } from "@/components/media-image";
 import { readLegacyPage } from "@/lib/legacy-pages";
 import { getSiteMediaId } from "@/features/content/repository";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 function withoutMedia(markdown: string): string {
   return markdown.split("\n").filter((line) => !line.trimStart().startsWith("![](")).join("\n").trim();
