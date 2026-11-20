@@ -1,4 +1,7 @@
 import type { MetadataRoute } from "next";
+
+// Required for metadata route export in the static GitHub Pages preview.
+export const dynamic = "force-static";
 import { getPages } from "../features/content/repository";
 
 // Unusable or placeholder snapshots should not enter the search index.
