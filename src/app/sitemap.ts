@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getPages } from "@/features/content/repository";
+import { getPages } from "../features/content/repository";
 
 // Unusable or placeholder snapshots should not enter the search index.
 const excludedPaths = new Set(["/blog", "/coming-soon"]);
