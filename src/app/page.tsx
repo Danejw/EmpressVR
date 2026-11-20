@@ -1,5 +1,7 @@
 import { LegacyMarkdown } from "@/components/legacy-markdown";
-import { readLegacyPage, sourceImages } from "@/lib/legacy-pages";
+import { MediaImage } from "@/components/media-image";
+import { readLegacyPage } from "@/lib/legacy-pages";
+import { getSiteMediaId } from "@/features/content/repository";
 
 function withoutMedia(markdown: string): string {
   return markdown.split("\n").filter((line) => !line.trimStart().startsWith("![](")).join("\n").trim();
@@ -14,7 +16,6 @@ function between(text: string, start: string, end?: string): string {
 
 export default async function Home() {
   const source = (await readLegacyPage("home")) || "";
-  const images = sourceImages(source);
   const fundraiser = between(source, "## The November", "# Welcome to the Metaverse");
   const hero = between(source, "# Welcome to the Metaverse", "## TechAlchemy 2026:");
   const techAlchemy = between(source, "## TechAlchemy 2026:", "### Global Community");
@@ -26,8 +27,7 @@ export default async function Home() {
     <section className="home-fundraiser" aria-label="Current fundraising campaign">
       <div className="page-container feature-layout">
         <div className="feature-image">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={images[0]} alt="EmpressVR Community Growth Flywheel" />
+          <MediaImage assetId={getSiteMediaId("home.fundraiser")} alt="EmpressVR Community Growth Flywheel" loading="eager" />
         </div>
         <LegacyMarkdown markdown={withoutMedia(fundraiser)} className="feature-copy" />
       </div>
@@ -35,12 +35,9 @@ export default async function Home() {
 
     <section className="home-hero">
       <div className="hero-layout">
-        <div className="hero-message">
-          <LegacyMarkdown markdown={withoutMedia(hero)} />
-        </div>
+        <div className="hero-message"><LegacyMarkdown markdown={withoutMedia(hero)} /></div>
         <div className="hero-art">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={images[1]} alt="Colorful EmpressVR metaverse character" />
+          <MediaImage assetId={getSiteMediaId("home.hero")} alt="Colorful EmpressVR metaverse character" loading="eager" />
         </div>
       </div>
     </section>
@@ -49,8 +46,7 @@ export default async function Home() {
       <div className="page-container feature-layout">
         <LegacyMarkdown markdown={withoutMedia(techAlchemy)} className="feature-copy" />
         <div className="feature-image poster-frame">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={images[2]} alt="TechAlchemy 2026: A Bristol Immersive Showcase poster" loading="lazy" />
+          <MediaImage assetId={getSiteMediaId("home.techalchemy")} alt="TechAlchemy 2026: A Bristol Immersive Showcase poster" />
         </div>
       </div>
     </section>
@@ -59,8 +55,7 @@ export default async function Home() {
       <div className="page-container community-layout">
         <LegacyMarkdown markdown={withoutMedia(community)} />
         <div className="community-art">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={images[3]} alt="EmpressVR immersive creative community" loading="lazy" />
+          <MediaImage assetId={getSiteMediaId("home.community")} alt="EmpressVR immersive creative community" />
         </div>
       </div>
     </section>
@@ -68,17 +63,14 @@ export default async function Home() {
     <section className="home-tarot">
       <div className="page-container tarot-layout">
         <div className="tarot-art">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={images[4]} alt="The Empress tarot card" loading="lazy" />
+          <MediaImage assetId={getSiteMediaId("home.tarot")} alt="The Empress tarot card" />
         </div>
         <LegacyMarkdown markdown={tarot} />
       </div>
     </section>
 
     <section className="home-mission">
-      <div className="page-container">
-        <LegacyMarkdown markdown={mission} />
-      </div>
+      <div className="page-container"><LegacyMarkdown markdown={mission} /></div>
     </section>
   </>;
 }

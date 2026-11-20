@@ -1,13 +1,13 @@
 import Link from "next/link";
-
-const whiteLogo = "https://images.squarespace-cdn.com/content/v1/6675b24a42baae7c4c24730e/767e5584-1fca-40dd-9178-654b1a689051/EmpressVR_White_Logo.png";
+import {MediaImage} from "@/components/media-image";
+import {getSiteMediaId} from "@/features/content/repository";
 
 export function SiteFooter() {
   return <footer className="site-footer">
     <div className="page-container footer-inner">
       <div className="footer-identity">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={whiteLogo} alt="EmpressVR" width={224} height={74} className="footer-logo" loading="lazy" />
+        <MediaImage assetId={getSiteMediaId("site.logo.light")} alt="EmpressVR" width={224} height={74}
+          className="footer-logo" />
         <p>Empress Immersive LTD<br />Registered in England<br />Company Number 16325264</p>
       </div>
       <div className="footer-links">

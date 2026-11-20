@@ -3,6 +3,7 @@ import Link from "next/link";
 import ReactMarkdown, { type Components } from "react-markdown";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { MediaImage } from "@/components/media-image";
 
 const contentDirectory = join(process.cwd(), "src", "content", "legacy");
 
@@ -30,9 +31,7 @@ const components: Components = {
   },
   img: ({ src, alt }) => {
     if (!src || typeof src !== "string" || !src.startsWith("https://")) return null;
-    // Temporary source images: replace with client-owned local assets in the migration phase.
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img className="source-image" src={src} alt={alt || ""} loading="lazy" />;
+    return <MediaImage sourceUrl={src} className="source-image" alt={alt || undefined} loading="lazy" />;
   },
 };
 
