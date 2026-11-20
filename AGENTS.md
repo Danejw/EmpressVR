@@ -16,3 +16,11 @@ Principles: simple, modular, composable, reusable, interoperable, verifiable, po
 - No real payments, migrations, or credentials without explicitly approved scope and proper test mode.
 - Never discard old website content or disable the existing checkout before verified cutover.
 - Do not assert tests passed unless they were actually executed.
+
+## Squarespace-faithful rebuild branch
+
+The client's approved migration direction is to preserve the live Squarespace site's layout, imagery, words and URL paths as closely as practical. Source snapshots are stored under `src/content/legacy/*.md`, where `__` encodes a nested URL slash. When editing copy, compare the live page; keep wording verbatim unless the user specifically requests a change. Do not replace real artwork with synthetic or stock imagery.
+
+Maintain functioning checkout and bookings on the *existing* Squarespace/Acuity site until the corresponding Stripe/Calendar replacement is verified. Do not impersonate operational payment or scheduling capabilities with static buttons.
+
+This branch uses CDN-hosted source images temporarily. Before commercial launch, export approved original media and host them independently, preserving licenses, captions and credits. The source snapshots may contain extraction artifacts or stale event embeds and require manual comparison before go-live. See `docs/migration/README.md`.

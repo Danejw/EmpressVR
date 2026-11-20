@@ -2,6 +2,8 @@
 
 Next.js + TypeScript website rebuild for Empress Immersive LTD.
 
+The active development work is on `feat/squarespace-faithful-rebuild`. It recreates the public Squarespace website using archived source copy and genuine site images. Do not merge until visual, content, commerce and booking cutover checks are complete.
+
 ## Get started
 
 Requires Node.js 20.9+ (Node 22 recommended).
@@ -37,6 +39,6 @@ This initial scaffold has not been dependency-installed or built in this environ
 
 ## Implementation status
 
-The branded home and navigation are starter content. **No production Stripe, Supabase, or Google Calendar integration is implemented yet.** No Squarespace content has been migrated. The existing site should remain live until content, bookings, and payments are independently verified.
+On the feature branch, the home, projects, team, store, header and footer are source-backed reproductions. Other public pages render through reusable content templates. **No production Stripe, Supabase, or Google Calendar integration is implemented yet.** Source text snapshots have been imported from public Squarespace pages, but they have not been fully proofread against the live CMS export. The existing site should remain live until content, bookings, and payments are independently verified.
 
 Vercel Hobby is noncommercial-only. Use it only where eligible for development and previews. Select permitted commercial hosting before launching the business website.

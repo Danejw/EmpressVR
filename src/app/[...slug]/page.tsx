@@ -28,6 +28,7 @@ export default async function ArchivedPage({ params }: Props) {
 
   return <article className="legacy-page">
     <div className="page-container">
+      {key === "scheduling" || key === "fun-raiser" ? <p className="legacy-checkout-note"><a href={sourcePageUrl(key)} rel="noopener noreferrer">Continue booking or donating on the existing EmpressVR site ↗</a></p> : null}
       <LegacyMarkdown markdown={markdown} />
       {key === "scheduling" || key === "fun-raiser" || key.startsWith("store__p__") ? (
         <p className="legacy-checkout-note">Booking and payment processing are still handled on the existing website during migration.{" "}

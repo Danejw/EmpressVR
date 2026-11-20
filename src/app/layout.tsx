@@ -5,7 +5,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "EmpressVR | Immersive Storytelling", template: "%s | EmpressVR" },
-  description: "Amplifying diverse voices through immersive storytelling and community-led creativity."
+  description: "Amplifying Diverse Voices in Immersive Storytelling.",
+  icons: { icon: "https://images.squarespace-cdn.com/content/v1/6675b24a42baae7c4c24730e/6de4e97a-b4f9-46c1-9acb-aec2f80d99f2/favicon.ico?format=100w" }
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
