@@ -35,3 +35,22 @@ test("legacy detail pages resolve locally", async ({ page }) => {
   await page.goto("/privacypolicy");
   await expect(page.locator(".legacy-copy")).not.toBeEmpty();
 });
+
+test("search metadata preserves canonical pages and the source website", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://www.empressvr.com/");
+
+  await page.goto("/projects");
+  await expect(page).toHaveTitle(/Projects \| EmpressVR/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://www.empressvr.com/projects");
+
+  const robots = await page.request.get("/robots.txt");
+  expect(robots.ok()).toBe(true);
+  expect(await robots.text()).toContain("Sitemap: https://www.empressvr.com/sitemap.xml");
+
+  const sitemap = await page.request.get("/sitemap.xml");
+  expect(sitemap.ok()).toBe(true);
+  const xml = await sitemap.text();
+  expect(xml).toContain("https://www.empressvr.com/projects");
+  expect(xml).not.toContain("https://www.empressvr.com/blog");
+});
