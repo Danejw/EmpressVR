@@ -9,7 +9,8 @@ type Props = Omit<ImgHTMLAttributes<HTMLImageElement>,"src"> & {
 /** One render path for local media, then Supabase Storage, retaining the CDN fallback. */
 export function MediaImage({assetId,sourceUrl,alt,loading,className,...props}:Props){
   const asset = getMediaAsset(assetId) || (sourceUrl ? getMediaBySourceUrl(sourceUrl) : undefined);
-  const basePath = process.env.GITHUB_PAGES_PREVIEW === "true" ? "/EmpressVR" : "";
+  const basePath = process.env.GITHUB_PAGES_PREVIEW === "true"
+    ? (process.env.GITHUB_PAGES_BASE_PATH || "/EmpressVR") : "";
   const local = asset?.status === "imported" && asset.storage_key;
   const src = local ? basePath + "/" + asset.storage_key : asset?.source_url || sourceUrl;
   if (!src || !src.startsWith("/") && !src.startsWith("https://")) return null;

@@ -449,3 +449,30 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
   .membership-form-panel, .membership-summary { padding: 22px; }
   .membership-legacy-handoff { padding: 22px; }
 }
+
+/* Supabase integration-only, read-only branch health preview */
+.supabase-preview-page { padding: 64px 0 110px; min-height: 70vh; background: #faf9fd; }
+.supabase-preview-page h1 { margin: 8px 0 18px; }
+.supabase-preview-lead { max-width: 730px; color: #4a5069; line-height: 1.65; }
+.supabase-preview-links { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 24px 0 50px; }
+.supabase-preview-links .pill-button, .supabase-preview-links .outline-button { margin: 0; }
+.supabase-checker { background: white; border: 1px solid #e5e0ed; padding: clamp(22px, 3vw, 38px); }
+.supabase-checker-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.supabase-checker-header h2 { margin: 0 0 10px; font-size: 1.9rem; }
+.supabase-checker-header p { color: #565c72; font-size: 14px; line-height: 1.5; max-width: 660px; }
+.supabase-checker-header button { background: var(--magenta); border: 0; border-radius: 999px; padding: 12px 20px; font: inherit; font-size: 14px; cursor: pointer; }
+.supabase-checker-header button:disabled { opacity: .55; cursor: default; }
+.supabase-checker-summary { margin: 18px 0; font-weight: 700; color: #71276b; }
+.supabase-checker-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.supabase-checker-result { background: #f9f7fb; border: 1px solid #ece8f0; padding: 18px; display: flex; justify-content: space-between; gap: 16px; }
+.supabase-checker-result > div:first-child { display: flex; flex-direction: column; gap: 6px; }
+.supabase-checker-result strong { font-size: 14px; }
+.supabase-checker-result small { display: block; color: #5c6177; font-size: 12px; }
+.supabase-checker-number { font-weight: 700; text-align: right; font-size: 20px; }
+.supabase-checker-number small { font-size: 11px; font-weight: 400; max-width: 150px; }
+.supabase-checker-footnote, .supabase-preview-caveat { line-height: 1.65; color: #5b6077; font-size: 13px; }
+.supabase-preview-caveat { max-width: 830px; margin-top: 24px; }
+@media (max-width: 640px) {
+  .supabase-preview-page { padding: 38px 0 70px; }
+  .supabase-checker-results { grid-template-columns: 1fr; }
+}

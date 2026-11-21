@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
         // Build a static snapshot only for previews; future Stripe/Calendar
         // handlers will require server-capable production hosting.
         output: "export" as const,
-        basePath: "/EmpressVR",
+        basePath: process.env.GITHUB_PAGES_BASE_PATH || "/EmpressVR",
         trailingSlash: true,
         images: { unoptimized: true },
       }

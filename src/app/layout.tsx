@@ -9,7 +9,9 @@ const isPagesPreview = process.env.GITHUB_PAGES_PREVIEW === "true";
 const description = "Amplifying Diverse Voices in Immersive Storytelling.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(isPagesPreview ? "https://danejw.github.io/EmpressVR" : "https://www.empressvr.com"),
+  metadataBase: new URL(isPagesPreview
+    ? "https://danejw.github.io" + (process.env.GITHUB_PAGES_BASE_PATH || "/EmpressVR")
+    : "https://www.empressvr.com"),
   title: { default: "EmpressVR | Immersive Storytelling", template: "%s | EmpressVR" },
   description,
   robots: isPagesPreview ? { index: false, follow: false } : { index: true, follow: true },
