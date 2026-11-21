@@ -104,19 +104,20 @@ export async function getPublicMediaAsset(id: string | null | undefined): Promis
   if (!id) return undefined;
   const rows = await getPublicMediaAssets();
   // A missing published row must not hide a verified bundled image.
-  return rows.find((asset) => asset.id === id) ?? getMediaAsset(id);
+  return rows.find((asset) => asset.id === id) ?? (publicReadConfig().url ? undefined : getMediaAsset(id));
 }
 
 export async function getPublicMediaBySourceUrl(url: string): Promise<MediaAsset | undefined> {
   const source = url.split("?")[0].split("#")[0];
   const rows = await getPublicMediaAssets();
   return rows.find((asset) => asset.source_key === source || asset.source_url === source)
-    ?? getMediaBySourceUrl(url);
+    ?? (publicReadConfig().url ? undefined : getMediaBySourceUrl(url));
 }
 
 export async function getPublicSiteMediaId(slot: string): Promise<string | undefined> {
   const rows = await getPublicSiteMedia();
-  return rows.find((row) => row.slot === slot)?.media_asset_id ?? getSiteMediaId(slot);
+  return rows.find((row) => row.slot === slot)?.media_asset_id
+    ?? (publicReadConfig().url ? undefined : getSiteMediaId(slot));
 }
 
 export function getPublishedEvents(): Promise<EventRecord[]> {
@@ -216,7 +217,7 @@ async function getPublicGallery(
       });
       if (response.ok) {
         const remote: unknown = await response.json();
-        if (Array.isArray(remote) && remote.length)
+        if (Array.isArray(remote))
           return [...new Set((remote as GalleryRow[]).map(row => row.media_asset_id))];
       }
     } catch { /* verified bundled images remain available */ }

@@ -15,7 +15,7 @@ export default async function Community() {
   if (raw === null) notFound();
   const markdown = cleanLegacyContent("community", raw);
   const start = markdown.indexOf("### Community Calendar!");
-  const end = start >= 0 ? markdown.indexOf("# Building a Global Community", start) : -1;
+  const end = start >= 0 ? markdown.indexOf("## Building a Global Community", start) : -1;
   const month = monthKey();
   const firstMonth = shiftMonth(month, -3);
   const lastMonth = shiftMonth(month, 12);
@@ -28,7 +28,7 @@ export default async function Community() {
     <PageSections sections={sectionsFromMarkdown(start >= 0 && end > start ? markdown.slice(0,start) : markdown)}/>
     {start >= 0 && end > start ? <>
       <section className="community-calendar-section" aria-label="Community Calendar">
-        <h3>Community Calendar!</h3>
+        <h2>Community Calendar!</h2>
         <CommunityCalendar events={feed.events} status={feed.status} initialMonth={month}
           firstMonth={firstMonth} lastMonth={lastMonth}/>
       </section>

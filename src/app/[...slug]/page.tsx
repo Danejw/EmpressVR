@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { PageSections } from "@/components/page-sections";
-import { getPublishedProjects, getPublicTeamMembers, fetchPublishedPageSections } from "@/features/content/supabase-public";
-import { cleanLegacyContent, sectionsFromMarkdown } from "@/features/content/page-sections";
+import { GalleryLightbox } from "@/components/gallery-lightbox";
+import { getPublishedProjects, getPublishedPages, getPublicTeamMembers, getPublicMediaAssets, getPublicPageGallery, fetchPublishedPageSections, publicReadConfig } from "@/features/content/supabase-public";
+import { mediaSource } from "@/features/content/media-url";
+import { cleanLegacyContent, sectionsFromMarkdown, withoutLegacyFullsizeLinks } from "@/features/content/page-sections";
 import { readLegacyPage, sourcePageUrl } from "@/lib/legacy-pages";
 
 type Props = { params: Promise<{ slug: string[] }> };
@@ -44,6 +46,25 @@ export default async function ContentRoute({ params }: Props) {
   const archivedCopy = membershipStart >= 0 ? copy.slice(0, membershipStart) : copy;
   const sections = !name && membershipStart < 0
     ? await fetchPublishedPageSections(key) : null;
+  // The imported full-size links still point to Squarespace. Use the live
+  // database gallery and its public Storage objects instead.
+  const galleryImages = key === "the-self-we-find" ? await (async () => {
+    const record = (await getPublishedPages()).find(page => page.source_key === key);
+    if (!record) return [];
+    const [imageIds, assets] = await Promise.all([
+      getPublicPageGallery(record.id),
+      getPublicMediaAssets(),
+    ]);
+    const byId = new Map(assets.map(asset => [asset.id, asset]));
+    const config = publicReadConfig();
+    return imageIds.flatMap((id, index) => {
+      const asset = byId.get(id);
+      const src = mediaSource(asset, { supabaseUrl: config.url, localBasePath: "" });
+      return src ? [{ src, alt: asset?.alt_text?.trim() || `The Self We Find scene ${index + 1}` }] : [];
+    });
+  })() : [];
+  const pageCopy = key === "the-self-we-find"
+    ? withoutLegacyFullsizeLinks(archivedCopy) : archivedCopy;
 
   return <article className="legacy-page"><div className="page-container">
     {name ? <header className="detail-heading">
@@ -57,7 +78,8 @@ export default async function ContentRoute({ params }: Props) {
       <Link className="pill-button" href="/book">Explore the new booking calendar</Link>
       <a href={sourcePageUrl(key)} rel="noopener noreferrer">Book on the current EmpressVR website</a>
     </div> : null}
-    <PageSections sections={sections ?? sectionsFromMarkdown(archivedCopy)}/>
+    <PageSections sections={sections ?? sectionsFromMarkdown(pageCopy)}/>
+    {galleryImages.length ? <GalleryLightbox images={galleryImages}/> : null}
     {membershipStart >= 0 ? <section className="membership-legacy-handoff">
       <h2>{key === "join-the-coop-na" ? "Applications are currently closed" : "Explore membership applications"}</h2>
       <p>The new membership form is a preview and does not submit an application.</p>

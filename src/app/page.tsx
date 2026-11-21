@@ -21,13 +21,15 @@ export default async function Home() {
   const source = (await readLegacyPage("home")) || "";
   const media = await Promise.all(["home.fundraiser","home.hero","home.techalchemy","home.community","home.tarot"].map(getPublicSiteMediaId));
   const fundraiser = between(source, "## The November", "# Welcome to the Metaverse");
-  const hero = between(source, "# Welcome to the Metaverse", "## TechAlchemy 2026:");
+  const hero = between(source, "# Welcome to the Metaverse", "## TechAlchemy 2026:")
+    .replace(/^# Welcome to the Metaverse/m, "## Welcome to the Metaverse");
   const techAlchemy = between(source, "## TechAlchemy 2026:", "### Global Community");
   const community = between(source, "### Global Community", "EmpressVR was named after");
   const tarot = between(source, "EmpressVR was named after", "### What does the Empress stand for?");
   const mission = between(source, "### What does the Empress stand for?", "#### Join our mailing list");
 
   return <>
+    <h1 className="visually-hidden">EmpressVR: Welcome to the Metaverse</h1>
     <section className="home-fundraiser" aria-label="Current fundraising campaign">
       <div className="page-container feature-layout">
         <div className="feature-image">
