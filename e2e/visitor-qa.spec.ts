@@ -55,3 +55,16 @@ test("Eirian profile is reachable from Who We Are", async ({page}) => {
   await expect(card.getByRole("link",{name:"Learn More"}))
     .toHaveAttribute("href","https://www.linkedin.com/in/eiriansoar/");
 });
+
+test("tablet and phone layout does not overflow on key visitor pages", async ({page}) => {
+  for (const width of [375,768]) {
+    await page.setViewportSize({width,height:900});
+    for (const route of ["/","/about","/projects","/community","/store","/store/masks",
+      "/store/p/fox-mask-stl-file-for-3d-printing","/projects-digital-2d-art"]) {
+      await page.goto(route);
+      const overflow = await page.evaluate(() =>
+        document.documentElement.scrollWidth - window.innerWidth);
+      expect(overflow, route + " overflow at " + width + "px").toBeLessThanOrEqual(2);
+    }
+  }
+});
