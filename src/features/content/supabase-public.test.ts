@@ -47,6 +47,7 @@ describe("public Supabase content adapter", () => {
 
   it("keeps secret credentials out of public content configuration", () => {
     const env = {
+      NODE_ENV: "test",
       SUPABASE_URL: config.url,
       SUPABASE_PUBLISHABLE_KEY: config.publishableKey,
       SUPABASE_SERVICE_ROLE_KEY: "must-never-be-used",
