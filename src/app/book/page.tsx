@@ -26,7 +26,7 @@ export default function BookingPage() {
       currency: product.currency,
       soldOut: product.sold_out,
     }));
-  return <main className="booking-page">
+  return <section className="booking-page">
     <div className="page-container">
       <BookingPlanner
         archivedCourses={archivedCourses}
@@ -35,5 +35,5 @@ export default function BookingPage() {
         initialMonth={monthKey()}
       />
     </div>
-  </main>;
+  </section>;
 }

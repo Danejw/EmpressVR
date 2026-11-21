@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { LegacyMarkdown } from "@/components/legacy-markdown";
 import { CommunityCalendar } from "@/components/community-calendar";
 import { monthKey, shiftMonth } from "@/features/scheduling/calendar-month";
@@ -55,7 +56,14 @@ export default async function ArchivedPage({ params }: Props) {
 
   return <article className="legacy-page">
     <div className="page-container">
-      {key === "scheduling" || key === "fun-raiser" ? <p className="legacy-checkout-note"><a href={sourcePageUrl(key)} rel="noopener noreferrer">Continue booking or donating on the existing EmpressVR site ↗</a></p> : null}
+      {key === "scheduling" ? (
+        <div className="booking-preview-link">
+          <Link className="pill-button" href="/book">Explore the new booking calendar</Link>
+          <a href={sourcePageUrl(key)} rel="noopener noreferrer">Book on the current EmpressVR website</a>
+        </div>
+      ) : key === "fun-raiser" ? (
+        <p className="legacy-checkout-note"><a href={sourcePageUrl(key)} rel="noopener noreferrer">Continue donating on the existing EmpressVR site</a></p>
+      ) : null}
       {hasCalendar ? <>
         <LegacyMarkdown markdown={markdown.slice(0, calendarStart)} />
         <section className="community-calendar-section" aria-label="Community Calendar">

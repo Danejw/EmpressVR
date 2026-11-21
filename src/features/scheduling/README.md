@@ -17,3 +17,21 @@ month-grid UI. It requires separate `GOOGLE_COMMUNITY_CALENDAR_ID` and OAuth
 credentials on server-capable hosting; the static GitHub Pages preview remains
 unconnected. See [Google Calendar setup](../../../docs/google-calendar.md).
 This does not enable booking writes or change existing Squarespace/Acuity links.
+
+## Pre-backend booking UI
+
+`/book` is a standalone, tested booking-planner interface with class selection,
+month/day navigation, time selection, attendee quantity and contact fields, and a
+booking review. It deliberately **does not submit** or store customer data.
+The current class cards are taken from the archived product catalog, which
+marks all three as sold out. No verified future offering/slot records exist
+in that snapshot, so every date is disabled and the official booking site
+remains linked. The /scheduling page links to this preview.
+
+Only published, accepting offerings and future slots from trusted persistence
+may populate the `BookingPlanner` props. The `bookableSlots` utility filters
+invalid/closed slots for presentation; it **does not** determine remaining
+capacity or reserve seats. Before enabling submission, implement authorized
+server-side validation, `private.reserve_booking_hold`, payment handling where
+required, and booking contact storage. Never derive availability from archived
+Squarespace event dates or a generic Google Calendar free/busy result.

@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import {
-  bookableSlots, canReviewRequest, dayInZone, formatPrice, formatSlotTime,
+  bookableSlots, canReviewRequest, formatPrice, formatSlotTime,
   monthCells, slotsOnDay, type ArchivedCourse, type BookingOffering, type BookingSlot,
 } from "@/features/scheduling/booking-view";
-import { monthKey, shiftMonth } from "@/features/scheduling/calendar-month";
+import { shiftMonth } from "@/features/scheduling/calendar-month";
 
 const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const liveBookingUrl = "https://www.empressvr.com/scheduling";
@@ -163,8 +163,10 @@ export function BookingPlanner({
             disabled={!selectedSlot} value={email} onChange={(event) => setEmail(event.target.value)}
             placeholder="you@example.com" />
         </div>
-        <p className="booking-availability-note">Times must be rechecked before any reservation. This preview does not save attendee details or take payment.</p>
-        <button className="booking-reserve-button" disabled={!reviewReady || true} type="button">
+        <p className="booking-availability-note">{reviewReady
+          ? "Your selection is ready to review once secure booking is connected."
+          : "This preview does not save attendee details, reserve seats, or take payment."}</p>
+        <button className="booking-reserve-button" disabled type="button">
           Online booking not yet connected
         </button>
         <p className="booking-live-link">For now, <a href={liveBookingUrl} rel="noopener noreferrer">
