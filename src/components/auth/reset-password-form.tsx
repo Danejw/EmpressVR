@@ -19,7 +19,7 @@ export function ResetPasswordForm() {
     let active = true;
     const auth = getBrowserAuth();
     if (!auth) { setChecking(false); return; }
-    void auth.auth.getUser().then(({ data, error: authError }) => {
+    void auth.auth.getUser().then(({ data, error: authError }: { data: { user: unknown }; error: unknown }) => {
       if (!active) return;
       setAuthorized(!!data.user && !authError);
       setChecking(false);
