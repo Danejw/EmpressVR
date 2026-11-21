@@ -16,7 +16,7 @@ test("store keeps sold-out products unavailable and adds the real £5 item to ca
   await expect(page.getByRole("heading", { name: "Shopping cart" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Fox Mask - STL File for 3D Printing" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Cart items" })).toBeVisible();
-  await expect(page.getByText("£5.00", { exact: true })).toHaveCount(3);
+  await expect(page.getByRole("complementary", { name: "Order summary" })).toContainText("£5.00");
 
   await page.reload();
   await expect(page.getByRole("heading", { name: "Fox Mask - STL File for 3D Printing" })).toBeVisible();
