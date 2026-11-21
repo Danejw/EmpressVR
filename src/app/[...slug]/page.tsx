@@ -59,9 +59,9 @@ export default async function ContentRoute({ params }: Props) {
     </div> : null}
     <PageSections sections={sections ?? sectionsFromMarkdown(archivedCopy)}/>
     {membershipStart >= 0 ? <section className="membership-legacy-handoff">
-      <h2>Explore membership applications</h2>
+      <h2>{key === "join-the-coop-na" ? "Applications are currently closed" : "Explore membership applications"}</h2>
       <p>The new membership form is a preview and does not submit an application.</p>
-      <Link className="pill-button" href="/membership">Explore membership options</Link>
+      <Link className="pill-button" href="/membership">Explore the new membership form</Link>
       <p><a href={sourcePageUrl(key)} rel="noopener noreferrer">Apply on the current EmpressVR site</a></p>
     </section> : null}
     {key === "scheduling" ? <p className="legacy-checkout-note">
