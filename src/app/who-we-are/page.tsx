@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegacyMarkdown } from "@/components/legacy-markdown";
 import { MediaImage } from "@/components/media-image";
-import { getTeamMembers, getSiteMediaId } from "@/features/content/repository";
+import { getSiteMediaId } from "@/features/content/repository";
+import { getPublicTeamMembers } from "@/features/content/supabase-public";
 import { listLegacySlugs,readLegacyPage } from "@/lib/legacy-pages";
 
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ export default async function WhoWeAre() {
   const original = await readLegacyPage("who-we-are") || "";
   const intro = original.slice(0, original.indexOf("- ![](")).trim();
   const imported = new Set(await listLegacySlugs());
-  const members = getTeamMembers();
+  const members = await getPublicTeamMembers();
   return <article className="people-page">
     <div className="intro-band">
       <div className="page-container"><LegacyMarkdown markdown={intro} /></div>

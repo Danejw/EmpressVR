@@ -38,7 +38,9 @@ export default async function ArchivedPage({ params }: Props) {
   const markdown = await readLegacyPage(key);
   if (!markdown || specialPages.has(key)) notFound();
   const productSlug = key.startsWith("store__p__") ? key.slice("store__p__".length) : null;
-  const storeProduct = productSlug ? getStoreCatalog().find((item) => item.slug === productSlug) : null;
+  const storeProduct = productSlug
+    ? (await getStoreCatalog()).find((item) => item.slug === productSlug)
+    : null;
   // The Squarespace scrape included non-functional button labels. The real
   // shopping control is rendered separately and those stale labels are removed.
   const productMarkdown = storeProduct

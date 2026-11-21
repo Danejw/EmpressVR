@@ -98,3 +98,35 @@ and Docker runtime were not available in the authoring environment. Run the
 commands above or the database CI workflow before calling the SQL execution
 verified. Database migrations are the foundation; no claim is made that
 checkout, booking, or admin application integrations are complete.
+
+
+## Hosted project: EmpressVR
+
+The live database foundation has been applied to Supabase project
+`zxsrixbjsmyzmqywukwa` using the connected `danejw3@gmail.com` account.
+Eleven migrations are recorded (ten schema migrations plus the optional RLS
+event-trigger privilege hardening), with migration versions aligned to the
+versioned Git filenames. Thirty application tables have RLS enabled.
+The original site snapshot was imported: 48 pages, 160 media metadata records,
+7 projects, 9 team members, 4 products, 7 archived events and their image
+relationships. It is **historical content**, not a live offering or booking
+catalog. Existing bookings, payments, Stripe IDs, and customer data were not
+fabricated.
+
+The 160 optimized image files still exist in the checked-in `public/media`
+directory but have **not** been transferred into Supabase Storage. The remote
+media records are marked `remote` until upload verification completes. The
+`site-media` bucket exists and is public; the `paid-downloads` bucket exists
+and is private. Never interpret metadata alone as uploaded bytes.
+
+`src/features/content/supabase-public.ts` reads published projects,
+products and team members only when `SUPABASE_URL` and
+`SUPABASE_PUBLISHABLE_KEY` are configured on a server-capable host.
+GitHub Pages uses the verified local snapshot. The public read adapter does
+not access paid orders, booking capacity, subscriptions or admin data.
+The existing checkout, bookings and membership application forms remain
+disabled until authenticated workflows and verified provider integration exist.
+
+Do not commit service-role/secret keys. The URL is public, and the publishable
+key is safe for low-privilege client use, but environment configuration is
+preferred over hardcoded credentials.

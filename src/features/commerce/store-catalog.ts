@@ -1,9 +1,10 @@
-import { getProducts } from "@/features/content/repository";
+import { getPublishedProducts } from "@/features/content/supabase-public";
 import type { StoreProduct } from "./cart";
 
 /** Converts the local published content snapshot into future Supabase-compatible props. */
-export function getStoreCatalog(): StoreProduct[] {
-  return getProducts().map((product) => ({
+export async function getStoreCatalog(): Promise<StoreProduct[]> {
+  const products = await getPublishedProducts();
+  return products.map((product) => ({
     id: product.id,
     slug: product.slug,
     title: product.title,

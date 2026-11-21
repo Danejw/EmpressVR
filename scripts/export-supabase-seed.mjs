@@ -15,7 +15,13 @@ const lines=[
 "-- Re-runnable upserts preserve stable IDs; this file never removes rows.",
 "begin;"
 ];
-for(const m of db.media_assets)lines.push(insert("media_assets",m));
+// Local imported files are not yet hosted in Supabase Storage.
+ // Preserve any already-uploaded rows as imported on repeat seed runs.
+for(const m of db.media_assets) {
+  const statement = insert("media_assets",{...m,status:"remote"});
+  lines.push(statement.replace('"status"=excluded."status"',
+    '"status"=case when public.media_assets.status = \'imported\' then \'imported\' else excluded."status" end'));
+}
 for(const page of db.pages){
   const source=readFileSync(page.body_source,"utf8");
   lines.push(insert("site_pages",{id:page.id,path:page.path,source_key:page.source_key,

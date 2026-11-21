@@ -23,12 +23,13 @@ export const metadata: Metadata = {
   icons: { icon: "https://images.squarespace-cdn.com/content/v1/6675b24a42baae7c4c24730e/6de4e97a-b4f9-46c1-9acb-aec2f80d99f2/favicon.ico?format=100w" }
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const catalog = await getStoreCatalog();
   return (
     <html lang="en">
       <body>
         <a className="skip-link" href="#main-content">Skip to content</a>
-        <CartProvider catalog={getStoreCatalog()}>
+        <CartProvider catalog={catalog}>
           <SiteHeader />
           <main id="main-content">{children}</main>
           <SiteFooter />

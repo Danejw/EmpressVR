@@ -10,7 +10,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/store" },
 };
 
-export default function Store() {
+export default async function Store() {
+  const products = await getStoreCatalog();
   return <section className="store-page">
     <div className="page-container">
       <div className="store-heading">
@@ -18,7 +19,7 @@ export default function Store() {
         <div className="store-heading-links"><Link href="/store/masks">Categories: Masks</Link><Link href="/cart">View cart</Link></div>
       </div>
       <div className="store-grid">
-        {getStoreCatalog().map(product => {
+        {products.map(product => {
           const local = "/store/p/" + product.slug;
           const price = new Intl.NumberFormat("en-GB",{style:"currency",currency:product.currency})
             .format(product.priceMinor/100);

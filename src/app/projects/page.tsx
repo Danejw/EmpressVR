@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MediaImage } from "@/components/media-image";
-import { getProjects } from "@/features/content/repository";
+import { getPublishedProjects } from "@/features/content/supabase-public";
 import { listLegacySlugs } from "@/lib/legacy-pages";
 
 export const metadata: Metadata = {
@@ -12,9 +12,10 @@ export const metadata: Metadata = {
 
 export default async function Projects() {
   const imported = new Set(await listLegacySlugs());
+  const projects = await getPublishedProjects();
   return <section className="projects-page" aria-label="EmpressVR projects">
     <div className="project-grid">
-      {getProjects().map((project,index) => {
+      {projects.map((project,index) => {
         const href = imported.has(project.slug) ? "/" + project.slug : "https://www.empressvr.com/" + project.slug;
         return <article className={"project-tile project-tone-" + (index % 4)} key={project.id}>
           <div className="project-image">
