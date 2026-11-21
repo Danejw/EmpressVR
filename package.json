@@ -2,7 +2,9 @@
   "name": "empressvr",
   "version": "0.1.0",
   "private": true,
-  "engines": { "node": ">=20.9.0" },
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,12 +13,19 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run build"
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "test:e2e": "playwright test",
+    "audit:content": "node scripts/audit-content.mjs",
+    "content:generate": "node scripts/build-content-index.mjs",
+    "content:validate": "node scripts/validate-content-index.mjs",
+    "media:import": "node scripts/import-media.mjs"
   },
   "dependencies": {
     "next": "16.4.6",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.0",
@@ -28,6 +37,7 @@
     "postcss": "^8.5.0",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.9.0",
-    "vitest": "^4.0.0"
+    "vitest": "4.1.11",
+    "@playwright/test": "1.65.1"
   }
 }

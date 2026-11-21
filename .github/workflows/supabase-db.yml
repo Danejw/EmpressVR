@@ -1,0 +1,57 @@
+name: Supabase Database
+
+on:
+  push:
+    branches:
+      - feat/squarespace-faithful-rebuild
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/supabase-db.yml'
+  pull_request:
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/supabase-db.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: supabase-db-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v3
+        with:
+          version: latest
+      - name: Start isolated local Supabase
+        run: supabase start
+      - name: Recreate database from all migrations
+        run: supabase db reset
+      - name: Test schema, RLS and transactional behavior
+        run: supabase test db
+      - name: Check SQL functions and schema
+        run: supabase db lint --level error
+      - name: Ensure PostgreSQL client is available
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y postgresql-client
+          fi
+      - name: Verify saved site content imports cleanly, twice
+        env:
+          EMPR_DB_TEST_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: |
+          node scripts/export-supabase-seed.mjs
+          psql "$EMPR_DB_TEST_URL" -X -v ON_ERROR_STOP=1 -f supabase/seed-content.sql > /dev/null
+          psql "$EMPR_DB_TEST_URL" -X -v ON_ERROR_STOP=1 -f supabase/seed-content.sql > /dev/null
+          ACTUAL="$(psql "$EMPR_DB_TEST_URL" -X -A -t -v ON_ERROR_STOP=1 -c "select (select count(*) from public.site_pages), (select count(*) from public.media_assets), (select count(*) from public.projects), (select count(*) from public.team_members), (select count(*) from public.products), (select count(*) from public.events)")"
+          EXPECTED="48|160|7|9|4|7"
+          test "$ACTUAL" = "$EXPECTED" || { echo "Imported counts $ACTUAL; expected $EXPECTED"; exit 1; }
+          echo "PASS: real content import is complete, repeatable, and relationally valid."
+      - name: Verify concurrent reservation capacity
+        env:
+          EMPR_DB_TEST_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: node scripts/test-booking-concurrency.mjs

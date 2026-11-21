@@ -1,0 +1,61 @@
+name: Prepare EmpressVR content and media
+
+on:
+  push:
+    branches: [feat/squarespace-faithful-rebuild]
+    paths:
+      - scripts/build-content-index.mjs
+      - scripts/validate-content-index.mjs
+      - scripts/import-media.mjs
+      - src/features/content/catalog.json
+      - src/features/content/logo-sources.json
+      - src/content/legacy/**
+      - .github/workflows/prepare-content.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: empressvr-media-import
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/feat/squarespace-faithful-rebuild'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --global npm@11.21.1
+      - run: npm install --no-audit --no-fund
+      - name: Generate structured content records
+        run: npm run content:generate
+      - id: import
+        name: Download and optimize source images
+        continue-on-error: true
+        run: npm run media:import
+      - name: Validate media relationships
+        run: npm run content:validate
+      - name: Commit content and images to feature branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A src/features/content/content-index.json docs/migration/media-import-report.json
+          if [ -d public/media ]; then
+            git add -A public/media || true
+          fi
+          if ! git diff --cached --quiet; then
+            git commit -m "data(media): import source images and normalized content"
+            git push origin HEAD:refs/heads/feat/squarespace-faithful-rebuild
+          else
+            echo "Content and assets already up to date"
+          fi
+      - name: Report import failure
+        if: steps.import.outcome == 'failure'
+        run: |
+          echo "Image import failed; see the import report and retry before production cutover."
+          exit 1

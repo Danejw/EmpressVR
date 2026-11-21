@@ -1,0 +1,4 @@
+# Supabase CLI local state; do not commit generated project metadata.
+.temp/
+.branches/
+.profiles/

@@ -1,0 +1,154 @@
+{
+  "projects": [
+    {
+      "slug": "exploring-the-shadows",
+      "title": "Exploring the Shadows",
+      "subtitle": "The Journey to Trauma Healing"
+    },
+    {
+      "slug": "circusxvr",
+      "title": "Circus x VR",
+      "subtitle": ""
+    },
+    {
+      "slug": "robotic-echoes",
+      "title": "Robotic Echoes",
+      "subtitle": "Technology x Art x Culture"
+    },
+    {
+      "slug": "the-self-we-find",
+      "title": "The Self We Find",
+      "subtitle": "Artist: Dominique Vyborna\nCollaborators: Abil Gunawan and Jaye Marigold"
+    },
+    {
+      "slug": "fireside",
+      "title": "Fireside",
+      "subtitle": "By the Eunoia Collab"
+    },
+    {
+      "slug": "sunlink",
+      "title": "Sunlink",
+      "subtitle": ""
+    },
+    {
+      "slug": "shadows-of-combat",
+      "title": "Shadows of Combat",
+      "subtitle": ""
+    }
+  ],
+  "team_members": [
+    {
+      "name": "Dominique Vyborna",
+      "slug": "dominique-vyborna",
+      "roles": [
+        "FOUNDER & CEO",
+        "BOARD TREASURER - 2026",
+        "FOUNDING BOARD SECRETARY - 2025"
+      ],
+      "group": "current"
+    },
+    {
+      "name": "Eirini Lampiri",
+      "slug": null,
+      "roles": [
+        "BOARD MEMBER AT-LARGE - 2026",
+        "FOUNDING BOARD CHAIR - 2025",
+        "USER MEMBER"
+      ],
+      "group": "current",
+      "external_url": "https://eirinilampiri.wixsite.com/portfolio"
+    },
+    {
+      "name": "Dane Willacker",
+      "slug": "dane-willacker",
+      "roles": [
+        "BOARD MEMBER AT-LARGE - 2026",
+        "FOUNDING BOARD MEMBER AT-LARGE - 2025",
+        "SUPPORTER MEMBER"
+      ],
+      "group": "current"
+    },
+    {
+      "name": "John Howard",
+      "slug": "john-howard",
+      "roles": [
+        "BOARD SECRETARY - 2026",
+        "FOUNDING BOARD MEMBER AT-LARGE - 2025",
+        "SUPPORTER MEMBER"
+      ],
+      "group": "current"
+    },
+    {
+      "name": "Eirian Soar",
+      "slug": null,
+      "roles": [
+        "BOARD MEMBER - 2026",
+        "SOCIALS TEAM LEAD - 2026",
+        "SUPPORTER MEMBER"
+      ],
+      "group": "current"
+    },
+    {
+      "name": "Darko Masnec",
+      "slug": null,
+      "roles": [
+        "USER MEMBER"
+      ],
+      "group": "other"
+    },
+    {
+      "name": "Andrew Dennis",
+      "slug": null,
+      "roles": [
+        "USER MEMBER"
+      ],
+      "group": "other"
+    },
+    {
+      "name": "Harrison Willmott",
+      "slug": null,
+      "roles": [
+        "FOUNDING BOARD MEMBER"
+      ],
+      "group": "past"
+    },
+    {
+      "name": "Adam Tuffey",
+      "slug": null,
+      "roles": [
+        "FOUNDING MEMBER"
+      ],
+      "group": "past"
+    }
+  ],
+  "products": [
+    {
+      "slug": "immersive-storytelling-principles-in-vrchat",
+      "title": "Immersive Storytelling Principles -> In VRChat!",
+      "price_minor": 4000,
+      "sold_out": true,
+      "description": "This 2 hour class will take place in VRChat and will navigate to several worlds that are educational in nature and will demonstrate the principles of immersive storytelling in either very good — or very bad — ways!"
+    },
+    {
+      "slug": "principles-of-immersive-storytelling-in-vrchat",
+      "title": "Intro to VRChat Fluency --> In VR!",
+      "price_minor": 1200,
+      "sold_out": true,
+      "description": "This 1 hour class will take place in VRChat and will navigate to several worlds that are educational in nature and is specifically designed to allow you to acclimate to virtual reality gradually which will give your nervous system time to adjust while limiting the risk of motion sickness and allowing you to enjoy your time exploring virtual worlds fearlessly!"
+    },
+    {
+      "slug": "intro-to-unity-for-meta-quest-vr-development-zoom",
+      "title": "Intro to Unity for Meta Quest VR Development - Zoom",
+      "price_minor": 40000,
+      "sold_out": true,
+      "description": "This is a 6 Week Bootcamp-style course with low-to-no coding designed for Creatives and Artists who want to fast-track their ability to prototype immersive VR applications and test ideas in pre-production."
+    },
+    {
+      "slug": "fox-mask-stl-file-for-3d-printing",
+      "title": "Fox Mask - STL File for 3D Printing",
+      "price_minor": 500,
+      "sold_out": false,
+      "description": "This fox mask was created for the DnD Themed Immersive Interactive Busking Street Theatre Piece produced in 2026. A trickster character, it was worn by our Druid-in-fox-form."
+    }
+  ]
+}

@@ -2,7 +2,7 @@ name: Validate
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'feat/**']
   pull_request:
 
 jobs:
@@ -13,8 +13,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: npm install -g npm@11.21.1
       - run: npm install --no-audit --no-fund
+      - name: Audit migrated content
+        run: npm run audit:content
+      - name: Validate structured content and media references
+        run: npm run content:validate
+      - name: Verify exportable Supabase seed
+        run: node scripts/export-supabase-seed.mjs
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test
       - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-results
+          path: test-results/
+          if-no-files-found: ignore
