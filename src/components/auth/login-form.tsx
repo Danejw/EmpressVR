@@ -1,97 +1,63 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { getBrowserAuth } from "@/lib/auth/browser";
+import { completeSignIn } from "@/lib/auth/complete-sign-in";
 
-export function LoginForm() {
+export function LoginForm({ notice }: { notice?: "verified" | "reset" | "error" }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [step, setStep] = useState<"email" | "code">("email");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  async function requestCode(event: FormEvent<HTMLFormElement>) {
+  async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const supabase = getBrowserAuth();
     if (!supabase) { setError("Authentication is not configured."); return; }
-    const address = email.trim().toLowerCase();
-    setBusy(true); setError(""); setMessage("");
+    setBusy(true); setError("");
     try {
-      const { error: sendError } = await supabase.auth.signInWithOtp({
-        email: address,
-        options: { shouldCreateUser: true },
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(), password,
       });
-      if (sendError) throw sendError;
-      setEmail(address); setStep("code");
-      setMessage("Check your inbox for your six-digit sign-in code.");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not send your code.");
-    } finally { setBusy(false); }
-  }
-
-  async function verifyCode(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const supabase = getBrowserAuth();
-    if (!supabase) { setError("Authentication is not configured."); return; }
-    if (!/^\d{6}$/.test(code)) { setError("Enter the six-digit code from your email."); return; }
-    setBusy(true); setError(""); setMessage("");
-    try {
-      const { data, error: verifyError } = await supabase.auth.verifyOtp({
-        email, token: code, type: "email",
-      });
-      if (verifyError) throw verifyError;
-      if (!data.user?.email) throw new Error("Could not verify your account.");
-
-      const { data: customer, error: lookupError } = await supabase.from("customers")
-        .select("id").eq("user_id", data.user.id).maybeSingle();
-      if (!lookupError && !customer) {
-        const { error: insertError } = await supabase.from("customers").insert({
-          user_id: data.user.id, contact_email: data.user.email.toLowerCase(),
-        });
-        if (insertError && insertError.code !== "23505")
-          throw new Error("Signed in, but your profile could not be created. Try again.");
-      }
-      // The RPC grants a role only when the user's verified email was invited.
-      await supabase.rpc("claim_staff_invitation");
-      const { data: staff } = await supabase.from("staff_roles")
-        .select("role").eq("user_id", data.user.id).maybeSingle();
-      router.replace(staff?.role === "admin" || staff?.role === "editor" ? "/staff" : "/account");
+      if (loginError) throw loginError;
+      const destination = await completeSignIn();
+      router.replace(destination);
       router.refresh();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "The code could not be verified.");
+      setError(e instanceof Error ? e.message : "Unable to sign in.");
     } finally { setBusy(false); }
   }
 
   return <div className="auth-panel">
     <h1>Sign in to EmpressVR</h1>
-    <p className="auth-lead">Access your member account or staff workspace using your email.</p>
-    {message ? <p className="auth-message" role="status">{message}</p> : null}
+    <p className="auth-lead">Access your member account or staff workspace.</p>
+    {notice === "verified" ? <p className="auth-message" role="status">Email confirmed. Sign in with your password.</p> : null}
+    {notice === "reset" ? <p className="auth-message" role="status">Password updated. Sign in with your new password.</p> : null}
+    {notice === "error" ? <p className="auth-error" role="alert">That email link is invalid or has expired. Request a new one.</p> : null}
     {error ? <p className="auth-error" role="alert">{error}</p> : null}
-    {step === "email" ? <form className="auth-form" onSubmit={requestCode}>
+    <form className="auth-form" onSubmit={signIn}>
       <label htmlFor="auth-email">Email address</label>
       <input id="auth-email" type="email" required autoComplete="email" maxLength={254}
         value={email} onChange={event => setEmail(event.target.value)}
         placeholder="you@example.com" disabled={busy} />
-      <button type="submit" className="pill-button" disabled={busy}>
-        {busy ? "Sending..." : "Send sign-in code"}
-      </button>
-      <p className="auth-small">New here? Entering your email can create a free account. Membership approval is separate.</p>
-    </form> : <form className="auth-form" onSubmit={verifyCode}>
-      <p>We sent a sign-in code to <strong>{email}</strong>.</p>
-      <label htmlFor="auth-code">Six-digit code</label>
-      <input id="auth-code" type="text" inputMode="numeric" pattern="[0-9]{6}"
-        autoComplete="one-time-code" maxLength={6} required value={code}
-        onChange={event => setCode(event.target.value.replace(/\D/g, ""))}
-        placeholder="123456" disabled={busy} />
-      <button className="pill-button" type="submit" disabled={busy}>
-        {busy ? "Verifying..." : "Verify and sign in"}
-      </button>
-      <button className="auth-text-button" type="button"
-        onClick={() => { setCode(""); setStep("email"); setError(""); setMessage(""); }}
-        disabled={busy}>Use a different email or request another code</button>
-    </form>}
+      <label htmlFor="auth-password">Password</label>
+      <div className="auth-password-field">
+        <input id="auth-password" type={showPassword ? "text" : "password"}
+          required autoComplete="current-password" value={password}
+          onChange={event => setPassword(event.target.value)}
+          minLength={6} disabled={busy}/>
+        <button type="button" className="auth-text-button" aria-label={showPassword ? "Hide password" : "Show password"}
+          onClick={() => setShowPassword(value => !value)}>{showPassword ? "Hide" : "Show"}</button>
+      </div>
+      <button type="submit" className="pill-button" disabled={busy}>{busy ? "Signing in..." : "Sign in"}</button>
+      <div className="auth-secondary-links">
+        <Link className="auth-link" href="/forgot-password">Forgot password?</Link>
+        <p>New to EmpressVR? <Link className="auth-link" href="/signup">Create an account</Link></p>
+      </div>
+    </form>
   </div>;
 }

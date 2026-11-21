@@ -568,3 +568,11 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
   .auth-dashboard-grid { grid-template-columns: 1fr; }
   .auth-page { padding: 35px 0 70px; }
 }
+
+
+/* EVR-21: password visibility controls and account recovery. */
+.auth-password-field { display: flex; align-items: center; gap: 12px; }
+.auth-password-field input { flex: 1; min-width: 0; }
+.auth-password-field .auth-text-button { flex: none; }
+.auth-secondary-links { display: grid; gap: 5px; margin-top: 5px; }
+.auth-secondary-links p { margin: 0; }

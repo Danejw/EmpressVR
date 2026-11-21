@@ -6,8 +6,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function LoginPage() {
+export default async function LoginPage({ searchParams }: {
+  searchParams: Promise<{ verified?: string; reset?: string; error?: string }>;
+}) {
+  const params = await searchParams;
+  const notice = params.verified === "1" ? "verified"
+    : params.reset === "1" ? "reset" : params.error ? "error" : undefined;
   return <section className="auth-page"><div className="page-container">
-    <LoginForm />
+    <LoginForm notice={notice} />
   </div></section>;
 }
