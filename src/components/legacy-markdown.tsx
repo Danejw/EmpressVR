@@ -31,7 +31,9 @@ const components: Components = {
   },
   img: ({ src, alt }) => {
     if (!src || typeof src !== "string" || !src.startsWith("https://")) return null;
-    return <MediaImage sourceUrl={src} className="source-image" alt={alt || undefined} loading="lazy" />;
+    const meaningfulAlt = alt && !/\\.(?:png|jpe?g|gif|webp|jfif)$/i.test(alt.trim())
+      ? alt : "";
+    return <MediaImage sourceUrl={src} className="source-image" alt={meaningfulAlt} loading="lazy" />;
   },
 };
 

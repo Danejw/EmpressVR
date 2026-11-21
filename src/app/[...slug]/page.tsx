@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { LegacyMarkdown } from "@/components/legacy-markdown";
-import { CommunityCalendar } from "@/components/community-calendar";
-import { PublishedEvents } from "@/components/published-events";
-import { StoreAddButton } from "@/components/store-add-button";
-import { getStoreCatalog } from "@/features/commerce/store-catalog";
-import { displayMoney } from "@/features/commerce/cart";
-import { monthKey, shiftMonth } from "@/features/scheduling/calendar-month";
-import { fetchCommunityEvents } from "@/features/scheduling/google-calendar";
+import { PageSections } from "@/components/page-sections";
+import { getPublishedProjects, getPublicTeamMembers, fetchPublishedPageSections } from "@/features/content/supabase-public";
+import { cleanLegacyContent, sectionsFromMarkdown } from "@/features/content/page-sections";
 import { readLegacyPage, sourcePageUrl } from "@/lib/legacy-pages";
 
 type Props = { params: Promise<{ slug: string[] }> };
-const specialPages = new Set(["home", "projects", "who-we-are", "store"]);
+const corePages = new Set(["home", "projects", "who-we-are", "store"]);
 
 export const dynamicParams = true;
 
@@ -20,106 +15,58 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const key = slug.join("__");
   const markdown = await readLegacyPage(key);
-  const title = markdown?.match(/^#{1,3} (.+)$/m)?.[1]?.replaceAll("*", "") || slug.at(-1)?.replaceAll("-", " ") || "EmpressVR";
+  const title = markdown?.match(/^#{1,3} (.+)$/m)?.[1]?.replaceAll("*", "") ||
+    slug.at(-1)?.replaceAll("-", " ") || "EmpressVR";
   return {
-    title,
-    alternates: { canonical: "/" + slug.join("/") },
+    title, alternates: { canonical: "/" + slug.join("/") },
     ...(key === "blog" || key === "coming-soon" ? { robots: { index: false, follow: false } } : {}),
   };
 }
 
-export default async function ArchivedPage({ params }: Props) {
+/** Compatibility route for legacy paths; core pages have dedicated Next.js routes. */
+export default async function ContentRoute({ params }: Props) {
   const { slug } = await params;
   const key = slug.join("__");
-  const markdown = await readLegacyPage(key);
-  if (!markdown || specialPages.has(key)) notFound();
-  const productSlug = key.startsWith("store__p__") ? key.slice("store__p__".length) : null;
-  const storeProduct = productSlug
-    ? (await getStoreCatalog()).find((item) => item.slug === productSlug)
-    : null;
-  // The Squarespace scrape included non-functional button labels. The real
-  // shopping control is rendered separately and those stale labels are removed.
-  const productMarkdown = storeProduct
-    ? markdown.replace(/Add To Cart\s+Added!/g, "")
-    : markdown;
+  const original = await readLegacyPage(key);
+  if (original === null || corePages.has(key)) notFound();
+  const markdown = cleanLegacyContent(key, original);
+  const [projects, members] = await Promise.all([getPublishedProjects(), getPublicTeamMembers()]);
+  const project = projects.find(item => item.slug === key);
+  const member = members.find(item => item.slug === key);
+  const name = project?.title ?? member?.name;
+  const escape = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const copy = name ? markdown.replace(new RegExp("^#{1,3}\\s+" + escape(name) + "\\s*$", "im"), "").trim() : markdown;
 
-  // Preserve the archived community copy while replacing the captured, nonfunctional
-  // Squarespace calendar table with a live Google-backed calendar display.
-  const calendarHeading = "### Community Calendar!";
-  const nextHeading = "# Building a Global Community";
-  const calendarStart = key === "community" ? markdown.indexOf(calendarHeading) : -1;
-  const calendarEnd = calendarStart >= 0 ? markdown.indexOf(nextHeading, calendarStart) : -1;
-  const hasCalendar = calendarStart >= 0 && calendarEnd > calendarStart;
-  // Replace nonfunctional Squarespace application-form text in the source
-  // snapshot. The real, live application remains on the existing site.
-  const membershipFormHeading = key === "join-the-coop"
-    ? "# Applications Are Open!"
-    : key === "join-the-coop-na" ? "# Applications Are Currently Closed" : null;
-  const membershipFormStart = membershipFormHeading
-    ? markdown.indexOf(membershipFormHeading)
-    : key === "join-the-community" ? markdown.indexOf("\nName\n") : -1;
-  const hasLegacyMembershipForm = membershipFormStart >= 0;
-  const thisMonth = monthKey();
-  const firstMonth = shiftMonth(thisMonth, -3);
-  const lastMonth = shiftMonth(thisMonth, 12);
-  const [startYear, startMonth] = firstMonth.split("-").map(Number);
-  const [endYear, endMonth] = lastMonth.split("-").map(Number);
-  const feed = hasCalendar
-    ? await fetchCommunityEvents(
-        new Date(Date.UTC(startYear, startMonth - 1, 0)),
-        new Date(Date.UTC(endYear, endMonth, 2)),
-      )
-    : { status: "unconfigured" as const, events: [] };
+  const membershipFormHeading = key === "join-the-coop" ? "# Applications Are Open!" :
+    key === "join-the-coop-na" ? "# Applications Are Currently Closed" : null;
+  const membershipStart = membershipFormHeading ? copy.indexOf(membershipFormHeading) :
+    key === "join-the-community" ? copy.indexOf("\nName\n") : -1;
+  const archivedCopy = membershipStart >= 0 ? copy.slice(0, membershipStart) : copy;
+  const sections = !name && membershipStart < 0
+    ? await fetchPublishedPageSections(key) : null;
 
-  return <article className="legacy-page">
-    <div className="page-container">
-      {key === "scheduling" ? (
-        <div className="booking-preview-link">
-          <Link className="pill-button" href="/book">Explore the new booking calendar</Link>
-          <a href={sourcePageUrl(key)} rel="noopener noreferrer">Book on the current EmpressVR website</a>
-        </div>
-      ) : key === "fun-raiser" ? (
-        <p className="legacy-checkout-note"><a href={sourcePageUrl(key)} rel="noopener noreferrer">Continue donating on the existing EmpressVR site</a></p>
-      ) : null}
-      {storeProduct ? <div className="store-detail-purchase">
-        <div>
-          <span className="commerce-eyebrow">Store product</span>
-          <strong>{displayMoney(storeProduct.priceMinor, storeProduct.currency)}</strong>
-        </div>
-        <StoreAddButton productId={storeProduct.id} />
-      </div> : null}
-      {hasCalendar ? <>
-        <LegacyMarkdown markdown={markdown.slice(0, calendarStart)} />
-        <section className="community-calendar-section" aria-label="Community Calendar">
-          <h3>Community Calendar!</h3>
-          <CommunityCalendar
-            events={feed.events}
-            status={feed.status}
-            initialMonth={thisMonth}
-            firstMonth={firstMonth}
-            lastMonth={lastMonth}
-          />
-        </section>
-        <LegacyMarkdown markdown={markdown.slice(calendarEnd)} />
-      </> : hasLegacyMembershipForm ? <>
-        <LegacyMarkdown markdown={markdown.slice(0, membershipFormStart)} />
-        <section className="membership-legacy-handoff" aria-label="Membership application">
-          <h2>{key === "join-the-coop-na" ? "Applications are currently closed" : "Explore membership applications"}</h2>
-          <p>Preview the membership types, application questions, and joining costs in our new interface. This preview does not submit an application.</p>
-          <div>
-            <Link className="pill-button" href="/membership">Explore the new membership form</Link>
-            <a href={sourcePageUrl(key)} rel="noopener noreferrer">
-              {key === "join-the-coop-na" ? "Check the current application status" : "Apply on the current EmpressVR website"}
-            </a>
-          </div>
-        </section>
-      </> : <LegacyMarkdown markdown={productMarkdown} />}
-      {key === "community" ? <PublishedEvents /> : null}
-      {key === "scheduling" || key === "fun-raiser" || key.startsWith("store__p__") ? (
-        <p className="legacy-checkout-note">Booking and payment processing are still handled on the existing website during migration.{" "}
-          <a href={sourcePageUrl(key)} rel="noopener noreferrer">Continue on the current EmpressVR site ↗</a>
-        </p>
-      ) : null}
-    </div>
-  </article>;
+  return <article className="legacy-page"><div className="page-container">
+    {name ? <header className="detail-heading">
+      <Link className="detail-back" href={project ? "/projects" : "/who-we-are"}>
+        ← Back to {project ? "Projects" : "Who We Are"}
+      </Link>
+      <h1>{name}</h1>
+      {project?.subtitle ? <p>{project.subtitle}</p> : null}
+    </header> : null}
+    {key === "scheduling" ? <div className="booking-preview-link">
+      <Link className="pill-button" href="/book">Explore the new booking calendar</Link>
+      <a href={sourcePageUrl(key)} rel="noopener noreferrer">Book on the current EmpressVR website</a>
+    </div> : null}
+    <PageSections sections={sections ?? sectionsFromMarkdown(archivedCopy)}/>
+    {membershipStart >= 0 ? <section className="membership-legacy-handoff">
+      <h2>{key === "join-the-coop-na" ? "Applications are currently closed" : "Explore membership applications"}</h2>
+      <p>The new membership form is a preview and does not submit an application.</p>
+      <Link className="pill-button" href="/membership">Explore the new membership form</Link>
+      <p><a href={sourcePageUrl(key)} rel="noopener noreferrer">Apply on the current EmpressVR site</a></p>
+    </section> : null}
+    {key === "scheduling" ? <p className="legacy-checkout-note">
+      Bookings and payments are still handled on the current website.{" "}
+      <a href={sourcePageUrl(key)} rel="noopener noreferrer">Continue on the current EmpressVR site</a>
+    </p> : null}
+  </div></article>;
 }

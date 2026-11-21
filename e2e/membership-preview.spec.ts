@@ -53,7 +53,7 @@ test("old membership pages link to replacement preview without showing static fo
     await expect(page.getByRole("heading", { name: label }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: "Explore the new membership form" }))
       .toHaveAttribute("href", "/membership");
-    await expect(page.locator(".legacy-copy")).not.toContainText("SubmitSubmit");
+    await expect(page.locator(".page-sections")).not.toContainText("SubmitSubmit");
   }
   await expect(page.getByRole("heading", { name: "Applications are currently closed" })).toBeVisible();
 });

@@ -19,6 +19,8 @@ jobs:
         run: npm run audit:content
       - name: Validate structured content and media references
         run: npm run content:validate
+      - name: Verify typed content SQL export
+        run: npm run content:sections
       - name: Verify exportable Supabase seed
         run: node scripts/export-supabase-seed.mjs
       - name: Verify all public Supabase Storage image hashes

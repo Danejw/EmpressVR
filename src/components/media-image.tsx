@@ -21,7 +21,7 @@ export async function MediaImage({ assetId, sourceUrl, alt, loading, className, 
   if (!src) return null;
   // eslint-disable-next-line @next/next/no-img-element
   return <img {...props} src={src} alt={alt ?? asset?.alt_text ?? ""}
-    className={className} loading={loading ?? "lazy"}
+    className={className} loading={loading ?? "lazy"} decoding="async"
     width={props.width ?? asset?.width ?? undefined}
     height={props.height ?? asset?.height ?? undefined} />;
 }

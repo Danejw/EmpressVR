@@ -31,9 +31,9 @@ test("store preserves the four published product listings", async ({ page }) => 
 
 test("legacy detail pages resolve locally", async ({ page }) => {
   await page.goto("/robotic-echoes");
-  await expect(page.locator(".legacy-copy")).not.toBeEmpty();
+  await expect(page.locator(".page-sections")).not.toBeEmpty();
   await page.goto("/privacypolicy");
-  await expect(page.locator(".legacy-copy")).not.toBeEmpty();
+  await expect(page.locator(".page-sections")).not.toBeEmpty();
 });
 
 test("search metadata preserves canonical pages and the source website", async ({ page }) => {
