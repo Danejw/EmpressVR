@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { SiteHeader } from "@/components/site-header";
 import { CartProvider } from "@/components/cart-provider";
 import { getStoreCatalog } from "@/features/commerce/store-catalog";
 import { SiteFooter } from "@/components/site-footer";
 import "./globals.css";
 
-const isPagesPreview = process.env.GITHUB_PAGES_PREVIEW === "true";
+const isPreview = process.env.VERCEL_ENV === "preview" || process.env.GITHUB_PAGES_PREVIEW === "true";
 const description = "Amplifying Diverse Voices in Immersive Storytelling.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(isPagesPreview
-    ? "https://danejw.github.io" + (process.env.GITHUB_PAGES_BASE_PATH || "/EmpressVR")
-    : "https://www.empressvr.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.empressvr.com"),
   title: { default: "EmpressVR | Immersive Storytelling", template: "%s | EmpressVR" },
   description,
-  robots: isPagesPreview ? { index: false, follow: false } : { index: true, follow: true },
+  robots: isPreview ? { index: false, follow: false } : { index: true, follow: true },
   openGraph: {
     type: "website",
     siteName: "EmpressVR",
@@ -26,6 +25,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // Render on request so published database edits appear on refresh.
+  await connection();
   const catalog = await getStoreCatalog();
   return (
     <html lang="en">

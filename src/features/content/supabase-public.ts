@@ -6,12 +6,14 @@
  * publishable key. Row-level security remains the source of access control.
  * Booking capacity, payment, admin and private records are never read here.
  */
+import { cache } from "react";
 import {
-  getProjects, getProducts, getTeamMembers,
-  type Project, type Product, type TeamMember,
+  getProjects, getProducts, getTeamMembers, getEvents, getPages,
+  getMediaAsset, getMediaBySourceUrl, getSiteMediaId,
+  type Project, type Product, type TeamMember, type EventRecord, type PageRecord, type MediaAsset,
 } from "./repository";
 
-type PublicTable = "projects" | "products" | "team_members";
+type PublicTable = "projects" | "products" | "team_members" | "events" | "site_pages" | "media_assets" | "site_media";
 export type PublicReadConfig = Readonly<{
   url: string;
   publishableKey: string;
@@ -22,12 +24,16 @@ const predicates: Readonly<Record<PublicTable, string>> = {
   projects: "status=eq.published&order=sort_order.asc",
   products: "status=in.(active,sold_out)&order=sort_order.asc",
   team_members: "order=sort_order.asc",
+  events: "status=eq.published&date_review_required=eq.false&order=start_at.asc",
+  site_pages: "published=eq.true&order=path.asc",
+  media_assets: "status=eq.imported",
+  site_media: "order=slot.asc",
 };
 
 export function publicReadConfig(env: NodeJS.ProcessEnv = process.env): PublicReadConfig {
   return {
-    url: env.SUPABASE_URL ?? "",
-    publishableKey: env.SUPABASE_PUBLISHABLE_KEY ?? "",
+    url: env.SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL || "",
+    publishableKey: env.SUPABASE_PUBLISHABLE_KEY || env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "",
     staticPreview: env.GITHUB_PAGES_PREVIEW === "true",
   };
 }
@@ -82,6 +88,46 @@ export async function getPublicTeamMembers(): Promise<TeamMember[]> {
     ...member,
     group: group_name ?? member.group,
   }));
+}
+
+
+/** Server-request reads, deduplicated within a React render. */
+export const getPublicMediaAssets = cache(async (): Promise<MediaAsset[]> =>
+  fetchPublicRows("media_assets", () => [])
+);
+
+export const getPublicSiteMedia = cache(async (): Promise<Array<{ slot: string; media_asset_id: string }>> =>
+  fetchPublicRows("site_media", () => [])
+);
+
+export async function getPublicMediaAsset(id: string | null | undefined): Promise<MediaAsset | undefined> {
+  if (!id) return undefined;
+  const rows = await getPublicMediaAssets();
+  return rows.find((asset) => asset.id === id)
+    ?? (publicReadConfig().publishableKey ? undefined : getMediaAsset(id));
+}
+
+export async function getPublicMediaBySourceUrl(url: string): Promise<MediaAsset | undefined> {
+  const source = url.split("?")[0].split("#")[0];
+  const rows = await getPublicMediaAssets();
+  return rows.find((asset) => asset.source_key === source || asset.source_url === source)
+    ?? (publicReadConfig().publishableKey ? undefined : getMediaBySourceUrl(url));
+}
+
+export async function getPublicSiteMediaId(slot: string): Promise<string | undefined> {
+  const rows = await getPublicSiteMedia();
+  return rows.find((row) => row.slot === slot)?.media_asset_id
+    ?? (publicReadConfig().publishableKey ? undefined : getSiteMediaId(slot));
+}
+
+export function getPublishedEvents(): Promise<EventRecord[]> {
+  return fetchPublicRows("events", () => getEvents().filter((event) =>
+    event.status === "published" && !event.date_review_required
+  ));
+}
+
+export function getPublishedPages(): Promise<PageRecord[]> {
+  return fetchPublicRows("site_pages", () => getPages().filter((page) => page.published));
 }
 
 export async function fetchPublishedPageMarkdown(
