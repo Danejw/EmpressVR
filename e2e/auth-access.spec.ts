@@ -20,7 +20,7 @@ test("signup requires two matching passwords and does not grant membership", asy
   await page.getByLabel("Password", { exact: true }).fill("sufficient-test-password");
   await page.getByLabel("Confirm password").fill("different-test-password");
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page.getByRole("alert")).toContainText("Passwords do not match");
+  await expect(page.locator(".auth-panel .auth-error")).toContainText("Passwords do not match");
   await expect(page.getByText("Membership approval is separate.")).toBeVisible();
 });
 
@@ -39,7 +39,7 @@ test("reset password without an authenticated recovery link shows recovery instr
 test("invalid callback redirects to login instead of opening private pages", async ({ page }) => {
   await page.goto("/auth/callback?next=https://example.org/");
   await expect(page).toHaveURL(/\/login\?error=link$/);
-  await expect(page.getByRole("alert")).toContainText("invalid or has expired");
+  await expect(page.locator(".auth-panel .auth-error")).toContainText("invalid or has expired");
 });
 
 test("unauthenticated account and staff routes redirect to login", async ({ page }) => {
