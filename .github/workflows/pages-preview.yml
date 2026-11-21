@@ -20,34 +20,63 @@ jobs:
     if: github.ref == 'refs/heads/feat/squarespace-faithful-rebuild'
     runs-on: ubuntu-latest
     steps:
-      # GitHub Pages is currently restricted to this feature branch.
-      # Publish the actual main branch artifact until Pages settings allow main.
-      - uses: actions/checkout@v4
+      # GitHub Pages currently permits deployments from this workflow branch.
+      # Preserve the main preview and publish the separate Supabase branch
+      # under /EmpressVR/supabase-integration/ in the same artifact.
+      - name: Check out main
+        uses: actions/checkout@v4
         with:
           ref: main
+          path: main-site
+      - name: Check out Supabase integration
+        uses: actions/checkout@v4
+        with:
+          ref: supabase-integration
+          path: integration-site
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - name: Install supported npm
         run: npm install --global npm@11.21.1
-      - name: Install dependencies
+      - name: Install main dependencies
+        working-directory: main-site
         run: npm install --no-audit --no-fund
-      - name: Export static preview
+      - name: Export main preview
+        working-directory: main-site
         run: npm run build
         env:
           GITHUB_PAGES_PREVIEW: 'true'
-      - name: Verify preview cannot be indexed
+      - name: Install integration dependencies
+        working-directory: integration-site
+        run: npm install --no-audit --no-fund
+      - name: Export Supabase integration preview
+        working-directory: integration-site
+        run: npm run build
+        env:
+          GITHUB_PAGES_PREVIEW: 'true'
+          GITHUB_PAGES_BASE_PATH: /EmpressVR/supabase-integration
+          NEXT_PUBLIC_SUPABASE_URL: https://zxsrixbjsmyzmqywukwa.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_zbZpIX0JIxaGwJ6UBAu7PA_g4WT3rsa
+      - name: Combine both static exports
         run: |
-          grep -q "noindex" out/index.html
-          grep -q "Disallow: /" out/robots.txt
-      - name: Preserve Next.js underscore paths
-        run: touch out/.nojekyll
+          mkdir -p main-site/out/supabase-integration
+          cp -a integration-site/out/. main-site/out/supabase-integration/
+          touch main-site/out/.nojekyll
+      - name: Verify separate previews and no indexing
+        run: |
+          test -f main-site/out/index.html
+          test -f main-site/out/supabase-integration/index.html
+          test -f main-site/out/supabase-integration/supabase-check/index.html
+          grep -q "noindex" main-site/out/index.html
+          grep -q "noindex" main-site/out/supabase-integration/index.html
+          grep -q "noindex" main-site/out/supabase-integration/supabase-check/index.html
+          grep -q "Disallow: /" main-site/out/robots.txt
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Upload static preview
+      - name: Upload combined static preview
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out
+          path: ./main-site/out
 
   deploy:
     if: github.ref == 'refs/heads/feat/squarespace-faithful-rebuild'
@@ -58,5 +87,5 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        name: Publish branch preview
+        name: Publish main and Supabase preview
         uses: actions/deploy-pages@v4
