@@ -6,7 +6,7 @@ const contentDir = join(process.cwd(), "src", "content", "legacy");
 const routes = readdirSync(contentDir)
   .filter((name) => name.endsWith(".md"))
   .map((name) => name === "home.md" ? "/" : "/" + name.slice(0, -3).replaceAll("__", "/"))
-  .concat("/home")
+  .concat("/home", "/book")
   .sort();
 
 test.describe("migrated page inventory", () => {
