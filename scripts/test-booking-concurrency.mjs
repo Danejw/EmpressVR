@@ -9,7 +9,7 @@ if (!/127\.0\.0\.1|localhost/.test(new URL(dbUrl).hostname)) {
 }
 function psql(query, firstOutput) {
   return new Promise((resolve, reject) => {
-    const proc = spawn("psql", ["-X", "-q", "-A", "-t", "-v", "ON_ERROR_STOP=1", "--dbname", dbUrl, "-c", query]);
+    const proc = spawn("psql", ["-X", "-q", "-A", "-t", "-v", "ON_ERROR_STOP=1", "--dbname", dbUrl, "-f", "-"]);
     let stdout = "", stderr = "", first = false;
     proc.stdout.on("data", chunk => {
       stdout += String(chunk);
@@ -19,6 +19,7 @@ function psql(query, firstOutput) {
       }
     });
     proc.stderr.on("data", chunk => { stderr += String(chunk); });
+    proc.stdin.end(query);
     proc.once("error", reject);
     proc.once("close", code => resolve({ code, stdout, stderr }));
   });
