@@ -34,8 +34,8 @@ The existing `node scripts/export-supabase-seed.mjs` script produces `supabase/s
 
 ## Complete schema-migration foundation
 
-The repository now includes **eight sequential migrations** under
-`supabase/migrations/`, creating 26 RLS-enabled application tables.
+The repository now includes **ten sequential migrations** under
+`supabase/migrations/`, creating 30 RLS-enabled application tables.
 Besides the original content/media baseline, they cover staff roles,
 fundraising campaigns, membership plans and applications, bookings and
 capacity holds, orders, payment events, entitlement records, subscriptions,
@@ -48,7 +48,7 @@ to a hosted Supabase project, and live booking/commerce adapters are still
 unconnected. This preserves Squarespace operations until cutover.
 
 ## Later content import and application integration
-1. Create or designate the appropriate Supabase project and review **all eight** migration files plus the target project's current schema and migration history. Apply the complete set only to the intended project after approval.
+1. Create or designate the appropriate Supabase project and review **all ten** migration files plus the target project's current schema and migration history. Apply the complete set only to the intended project after approval.
 2. Use the public site-media Storage bucket for public images. Files remain separate from Postgres metadata. Never upload paid digital downloads to this public bucket; paid assets need a separately secured private bucket.
 3. Run node scripts/export-supabase-seed.mjs to prepare supabase/seed-content.sql and supabase/asset-upload-manifest.json. Apply the SQL seed using an authenticated migration connection. It is idempotent by stable IDs and preserves the original Markdown bodies.
 4. Upload each manifest entry to the site-media bucket using the exact stored key. Verify object hashes/counts and public URLs before switching the media provider.

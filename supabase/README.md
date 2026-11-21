@@ -37,8 +37,10 @@ reservation holds, payment transitions and idempotency.
 | `20261120000005_memberships_subscriptions.sql` | Membership applications, approved members, recurring subscriptions |
 | `20261120000006_transactional_workflows.sql` | Private atomic payment and booking transition operations |
 | `20261120000007_private_storage.sql` | Private bucket for purchased digital downloads |
+| `20261120000008_backend_relationships.sql` | Bookable offerings, product downloads, customer and booking contacts, recurring invoices, adjustment ledger |
+| `20261120000009_order_integrity.sql` | Booking order/line consistency enforced by database constraints and trigger |
 
-All 26 public application tables have RLS enabled. Browser roles can only
+All 30 public application tables have RLS enabled. Browser roles can only
 select published public catalogs/content and their own staff-role entry.
 They cannot directly change content, book seats, view orders or retrieve
 private payment/customer information. Sensitive workflows run through
@@ -64,6 +66,23 @@ Google Calendar synchronization are deliberately not fabricated.
    upload the manifest's media files to `site-media`.
 5. Set up server-only credentials, Stripe, calendar adapters and signed private
    file delivery after the operational requirements are confirmed.
+
+## Database hardening and verified scope
+
+The additional migrations link booking order lines to an offering, purchased
+entitlements to the exact product in their paid order, and products to private
+download objects. Booking contacts and customer email are private tables/fields;
+subscription invoices and refund/dispute adjustments have provider identifiers
+for future reconciliation. All new public tables have RLS enabled with no
+browser grants.
+
+CI now attempts a fresh reset, four pgTAP test files, a repeated import of
+the 48-page / 160-media source snapshot, and a real simultaneous two-client
+capacity check. A successful run proves schema deployability, the imported
+content's relational integrity, and the tested authorization behavior. It does
+not prove that real webhooks, guest booking flows, private file delivery,
+calendar sync, admin editing, or subscription billing are operational. The
+application adapters must be implemented and verified separately.
 
 A remote `db push` applies **schema migrations only**; it does not apply the
 local seed or upload image binaries. Never put service-role keys or provider

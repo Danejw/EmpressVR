@@ -43,7 +43,7 @@ GitHub Actions runs the checks above, including desktop/mobile Playwright tests.
 
 ## Supabase database
 
-Eight ordered migrations in `supabase/migrations/` define the 26-table
+Ten ordered migrations in `supabase/migrations/` define the 30-table
 Postgres foundation, RLS policies, transactional booking/payment operations,
 and public/private Storage buckets. See [Supabase setup](supabase/README.md)
 for the one-time local setup, `supabase db reset`, `supabase test db`,
