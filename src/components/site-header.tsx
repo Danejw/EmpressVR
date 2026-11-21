@@ -16,6 +16,7 @@ export async function SiteHeader() {
       <nav className="site-nav" aria-label="Primary navigation">
         {siteSections.map(section=><Link key={section.slug} href={"/"+section.slug}>{section.title}</Link>)}
         <CartHeaderLink />
+        <Link href="/account">Account</Link>
       </nav>
       <Link className="header-cta" href={schedule}>View Classes &amp; Socials</Link>
       <details className="mobile-menu">
@@ -23,6 +24,7 @@ export async function SiteHeader() {
         <nav aria-label="Mobile navigation">
           {siteSections.map(section=><Link key={section.slug} href={"/"+section.slug}>{section.title}</Link>)}
           <CartHeaderLink />
+          <Link href="/account">Account</Link>
           <Link href={schedule}>View Classes &amp; Socials</Link>
         </nav>
       </details>
