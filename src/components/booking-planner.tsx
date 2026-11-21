@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   bookableSlots, canReviewRequest, formatPrice, formatSlotTime,
   monthCells, slotsOnDay, type ArchivedCourse, type BookingOffering, type BookingSlot,
@@ -175,7 +176,7 @@ export function BookingPlanner({
     </div>
     {archivedCourses.length ? <section className="booking-archived" aria-label="Previously offered courses">
       <h3>Explore our classes</h3>
-      <p>These courses are from EmpressVR's existing catalog. They are currently marked sold out.</p>
+      <p>These courses are from the existing EmpressVR catalog. They are currently marked sold out.</p>
       <div className="booking-archived-grid">
         {archivedCourses.map((course) => <article key={course.id}>
           <h4>{course.title}</h4>
@@ -184,7 +185,7 @@ export function BookingPlanner({
             <span>{formatPrice(course.priceMinor, course.currency)}</span>
             <span className="booking-sold-out">{course.soldOut ? "Sold out" : "Contact for availability"}</span>
           </div>
-          <a href={"/store/p/" + course.slug}>Course details</a>
+          <Link href={"/store/p/" + course.slug}>Course details</Link>
         </article>)}
       </div>
     </section> : null}
