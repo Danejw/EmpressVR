@@ -484,3 +484,23 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
 .content-cta { margin: 24px 0 35px; }
 .project-tone-2 .outline-button { color: var(--navy); background: white; border-color: var(--navy); }
 .project-tone-2 .outline-button:hover { background: var(--navy); color: white; }
+
+/* Dedicated details and visitor controls */
+.detail-page { max-width: 1100px; margin: 0 auto; }
+.detail-back { display: inline-block; margin-bottom: 24px; color: #6d2572; text-decoration: underline; }
+.detail-heading { margin-bottom: 35px; }
+.detail-heading h1, .detail-page h1 { margin: 0 0 18px; }
+.detail-page > p a { text-decoration: underline; }
+.product-price { display: block; margin: 22px 0; font-size: 1.5rem; }
+.product-gallery { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,270px),1fr)); gap: 18px; margin: 30px 0; }
+.product-gallery img { width: 100%; height: auto; border-radius: 14px; background: var(--soft-blue); }
+.contact-form { max-width: 700px; margin: 10px 0 60px; display: grid; gap: 18px; }
+.contact-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.contact-form label { display: grid; gap: 7px; font-weight: 600; }
+.contact-form input, .contact-form textarea { width: 100%; border: 1px solid #77798b; border-radius: 8px; padding: 13px 14px; font: inherit; background: white; }
+.contact-form input:focus, .contact-form textarea:focus { outline: 2px solid var(--violet); outline-offset: 1px; }
+.contact-form button { cursor: pointer; border: none; justify-self: start; margin-top: 0; }
+.contact-form button:disabled { opacity: .7; cursor: wait; }
+.contact-form a { text-decoration: underline; }
+.contact-honeypot { display: none; }
+@media (max-width: 600px) { .contact-fields { grid-template-columns: 1fr; } }

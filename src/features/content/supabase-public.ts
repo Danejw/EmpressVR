@@ -194,3 +194,45 @@ export async function fetchPublishedPageSections(
     return null;
   }
 }
+
+type GalleryRow = { media_asset_id: string; position: number };
+/** Relationship-based image ordering; missing remote rows fall back to checked-in data. */
+async function getPublicGallery(
+  table: "page_media" | "project_media" | "product_media",
+  relation: "page_id" | "project_id" | "product_id",
+  id: string,
+  fallback: () => GalleryRow[],
+): Promise<string[]> {
+  const config = publicReadConfig();
+  if (!config.staticPreview && config.url && config.publishableKey) {
+    try {
+      const endpoint = new URL("/rest/v1/" + table, config.url);
+      endpoint.searchParams.set("select", "media_asset_id,position");
+      endpoint.searchParams.set(relation, "eq." + id);
+      endpoint.searchParams.set("order", "position.asc");
+      const response = await fetch(endpoint.toString(), {
+        headers: {apikey: config.publishableKey, Accept: "application/json"},
+        cache: "no-store", signal: AbortSignal.timeout(8000),
+      });
+      if (response.ok) {
+        const remote: unknown = await response.json();
+        if (Array.isArray(remote) && remote.length)
+          return [...new Set((remote as GalleryRow[]).map(row => row.media_asset_id))];
+      }
+    } catch { /* verified bundled images remain available */ }
+  }
+  return [...new Set(fallback().sort((a,b) => a.position-b.position).map(row => row.media_asset_id))];
+}
+
+export async function getPublicPageGallery(pageId: string): Promise<string[]> {
+  const { getPageGallery } = await import("./repository");
+  return getPublicGallery("page_media", "page_id", pageId, () => getPageGallery(pageId));
+}
+export async function getPublicProjectGallery(projectId: string): Promise<string[]> {
+  const { getProjectImages } = await import("./repository");
+  return getPublicGallery("project_media", "project_id", projectId, () => getProjectImages(projectId));
+}
+export async function getPublicProductGallery(productId: string): Promise<string[]> {
+  const { getProductImages } = await import("./repository");
+  return getPublicGallery("product_media", "product_id", productId, () => getProductImages(productId));
+}

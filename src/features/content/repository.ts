@@ -34,3 +34,7 @@ export function getProjectImages(projectId: string) {
 export function getProductImages(productId: string) {
   return index.product_media.filter(item => item.product_id === productId).sort((a,b)=>a.position-b.position);
 }
+
+export function getPageGallery(pageId: string) {
+  return index.page_media.filter(item => item.page_id === pageId).sort((a,b)=>a.position-b.position);
+}
