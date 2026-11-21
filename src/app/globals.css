@@ -63,7 +63,7 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
 .home-hero { background: var(--soft-blue); overflow: hidden; }
 .hero-layout { display: grid; grid-template-columns: 1fr 1fr; min-height: 610px; }
 .hero-message { display: flex; flex-direction: column; justify-content: center; padding: clamp(45px, 7vw, 120px); padding-right: 40px; }
-.hero-message .legacy-copy h2 { margin-top: 0; font-size: clamp(3.1rem, 5.3vw, 5.9rem); line-height: 1.1; }
+.hero-message .legacy-copy h1 { margin-top: 0; font-size: clamp(3.1rem, 5.3vw, 5.9rem); line-height: 1.1; }
 .hero-message .legacy-copy p { max-width: 540px; font-size: clamp(1.1rem, 1.7vw, 1.55rem); }
 .hero-message .legacy-copy p > a:only-child { margin-right: 14px; }
 .hero-art { min-height: 410px; background: linear-gradient(125deg, #5933ba, #bd4dca 50%, #efb45a); }
