@@ -17,13 +17,18 @@ export function ResetPasswordForm() {
 
   useEffect(() => {
     let active = true;
-    const auth = getBrowserAuth();
-    if (!auth) { setChecking(false); return; }
-    void auth.auth.getUser().then(({ data, error: authError }: { data: { user: unknown }; error: unknown }) => {
+    async function checkSession() {
+      const auth = getBrowserAuth();
+      if (!auth) {
+        if (active) setChecking(false);
+        return;
+      }
+      const { data, error: authError } = await auth.auth.getUser();
       if (!active) return;
       setAuthorized(!!data.user && !authError);
       setChecking(false);
-    });
+    }
+    void checkSession();
     return () => { active = false; };
   }, []);
 
