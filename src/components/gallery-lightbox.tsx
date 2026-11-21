@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 export type GalleryImage = { src: string; alt: string };
 
-export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
+export function GalleryLightbox({ images, title }: { images: GalleryImage[]; title: string }) {
   const [active, setActive] = useState<number | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
 
@@ -33,7 +33,7 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
 
   if (!images.length) return null;
   return <>
-    <div className="gallery-lightbox-grid" aria-label="The Self We Find image gallery">
+    <div className="gallery-lightbox-grid" aria-label={title + " image gallery"}>
       {images.map((item, index) => (
         <button key={item.src} className="gallery-lightbox-trigger"
           type="button" onClick={() => setActive(index)}

@@ -67,10 +67,17 @@ export function cleanLegacyContent(key: string, markdown: string): string {
   return copy.trim();
 }
 
-/** The source Markdown contains obsolete CDN full-size image links. */
-export function withoutLegacyFullsizeLinks(markdown: string): string {
-  const offset = markdown.search(/^\[View fullsize!\[/m);
-  return (offset >= 0 ? markdown.slice(0, offset) : markdown).trim();
+/** Split a contiguous legacy full-size image block without losing later article text. */
+export function splitLegacyFullsizeLinks(markdown: string): { before: string; after: string } {
+  const lines = markdown.split("\n");
+  const positions = lines.flatMap((line, index) => line.startsWith("[View fullsize![") ? [index] : []);
+  if (!positions.length) return { before: markdown.trim(), after: "" };
+  const first = positions[0], last = positions[positions.length - 1];
+  const between = lines.slice(first, last + 1);
+  if (between.some(line => line.trim() && !line.startsWith("[View fullsize!["))) {
+    return { before: lines.filter(line => !line.startsWith("[View fullsize![")).join("\n").trim(), after: "" };
+  }
+  return { before: lines.slice(0, first).join("\n").trim(), after: lines.slice(last + 1).join("\n").trim() };
 }
 
 /** Extracts media into reusable gallery sections instead of parsing images as text. */

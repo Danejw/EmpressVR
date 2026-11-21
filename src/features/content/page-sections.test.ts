@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanLegacyContent, isPageSections, sectionsFromMarkdown, withoutLegacyFullsizeLinks } from "./page-sections";
+import { cleanLegacyContent, isPageSections, sectionsFromMarkdown, splitLegacyFullsizeLinks } from "./page-sections";
 
 describe("typed content migration", () => {
   it("does not turn arbitrary JSON into UI", () => {
@@ -26,7 +26,8 @@ describe("typed content migration", () => {
       .toBe("Virtual Reality Projects");
   });
   it("cuts obsolete full-size CDN links while retaining the introduction", () => {
-    expect(withoutLegacyFullsizeLinks("Intro\n[View fullsize![Photo.jpg](https://old.example/x)](https://old.example/x)")).toBe("Intro");
+    const split = splitLegacyFullsizeLinks("Intro\n[View fullsize![Photo.jpg](https://old.example/x)](https://old.example/x)\n\nMore research");
+    expect(split).toEqual({ before: "Intro", after: "More research" });
   });
   it("strips dead imported contact and donation controls", () => {
     const about = cleanLegacyContent("about", "Contact us\n\nName\n\nFirst Name(required)\n\nLast Name(required)\n\nEmail(required)\n\nWhat can we help you with today?(required)\n\nSendSend\n\nSupporters");
