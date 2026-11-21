@@ -19,7 +19,8 @@
     "content:generate": "node scripts/build-content-index.mjs",
     "content:validate": "node scripts/validate-content-index.mjs",
     "media:import": "node scripts/import-media.mjs",
-    "verify:media:storage": "node scripts/verify-supabase-media.mjs"
+    "verify:media:storage": "node scripts/verify-supabase-media.mjs",
+    "content:sections": "node scripts/export-structured-content.mjs"
   },
   "dependencies": {
     "next": "16.4.6",

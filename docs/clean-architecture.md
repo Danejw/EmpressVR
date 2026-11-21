@@ -11,7 +11,7 @@ The rebuild runs on the existing Next.js + Supabase + Vercel stack. Existing pat
 
 ## Hosted database cutover
 
-**Do not update production Supabase as part of branch preview.** Inspect hosted migration history and apply the new additive migration explicitly after approval. Prepare and import edited `body_sections` for all 48 snapshots, validating each page's images and destinations before replacing Markdown as the source. Do not overwrite future manual edits: prefer only null `body_sections` rows and review diffs. After the migration, keep the Markdown compatibility path only until all pages have sections.
+**Do not update production Supabase as part of branch preview.** Inspect hosted migration history and apply the new additive migration explicitly after approval. Run `npm run content:sections` to generate `supabase/seed-sections.sql` for all 48 local snapshots. Review that SQL and the page images/links before applying it manually to the intended hosted database; the exporter never connects to Supabase. The updates only fill null `body_sections` values. Do not overwrite future manual edits: prefer only null `body_sections` rows and review diffs. After the migration, keep the Markdown compatibility path only until all pages have sections.
 
 ## Contact form
 
