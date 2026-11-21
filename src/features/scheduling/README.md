@@ -9,3 +9,11 @@ Paid bookings may be confirmed only by trusted server-side logic after the corre
 **Still missing:** approved live offerings and capacity policies; Supabase reservation tables/transactions/RLS; authentication and PII retention; available slots from Google Calendar with explicit zone handling; a public booking UI/API; email notices, reschedules, cancellation/refund policies, calendars and reconciliation; payment linkage. Existing Acuity/Squarespace booking URLs remain operational. The module has no network actions or working reservation endpoint.
 
 The `domain.test.ts` tests cover validation, time boundaries, transitions, idempotent retry rules, and the required atomic-capacity contract using a test-only ledger.
+
+## Community events calendar
+
+The `/community` page now includes a read-only Google Calendar events adapter and
+month-grid UI. It requires separate `GOOGLE_COMMUNITY_CALENDAR_ID` and OAuth
+credentials on server-capable hosting; the static GitHub Pages preview remains
+unconnected. See [Google Calendar setup](../../../docs/google-calendar.md).
+This does not enable booking writes or change existing Squarespace/Acuity links.
