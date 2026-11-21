@@ -1,0 +1,6 @@
+# EmpressVR local Supabase CLI project. No remote project is linked.
+project_id = "empressvr"
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]

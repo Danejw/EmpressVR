@@ -1,0 +1,3 @@
+-- Local development seed entry point, applied after migrations by Supabase CLI.
+-- Intentionally empty until non-sensitive test fixtures are approved.
+-- Production Squarespace content is exported separately to seed-content.sql.

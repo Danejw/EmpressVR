@@ -8,8 +8,32 @@ The frontend reads structured JSON through src/features/content/repository.ts. T
 
 Fixed image slots are in site_media (e.g. home.hero, home.community and site.logo.dark). Project and product galleries have ordered join rows. Team headshots and featured images use foreign keys. This lets editors replace or reuse an image without changing page layout code.
 
+## Standard Supabase CLI layout (not connected)
+
+The version-controlled Supabase project lives at `supabase/` alongside `src/`. It contains:
+
+- `config.toml` for local CLI configuration (no remote project reference or credentials).
+- `migrations/20261120000000_content_media_foundation.sql` as the first timestamped migration, preserving the original content/media schema and RLS policies unchanged.
+- `seed.sql` as the standard local seed entry point. It is intentionally empty so a reset cannot accidentally import unreviewed site content.
+- `.gitignore` to exclude CLI-managed local state.
+
+The timestamp prefix must contain 14 digits for Supabase CLI migration discovery. Future migrations should be created with `supabase migration new <name>`, reviewed, and added to this same directory. Do not maintain a duplicate declarative schema directory for these SQL migrations.
+
+Once the Supabase CLI and Docker-compatible runtime are installed, run from the repository root:
+
+```bash
+supabase --version
+supabase start
+supabase db reset
+supabase migration list
+```
+
+`db reset` recreates the **local** database from versioned migrations and runs `supabase/seed.sql`. Do not run it against a database that contains data you need to preserve. No local stack or hosted database has been started or changed by preparing this structure.
+
+The existing `node scripts/export-supabase-seed.mjs` script produces `supabase/seed-content.sql` and `supabase/asset-upload-manifest.json` separately. Its preserved Squarespace content and image uploads require explicit review and a later import; neither is automatically applied on local reset. A future hosted deploy requires reviewing the target project's schema and migration history and explicitly selecting the remote target in Supabase CLI v3 (such as `supabase db push --remote` after approval).
+
 ## Proposed Supabase deployment
-1. Create or designate the appropriate Supabase project, then review supabase/migrations/20261120_content_media_foundation.sql. It creates site_pages, projects, team_members, products, events, blog_posts, media_assets and explicit gallery and fixed-slot relations. Apply the migration to the chosen project only after reviewing its existing schema.
+1. Create or designate the appropriate Supabase project, then review supabase/migrations/20261120000000_content_media_foundation.sql. It creates site_pages, projects, team_members, products, events, blog_posts, media_assets and explicit gallery and fixed-slot relations. Apply the migration to the chosen project only after reviewing its existing schema.
 2. Use the public site-media Storage bucket for public images. Files remain separate from Postgres metadata. Never upload paid digital downloads to this public bucket; paid assets need a separately secured private bucket.
 3. Run node scripts/export-supabase-seed.mjs to prepare supabase/seed-content.sql and supabase/asset-upload-manifest.json. Apply the SQL seed using an authenticated migration connection. It is idempotent by stable IDs and preserves the original Markdown bodies.
 4. Upload each manifest entry to the site-media bucket using the exact stored key. Verify object hashes/counts and public URLs before switching the media provider.

@@ -39,6 +39,7 @@ GitHub Actions runs the checks above, including desktop/mobile Playwright tests.
 - `.skills/README.md` source registry, update guidance and honest coverage gaps
 - `docs/brand.md` source-backed EmpressVR brand identity, design taste, typography, colors and UI review checklist
 - `docs` architecture, migration plan and inventory
+- `supabase/` standard CLI config, timestamped migrations and local seed entry point (see `docs/migration/supabase.md`)
 
 ## Implementation status
 
