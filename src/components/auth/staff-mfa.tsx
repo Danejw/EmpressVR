@@ -23,7 +23,7 @@ export function StaffMfa() {
       if (!auth) return;
       const { data } = await auth.auth.mfa.listFactors();
       if (cancelled) return;
-      setFactor(data?.totp?.find(item => item.status === "verified") ?? null);
+      setFactor(data?.totp?.find((item: Factor) => item.status === "verified") ?? null);
     }
     void load();
     return () => { cancelled = true; };
