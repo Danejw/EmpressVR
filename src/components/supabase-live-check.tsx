@@ -17,7 +17,7 @@ const TABLES: ReadonlyArray<{ name: TableName; label: string; expected: number }
   { name: "team_members", label: "Team members", expected: 9 },
   { name: "products", label: "Published products", expected: 4 },
   { name: "events", label: "Archived and published events", expected: 7 },
-  { name: "media_assets", label: "Verified images in Supabase Storage", expected: 160 },
+  { name: "media_assets", label: "Imported media database records", expected: 160 },
 ];
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -108,9 +108,10 @@ export function SupabaseLiveCheck() {
       })}
     </div>
     <p className="supabase-checker-footnote">
-      Image metadata was imported, but the 160 image files have not been transferred into Supabase Storage yet.
-      The database only exposes verified uploaded media to anonymous readers. The main site and this
-      branch’s static pages still load the packaged images.
+      All 148 distinct site images and the favicon are now verified in the public Supabase Storage
+      bucket. The media record count above reflects database records, not Storage objects.
+      The integration preview serves the site images directly from Supabase; the local files
+      remain available only as an offline fallback.
     </p>
   </section>;
 }

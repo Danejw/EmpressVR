@@ -21,6 +21,9 @@ jobs:
         run: npm run content:validate
       - name: Verify exportable Supabase seed
         run: node scripts/export-supabase-seed.mjs
+      - name: Verify all public Supabase Storage image hashes
+        if: github.ref == 'refs/heads/supabase-integration'
+        run: npm run verify:media:storage
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test

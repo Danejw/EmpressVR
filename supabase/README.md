@@ -113,11 +113,13 @@ relationships. It is **historical content**, not a live offering or booking
 catalog. Existing bookings, payments, Stripe IDs, and customer data were not
 fabricated.
 
-The 160 optimized image files still exist in the checked-in `public/media`
-directory but have **not** been transferred into Supabase Storage. The remote
-media records are marked `remote` until upload verification completes. The
-`site-media` bucket exists and is public; the `paid-downloads` bucket exists
-and is private. Never interpret metadata alone as uploaded bytes.
+The 148 unique optimized WebP files, referenced by 160 media records, were
+uploaded to the public `site-media` bucket and verified against their SHA-256
+hashes. The original favicon was uploaded separately as WebP, giving 149 public
+Storage objects. All 160 media records are marked `imported`. The
+`paid-downloads` bucket remains private. Local copies remain in `public/media`
+for development and rollback; they are no longer needed by the deployed
+integration preview.
 
 `src/features/content/supabase-public.ts` reads published projects,
 products and team members only when `SUPABASE_URL` and
@@ -130,3 +132,26 @@ disabled until authenticated workflows and verified provider integration exist.
 Do not commit service-role/secret keys. The URL is public, and the publishable
 key is safe for low-privilege client use, but environment configuration is
 preferred over hardcoded credentials.
+
+
+## Supabase public media migration
+
+The integration branch uses `src/features/content/media-url.ts` as the common
+URL resolver for all published site images. Supabase URLs are built from verified
+`media_assets.storage_key` values. The original Squarespace URL fields remain
+for migration provenance and local source matching, but never become a rendered
+image URL. The favicon uses its verified public Storage object.
+
+`npm run verify:media:storage` downloads the public objects from Supabase and
+checks each file's byte size and SHA-256 against the checked-in catalog, plus the
+favicon's fixed hash. It is read-only, requires no secret key, and is run in CI
+on the `supabase-integration` branch. This catches missing or corrupted
+objects before deployment. The 148 unique catalog files and the favicon each
+have their original bytes verified against pinned local source content.
+The temporary privileged migration Edge Function has been disabled.
+
+To use the hosted media locally, set `NEXT_PUBLIC_SUPABASE_URL` to
+`https://zxsrixbjsmyzmqywukwa.supabase.co`; with no Supabase URL configured,
+the renderer serves local files instead. In production, a server-only
+`SUPABASE_URL` can also enable this resolver. No image rendering needs
+privileged API keys.

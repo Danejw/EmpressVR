@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     description,
     url: "/",
   },
-  icons: { icon: "https://images.squarespace-cdn.com/content/v1/6675b24a42baae7c4c24730e/6de4e97a-b4f9-46c1-9acb-aec2f80d99f2/favicon.ico?format=100w" }
+  icons: { icon: "https://zxsrixbjsmyzmqywukwa.supabase.co/storage/v1/object/public/site-media/media/7d47d13b010dcf98a25cf2d22b5fe2a41f3ff9cd1a958375ab3b10749e9471c7.webp" }
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
