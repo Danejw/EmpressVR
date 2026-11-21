@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { MediaImage } from "./media-image";
 import { useCart } from "./cart-provider";
 import { displayMoney, PREVIEW_QUANTITY_LIMIT } from "@/features/commerce/cart";
 
@@ -22,7 +21,10 @@ export function StoreCartView() {
           {summary.lines.map(({ product, quantity, lineMinor }) => (
             <article className="cart-entry" key={product.id}>
               <Link href={"/store/p/" + product.slug} className="cart-entry-image">
-                <MediaImage assetId={product.featuredMediaId} alt={product.title} />
+                {product.featuredMediaUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={product.featuredMediaUrl} alt={product.title} loading="lazy" />
+                ) : null}
               </Link>
               <div className="cart-entry-details">
                 <h2><Link href={"/store/p/" + product.slug}>{product.title}</Link></h2>

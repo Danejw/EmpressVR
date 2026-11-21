@@ -14,6 +14,7 @@ export type StoreProduct = Readonly<{
   currency: string;
   soldOut: boolean;
   featuredMediaId: string | null;
+  featuredMediaUrl?: string | null;
 }>;
 
 export type CartLine = Readonly<{ productId: string; quantity: number }>;
