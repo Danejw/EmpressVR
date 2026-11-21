@@ -46,4 +46,4 @@ jobs:
       - name: Rebuild both public preview sites from latest branch heads
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run pages-preview.yml --ref feat/squarespace-faithful-rebuild
+        run: gh workflow run pages-preview.yml --repo Danejw/EmpressVR --ref feat/squarespace-faithful-rebuild
