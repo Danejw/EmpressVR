@@ -69,16 +69,16 @@ insert into public.order_items(
   '40000000-0000-4000-8000-000000000003',
   '40000000-0000-4000-8000-000000000001',1,500,'once'
 );
-select lives_ok($$
-  insert into public.entitlements(order_item_id,product_id)
-  values ('40000000-0000-4000-8000-000000000004',
-          '40000000-0000-4000-8000-000000000001')
-$$, 'Purchased product can receive an entitlement');
-select throws_ok($$
+select throws_ok($
   insert into public.entitlements(order_item_id,product_id)
   values ('40000000-0000-4000-8000-000000000004',
           '40000000-0000-4000-8000-000000000002')
-$$, '23503', null, 'Entitlement cannot grant an unpurchased product');
+$, '23503', null, 'Entitlement cannot grant an unpurchased product');
+select lives_ok($
+  insert into public.entitlements(order_item_id,product_id)
+  values ('40000000-0000-4000-8000-000000000004',
+          '40000000-0000-4000-8000-000000000001')
+$, 'Purchased product can receive an entitlement');
 
 select lives_ok($$
   insert into public.product_downloads(product_id,storage_key,filename,available)
