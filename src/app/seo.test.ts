@@ -3,17 +3,20 @@ import robots from "./robots";
 import sitemap from "./sitemap";
 import { getPages } from "../features/content/repository";
 
-const previousPreview = process.env.GITHUB_PAGES_PREVIEW;
-
+const oldVercelEnv = process.env.VERCEL_ENV;
+const oldSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 afterEach(() => {
-  if (previousPreview === undefined) delete process.env.GITHUB_PAGES_PREVIEW;
-  else process.env.GITHUB_PAGES_PREVIEW = previousPreview;
+  if (oldVercelEnv === undefined) delete process.env.VERCEL_ENV;
+  else process.env.VERCEL_ENV = oldVercelEnv;
+  if (oldSiteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+  else process.env.NEXT_PUBLIC_SITE_URL = oldSiteUrl;
 });
 
 describe("search engine metadata", () => {
-  it("lists published, substantive pages without duplicating /home", () => {
-    delete process.env.GITHUB_PAGES_PREVIEW;
-    const urls = sitemap().map((item) => item.url);
+  it("lists published pages without duplicating /home", async () => {
+    delete process.env.VERCEL_ENV;
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+    const urls = (await sitemap()).map((item) => item.url);
     const expected = getPages()
       .filter((page) => page.published && !["/blog", "/coming-soon"].includes(page.path))
       .map((page) => "https://www.empressvr.com" + page.path);
@@ -23,15 +26,15 @@ describe("search engine metadata", () => {
     expect(urls).not.toContain("https://www.empressvr.com/home");
   });
 
-  it("keeps the public feature-branch preview out of search engines", () => {
-    process.env.GITHUB_PAGES_PREVIEW = "true";
+  it("keeps Vercel preview out of search engines", async () => {
+    process.env.VERCEL_ENV = "preview";
     expect(robots().rules).toEqual({ userAgent: "*", disallow: "/" });
     expect(robots().sitemap).toBeUndefined();
-    expect(sitemap().every((item) => item.url.startsWith("https://danejw.github.io/EmpressVR/"))).toBe(true);
+    expect((await sitemap()).every((item) => item.url.startsWith("https://www.empressvr.com/"))).toBe(true);
   });
 
   it("exposes a production sitemap after approved cutover", () => {
-    delete process.env.GITHUB_PAGES_PREVIEW;
+    delete process.env.VERCEL_ENV;
     expect(robots()).toEqual({
       rules: { userAgent: "*", allow: "/" },
       sitemap: "https://www.empressvr.com/sitemap.xml",

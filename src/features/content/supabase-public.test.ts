@@ -45,6 +45,38 @@ describe("public Supabase content adapter", () => {
       .toEqual([{ id: "cached" }]);
   });
 
+
+  it("filters public events to published, date-reviewed records", async () => {
+    const request = vi.fn<typeof fetch>().mockResolvedValue(new Response("[]", { status: 200 }));
+    const fallback = vi.fn(() => [{ id: "archived" }]);
+    expect(await fetchPublicRows("events", fallback, config, request)).toEqual([]);
+    const [url] = request.mock.calls[0];
+    expect(url).toContain("status=eq.published");
+    expect(url).toContain("date_review_required=eq.false");
+    expect(fallback).not.toHaveBeenCalled();
+  });
+
+  it("reads the current public image library and editable image slots", async () => {
+    const request = vi.fn<typeof fetch>().mockResolvedValue(new Response("[]", { status: 200 }));
+    await fetchPublicRows("media_assets", () => [], config, request);
+    await fetchPublicRows("site_media", () => [], config, request);
+    expect(String(request.mock.calls[0][0])).toContain("media_assets?select=*&status=eq.imported");
+    expect(String(request.mock.calls[1][0])).toContain("site_media?select=*&order=slot.asc");
+    for (const [,init] of request.mock.calls) {
+      expect(init?.headers).toEqual({ apikey: config.publishableKey, Accept: "application/json" });
+      expect(init?.cache).toBe("no-store");
+    }
+  });
+
+  it("accepts browser publishable configuration without any secret key", () => {
+    const env = {
+      NEXT_PUBLIC_SUPABASE_URL: config.url,
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: config.publishableKey,
+      SUPABASE_SERVICE_ROLE_KEY: "not-used",
+    } as NodeJS.ProcessEnv;
+    expect(publicReadConfig(env)).toEqual(config);
+  });
+
   it("keeps secret credentials out of public content configuration", () => {
     const env = {
       NODE_ENV: "test",
