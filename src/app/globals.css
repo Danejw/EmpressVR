@@ -179,3 +179,42 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
 .store-detail-link { display: inline-block; text-decoration: underline; text-underline-offset: 4px; margin-top: 12px; font-size: .86rem; }
 @media (max-width: 1100px) { .store-grid { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .store-card { grid-template-columns: 1fr; } .store-card-image { min-height: 240px; } .store-page { padding-block: 45px 80px; } }
+
+/* The Community month grid replaces the current Squarespace Calendar Block. */
+.community-calendar-section { margin: 55px auto 70px; }
+.community-calendar-section > h3 { text-align: center; margin: 0 0 32px; }
+.community-calendar { max-width: 900px; margin: 0 auto; }
+.community-calendar-navigation { display: grid; grid-template-columns: 1fr minmax(0, 4fr) 1fr; align-items: center; text-align: center; gap: 10px; margin-bottom: 20px; }
+.community-calendar-navigation h4 { font-size: 28px; margin: 0; }
+.community-calendar-navigation button { color: var(--navy); background: transparent; border: 0; cursor: pointer; font-size: 32px; line-height: 36px; padding: 0 15px; min-height: 44px; }
+.community-calendar-navigation button:disabled { opacity: .26; cursor: default; }
+.community-calendar-weekdays, .community-calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.community-calendar-weekdays { font-size: 12px; text-align: center; margin-bottom: 8px; }
+.community-calendar-day, .community-calendar-blank { min-width: 0; min-height: 122px; padding: 8px; background: rgba(110, 110, 110, .05); border: 0; color: var(--navy); text-align: left; }
+.community-calendar-day { display: flex; flex-direction: column; align-items: flex-start; }
+.community-calendar-day.is-today { background: rgba(110, 110, 110, .1); }
+.community-calendar-day.has-events { cursor: pointer; }
+.community-calendar-day.has-events:hover, .community-calendar-day.is-selected { background: var(--soft-blue); }
+.community-calendar-day .calendar-day-name { display: block; font-size: 12px; }
+.community-calendar-day .calendar-day-number { font-size: 18px; line-height: 1.4; font-weight: 600; }
+.calendar-event-markers { display: flex; flex-direction: column; gap: 4px; max-width: 100%; width: 100%; margin-top: 5px; }
+.calendar-event-marker { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 11px; background: #f4d5f3; border-radius: 3px; padding: 2px 4px; }
+.calendar-event-more { font-size: 11px; }
+.community-calendar-details { margin-top: 20px; padding: 20px 24px; background: #f6f4fb; }
+.community-calendar-details h5 { font-weight: 600; font-size: 17px; margin: 0 0 12px; }
+.community-calendar-event { display: flex; align-items: baseline; gap: 15px; margin-top: 8px; font-size: 15px; }
+.community-calendar-event > span { flex: 0 0 65px; font-size: 13px; }
+.community-calendar-event a { text-decoration: underline; text-underline-offset: 3px; }
+.community-calendar-state { font-size: 14px; color: #4c536e; text-align: center; padding: 18px 8px; }
+.community-calendar-state a { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 600px) {
+  .community-calendar-section { margin: 30px auto 45px; }
+  .community-calendar-navigation h4 { font-size: 22px; }
+  .community-calendar-day, .community-calendar-blank { min-height: 70px; padding: 5px; }
+  .community-calendar-day .calendar-day-name { font-size: 10px; }
+  .community-calendar-day .calendar-day-number { font-size: 14px; }
+  .calendar-event-marker { font-size: 0; width: 7px; height: 7px; border-radius: 50%; padding: 0; }
+  .calendar-event-markers { flex-direction: row; gap: 4px; }
+  .calendar-event-more { font-size: 9px; }
+  .community-calendar-event { flex-direction: column; gap: 0; }
+}
