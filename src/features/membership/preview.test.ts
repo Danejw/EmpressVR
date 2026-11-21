@@ -12,7 +12,7 @@ const completeCommunity: MembershipDraft = {
   communityContribution: "I teach community art workshops.", acceptsPrivacy: true,
 };
 const completeCoop: MembershipDraft = {
-  ...completeCommunity(), kind: "user", coopContribution: "I can organize meetups.",
+  ...completeCommunity, kind: "user", coopContribution: "I can organize meetups.",
   objectiveAlignment: "I want to increase access to creative technology.",
   acceptsTerms: true,
 };
