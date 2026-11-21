@@ -41,6 +41,14 @@ GitHub Actions runs the checks above, including desktop/mobile Playwright tests.
 - `docs` architecture, migration plan and inventory
 - `supabase/` standard CLI config, timestamped migrations and local seed entry point (see `docs/migration/supabase.md`)
 
+## Supabase database
+
+Eight ordered migrations in `supabase/migrations/` define the 26-table
+Postgres foundation, RLS policies, transactional booking/payment operations,
+and public/private Storage buckets. See [Supabase setup](supabase/README.md)
+for the one-time local setup, `supabase db reset`, `supabase test db`,
+and later hosted deployment. Nothing has been pushed to a hosted database.
+
 ## Implementation status
 
 On the feature branch, the home, projects, team, store, header and footer are source-backed reproductions. Other public pages render through reusable content templates. The local catalog includes 48 source snapshots, 7 projects, 9 team members, 4 products, 7 archived events and 160 imported public media assets. A future Supabase schema and export are prepared but not applied. The public preview is excluded from search indexing; live commerce and booking flows still use Squarespace. **No production Stripe, Supabase, or Google Calendar integration is implemented yet.** The source snapshots still require client verification, including the empty blog and image descriptions. Keep the existing site live until content, bookings and payments are independently verified.
