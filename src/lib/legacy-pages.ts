@@ -1,6 +1,7 @@
 import "server-only";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { fetchPublishedPageMarkdown } from "@/features/content/supabase-public";
 
 const contentDirectory = join(process.cwd(), "src", "content", "legacy");
 
@@ -12,6 +13,8 @@ export async function listLegacySlugs(): Promise<string[]> {
 
 export async function readLegacyPage(slug: string): Promise<string | null> {
   if (!/^[a-z0-9-]+(?:__[a-z0-9-]+)*$/.test(slug)) return null;
+  const remote = await fetchPublishedPageMarkdown(slug);
+  if (remote.connected) return remote.body;
   try {
     return await readFile(join(contentDirectory, slug + ".md"), "utf8");
   } catch (error) {

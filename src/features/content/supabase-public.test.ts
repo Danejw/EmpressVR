@@ -56,3 +56,24 @@ describe("public Supabase content adapter", () => {
     expect(publicReadConfig(env)).toEqual(config);
   });
 });
+
+describe("published page content", () => {
+  it("reads approved Markdown through public RLS", async () => {
+    const request = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify([{ body_markdown: "# New page" }]), { status: 200 }),
+    );
+    const { fetchPublishedPageMarkdown } = await import("./supabase-public");
+    const result = await fetchPublishedPageMarkdown("about", config, request);
+    expect(result).toEqual({ connected: true, body: "# New page" });
+    const [url] = request.mock.calls[0];
+    expect(url).toContain("source_key=eq.about");
+    expect(url).toContain("published=eq.true");
+  });
+
+  it("does not revive a removed or unpublished database page from a local snapshot", async () => {
+    const request = vi.fn<typeof fetch>().mockResolvedValue(new Response("[]", { status: 200 }));
+    const { fetchPublishedPageMarkdown } = await import("./supabase-public");
+    expect(await fetchPublishedPageMarkdown("retired-page", config, request))
+      .toEqual({ connected: true, body: null });
+  });
+});
