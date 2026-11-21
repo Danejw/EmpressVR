@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Classes and bookings",
   description: "Explore EmpressVR classes, community sessions, and booking dates.",
   alternates: { canonical: "/book" },
+  robots: { index: false, follow: false }, // Hold search indexing until real bookings are enabled.
 };
 
 /**
