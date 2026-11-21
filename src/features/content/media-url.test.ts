@@ -37,6 +37,13 @@ describe("Supabase media resolver", () => {
     expect(mediaSource(undefined, { supabaseUrl: base, localBasePath })).toBeNull();
   });
 
+  it("accepts only UUID-named public blog images", () => {
+    const key = "blog/123e4567-e89b-42d3-a456-426614174000.webp";
+    expect(publicStorageMediaUrl(key, base)).toContain("/site-media/blog/");
+    expect(publicStorageMediaUrl("blog/../../admin.webp", base)).toBeNull();
+    expect(publicStorageMediaUrl("blog/random.webp", base)).toBeNull();
+  });
+
   it("rejects invalid Storage origins, path injection and unknown source images", () => {
     const valid = index.media_assets[0].storage_key;
     expect(publicStorageMediaUrl(valid, "https://supabase.co.evil.example")).toBeNull();

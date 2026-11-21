@@ -2,7 +2,7 @@ import type { MediaAsset } from "./repository";
 
 /** Only validated public Storage object keys are accepted for image URLs. */
 export function publicStorageMediaUrl(storageKey: string, root: string): string | null {
-  if (!/^media\/[a-f0-9]{64}\.(webp|gif|png|jpg|jpeg|avif)$/.test(storageKey)) return null;
+  if (!/^(?:media\/[a-f0-9]{64}|blog\/[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12})\.(webp|gif|png|jpg|jpeg|avif)$/.test(storageKey)) return null;
   try {
     const base = new URL(root);
     if (base.protocol !== "https:" || base.pathname !== "/" ||
