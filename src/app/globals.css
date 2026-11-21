@@ -476,3 +476,11 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
   .supabase-preview-page { padding: 38px 0 70px; }
   .supabase-checker-results { grid-template-columns: 1fr; }
 }
+
+/* Typed page sections and galleries */
+.page-sections > .legacy-copy + .legacy-copy { margin-top: 24px; }
+.content-gallery { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,280px),1fr)); gap: 20px; margin: 28px 0 44px; align-items: start; }
+.content-gallery .gallery-image { display: block; width: 100%; height: auto; background: var(--soft-blue); border-radius: 12px; }
+.content-cta { margin: 24px 0 35px; }
+.project-tone-2 .outline-button { color: var(--navy); background: white; border-color: var(--navy); }
+.project-tone-2 .outline-button:hover { background: var(--navy); color: white; }

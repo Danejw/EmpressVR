@@ -103,21 +103,20 @@ export const getPublicSiteMedia = cache(async (): Promise<Array<{ slot: string; 
 export async function getPublicMediaAsset(id: string | null | undefined): Promise<MediaAsset | undefined> {
   if (!id) return undefined;
   const rows = await getPublicMediaAssets();
-  return rows.find((asset) => asset.id === id)
-    ?? (publicReadConfig().publishableKey ? undefined : getMediaAsset(id));
+  // A missing published row must not hide a verified bundled image.
+  return rows.find((asset) => asset.id === id) ?? getMediaAsset(id);
 }
 
 export async function getPublicMediaBySourceUrl(url: string): Promise<MediaAsset | undefined> {
   const source = url.split("?")[0].split("#")[0];
   const rows = await getPublicMediaAssets();
   return rows.find((asset) => asset.source_key === source || asset.source_url === source)
-    ?? (publicReadConfig().publishableKey ? undefined : getMediaBySourceUrl(url));
+    ?? getMediaBySourceUrl(url);
 }
 
 export async function getPublicSiteMediaId(slot: string): Promise<string | undefined> {
   const rows = await getPublicSiteMedia();
-  return rows.find((row) => row.slot === slot)?.media_asset_id
-    ?? (publicReadConfig().publishableKey ? undefined : getSiteMediaId(slot));
+  return rows.find((row) => row.slot === slot)?.media_asset_id ?? getSiteMediaId(slot);
 }
 
 export function getPublishedEvents(): Promise<EventRecord[]> {
@@ -164,5 +163,34 @@ export async function fetchPublishedPageMarkdown(
     return { connected: true, body: typeof entry?.body_markdown === "string" ? entry.body_markdown : null };
   } catch {
     return { connected: false, body: null };
+  }
+}
+
+/** Optional structured content. Older deployments still have body_markdown. */
+export async function fetchPublishedPageSections(
+  sourceKey: string,
+  config: PublicReadConfig = publicReadConfig(),
+  request: typeof fetch = fetch,
+): Promise<import("./page-sections").PageSection[] | null> {
+  if (config.staticPreview || !config.url || !config.publishableKey) return null;
+  try {
+    const endpoint = new URL("/rest/v1/site_pages", config.url);
+    endpoint.searchParams.set("select", "body_sections");
+    endpoint.searchParams.set("source_key", "eq." + sourceKey);
+    endpoint.searchParams.set("published", "eq.true");
+    endpoint.searchParams.set("limit", "1");
+    const response = await request(endpoint.toString(), {
+      headers: { apikey: config.publishableKey, Accept: "application/json" },
+      cache: "no-store",
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!response.ok) return null; // Existing database may not have the migration.
+    const rows: unknown = await response.json();
+    if (!Array.isArray(rows) || !rows.length) return null;
+    const sections = (rows[0] as { body_sections?: unknown }).body_sections;
+    const { isPageSections } = await import("./page-sections");
+    return isPageSections(sections) ? sections : null;
+  } catch {
+    return null;
   }
 }
