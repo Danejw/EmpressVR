@@ -1,15 +1,16 @@
 import Link from "next/link";
 import {siteSections} from "@/lib/site-sections";
 import {MediaImage} from "@/components/media-image";
-import {getSiteMediaId} from "@/features/content/repository";
+import {getPublicSiteMediaId} from "@/features/content/supabase-public";
 import {CartHeaderLink} from "@/components/cart-header-link";
 
 const schedule = "/scheduling";
-export function SiteHeader() {
+export async function SiteHeader() {
+  const logoId = await getPublicSiteMediaId("site.logo.dark");
   return <header className="site-header">
     <div className="page-container header-inner">
       <Link className="brand-link" href="/" aria-label="EmpressVR home">
-        <MediaImage assetId={getSiteMediaId("site.logo.dark")} alt="EmpressVR" width={210} height={53}
+        <MediaImage assetId={logoId} alt="EmpressVR" width={210} height={53}
           className="site-brand-logo" loading="eager" />
       </Link>
       <nav className="site-nav" aria-label="Primary navigation">

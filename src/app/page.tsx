@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegacyMarkdown } from "@/components/legacy-markdown";
 import { MediaImage } from "@/components/media-image";
 import { readLegacyPage } from "@/lib/legacy-pages";
-import { getSiteMediaId } from "@/features/content/repository";
+import { getPublicSiteMediaId } from "@/features/content/supabase-public";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -19,6 +19,7 @@ function between(text: string, start: string, end?: string): string {
 
 export default async function Home() {
   const source = (await readLegacyPage("home")) || "";
+  const media = await Promise.all(["home.fundraiser","home.hero","home.techalchemy","home.community","home.tarot"].map(getPublicSiteMediaId));
   const fundraiser = between(source, "## The November", "# Welcome to the Metaverse");
   const hero = between(source, "# Welcome to the Metaverse", "## TechAlchemy 2026:");
   const techAlchemy = between(source, "## TechAlchemy 2026:", "### Global Community");
@@ -30,7 +31,7 @@ export default async function Home() {
     <section className="home-fundraiser" aria-label="Current fundraising campaign">
       <div className="page-container feature-layout">
         <div className="feature-image">
-          <MediaImage assetId={getSiteMediaId("home.fundraiser")} alt="EmpressVR Community Growth Flywheel" loading="eager" />
+          <MediaImage assetId={media[0]} alt="EmpressVR Community Growth Flywheel" loading="eager" />
         </div>
         <LegacyMarkdown markdown={withoutMedia(fundraiser)} className="feature-copy" />
       </div>
@@ -40,7 +41,7 @@ export default async function Home() {
       <div className="hero-layout">
         <div className="hero-message"><LegacyMarkdown markdown={withoutMedia(hero)} /></div>
         <div className="hero-art">
-          <MediaImage assetId={getSiteMediaId("home.hero")} alt="Colorful EmpressVR metaverse character" loading="eager" />
+          <MediaImage assetId={media[1]} alt="Colorful EmpressVR metaverse character" loading="eager" />
         </div>
       </div>
     </section>
@@ -49,7 +50,7 @@ export default async function Home() {
       <div className="page-container feature-layout">
         <LegacyMarkdown markdown={withoutMedia(techAlchemy)} className="feature-copy" />
         <div className="feature-image poster-frame">
-          <MediaImage assetId={getSiteMediaId("home.techalchemy")} alt="TechAlchemy 2026: A Bristol Immersive Showcase poster" />
+          <MediaImage assetId={media[2]} alt="TechAlchemy 2026: A Bristol Immersive Showcase poster" />
         </div>
       </div>
     </section>
@@ -58,7 +59,7 @@ export default async function Home() {
       <div className="page-container community-layout">
         <LegacyMarkdown markdown={withoutMedia(community)} />
         <div className="community-art">
-          <MediaImage assetId={getSiteMediaId("home.community")} alt="EmpressVR immersive creative community" />
+          <MediaImage assetId={media[3]} alt="EmpressVR immersive creative community" />
         </div>
       </div>
     </section>
@@ -66,7 +67,7 @@ export default async function Home() {
     <section className="home-tarot">
       <div className="page-container tarot-layout">
         <div className="tarot-art">
-          <MediaImage assetId={getSiteMediaId("home.tarot")} alt="The Empress tarot card" />
+          <MediaImage assetId={media[4]} alt="The Empress tarot card" />
         </div>
         <LegacyMarkdown markdown={tarot} />
       </div>

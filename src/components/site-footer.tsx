@@ -1,12 +1,13 @@
 import Link from "next/link";
 import {MediaImage} from "@/components/media-image";
-import {getSiteMediaId} from "@/features/content/repository";
+import {getPublicSiteMediaId} from "@/features/content/supabase-public";
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const logoId = await getPublicSiteMediaId("site.logo.light");
   return <footer className="site-footer">
     <div className="page-container footer-inner">
       <div className="footer-identity">
-        <MediaImage assetId={getSiteMediaId("site.logo.light")} alt="EmpressVR" width={224} height={74}
+        <MediaImage assetId={logoId} alt="EmpressVR" width={224} height={74}
           className="footer-logo" />
         <p>Empress Immersive LTD<br />Registered in England<br />Company Number 16325264</p>
       </div>

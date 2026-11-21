@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LegacyMarkdown } from "@/components/legacy-markdown";
 import { MediaImage } from "@/components/media-image";
-import { getSiteMediaId } from "@/features/content/repository";
+import { getPublicSiteMediaId } from "@/features/content/supabase-public";
 import { getPublicTeamMembers } from "@/features/content/supabase-public";
 import { listLegacySlugs,readLegacyPage } from "@/lib/legacy-pages";
 
@@ -17,6 +17,7 @@ export default async function WhoWeAre() {
   const intro = original.slice(0, original.indexOf("- ![](")).trim();
   const imported = new Set(await listLegacySlugs());
   const members = await getPublicTeamMembers();
+  const joinImage = await getPublicSiteMediaId("team.join");
   return <article className="people-page">
     <div className="intro-band">
       <div className="page-container"><LegacyMarkdown markdown={intro} /></div>
@@ -38,7 +39,7 @@ export default async function WhoWeAre() {
           </article>;
         })}
         <article className="member-card member-invite">
-          <MediaImage assetId={getSiteMediaId("team.join")} alt="Co-operative membership" />
+          <MediaImage assetId={joinImage} alt="Co-operative membership" />
           <div className="member-copy">
             <h2>Join the Co-op!</h2>
             <p>Membership Applications are Always Open!</p>
