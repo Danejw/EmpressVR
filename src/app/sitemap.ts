@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getPublishedPages } from "@/features/content/supabase-public";
+import { getPublishedPages } from "../features/content/supabase-public";
 
 export const dynamic = "force-dynamic";
 const excludedPaths = new Set(["/blog", "/coming-soon"]);
