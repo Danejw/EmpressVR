@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerAuth } from "@/lib/auth/server";
+import { authCallbackDestination } from "@/lib/auth/callback-destination";
 
 /**
  * Exchange the one-time Supabase PKCE code for a cookie-backed session.
@@ -10,8 +11,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const error = searchParams.get("error");
   const next = searchParams.get("next");
-  const allowed = new Set(["/login?verified=1", "/reset-password", "/account"]);
-  const destination = next && allowed.has(next) ? next : "/account";
+  const destination = authCallbackDestination(next);
   const origin = request.nextUrl.origin;
 
   if (error) return NextResponse.redirect(new URL("/login?error=link", origin));

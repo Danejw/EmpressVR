@@ -36,7 +36,7 @@ test.describe("migrated page inventory", () => {
           const path = url.pathname.replace(/\/+$/, "") || "/";
           return allowedPaths.includes(path) ? [] : [href];
         });
-      }, [...routes, "/login"]);
+      }, [...routes, "/login", "/signup", "/forgot-password", "/reset-password"]);
       expect(brokenLinks, "broken in-app navigation at " + route).toEqual([]);
 
       const missingSources = await page.locator("img").evaluateAll((images) =>

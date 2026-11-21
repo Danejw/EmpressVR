@@ -1,33 +1,40 @@
-# EVR-20: member and staff login
+# EVR-21: Email/password authentication
 
-## Design
-One Supabase Auth email-OTP login at /login for registered people, staff and members. New accounts are not automatically approved members or staff. User profile data lives in customers.user_id; membership status is read from memberships and membership_applications. The existing staff_roles table is authoritative for admin/editor permissions. /account is private; /staff requires staff role and authenticator-app MFA (AAL2). No service role API key is used in the web application.
+## Authentication flow
 
-The admin-only /staff invites feature writes a seven-day pending staff invitation. It does **not** send an email. The invited staff member can go to /login and sign in with that email; the first verified sign-in redeems the invitation. No one can self-assign a role.
+EmpressVR uses Supabase email/password authentication, with a single account for members and staff. Passwords are managed exclusively by Supabase Auth. There are no application password tables or secret-role credentials.
 
-## Hosted Supabase OTP email template (one-time manual setup)
-Supabase Dashboard → Authentication → Email Templates → **Magic Link**. Replace the content with:
-```html
-<h2>Your EmpressVR sign-in code</h2>
-<p>Enter this six-digit code to sign in: <strong>{{ .Token }}</strong></p>
-<p>If you didn't request this, you can ignore this email.</p>
-```
-For the first-time signup / confirmation email template, also ensure the confirmation message exposes \`{{ .Token }}\`, otherwise a first-time user may receive a confirmation link instead of a code. Configure / auth URL allow list appropriately. The Supabase built-in sender may allow delivery only to authorized team addresses and is rate-limited. Custom SMTP/Resend is intentionally deferred.
+- **/signup**: email, password (minimum eight characters), password confirmation, and email verification via Supabase's default confirmation link.
+- **/login**: email and password. An authenticated user is provisioned in \`customers\`, and the server-controlled \`claim_staff_invitation()\` RPC checks any pending invite linked to their verified email. Routing is based on the live \`staff_roles\` table.
+- **/forgot-password**: send a recovery email, with a generic successful response to avoid identifying existing accounts.
+- **/auth/callback**: exchange Supabase PKCE authentication codes using the cookie-based server client. Only three fixed internal redirect paths are allowed.
+- **/reset-password**: require an authenticated recovery session before changing a password, then sign out and return to login.
+- **/account**: private profile, live membership status and applications; registration is not membership approval.
+- **/staff**: assigned admin/editor roles only, with mandatory authenticator-app MFA (AAL2). Admin invitations remain seven-day records and require a separately verified email to redeem.
 
-## Bootstrap first admin
-1. Sign in using /login with the designated staff email after enabling the OTP email template. This creates the auth user.
-2. In Supabase SQL editor, as project owner, identify the user and assign its role. Replace the email intentionally:
-```sql
-select id, email from auth.users where email = '<authorized staff email>' and email_confirmed_at is not null;
-insert into public.staff_roles(user_id,role) values('<verified user UUID>','admin');
-```
-3. Sign in again and go to /staff/security to enroll an authenticator app.
-4. Visit /staff. An admin can then create staff invitations for new editors or admins. Send the login URL to the invited person by your usual communication channel. Invitation emails are not sent automatically.
+The SSR session implementation uses @supabase/ssr and Next.js cookies. Never make authorization decisions from editable user metadata. Keep existing Row Level Security policies in place.
 
-## Operational constraints
-- No public anonymous writes to content tables. Staff CMS editing is not yet implemented.
-- OTP delivery is throttled by Supabase; default email delivery has limited recipients.
-- Payment flows, membership approval and billing are separate projects.
-- Role checks are enforced on the server on every protected request; browser metadata does not grant permissions.
-- Staff MFA verification is required for /staff routes and administrative invite creation.
-- Existing public content remains accessible while auth is rolled out.
+## Hosted Supabase setup
+
+Supabase project: \`zxsrixbjsmyzmqywukwa\`
+
+The Site URL and allowlisted redirect origin are \`https://empress-vr.vercel.app\`. Email confirmation should remain **enabled**. The default "Confirm your email address" and "Reset your password" link templates can remain unchanged. No custom SMTP, Resend, or paid Supabase plan is required for the application implementation, although built-in Supabase email delivery remains restricted/rate-limited.
+
+Signup passes \`https://empress-vr.vercel.app/auth/callback?next=/login%3Fverified%3D1\` as emailRedirectTo, and password recovery passes \`https://empress-vr.vercel.app/auth/callback?next=/reset-password\`. Ensure the URLs are accepted in Supabase Auth Redirect URLs (use an allowlisted \`https://empress-vr.vercel.app/**\` pattern or the exact callback URLs).
+
+A confirmation email link is used only for signup. Normal password sign-in requires no email. Recovery emails are only required for forgotten passwords. Validate both hosted emails with real accounts before public onboarding.
+
+## Existing users and staff
+
+Existing verified Supabase Auth users keep their identities, memberships, and staff role bindings. Users who had passwordless accounts can use "Forgot password" to establish a password if the default recovery email is deliverable.
+
+First admin bootstrap remains a privileged project-owner action after the staff member has an authenticated verified account:
+\`\`\`sql
+select id, email from auth.users where email = '<verified staff email>' and email_confirmed_at is not null;
+insert into public.staff_roles(user_id,role) values('<verified user UUID>', 'admin');
+\`\`\`
+Staff sign in with a password and must complete authenticator-app MFA at \`/staff/security\`. Admins can invite editors/admins inside \`/staff\`; no invitation email is sent by the application.
+
+## QA
+
+Automated tests cover new page rendering, password validation, recovery landing, callback redirect safety and anonymous staff/member access. Integration test with real confirmation and recovery emails remains a manual step requiring access to a real inbox. No transactional email provider configured in EVR-21.
