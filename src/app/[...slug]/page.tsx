@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { PageSections } from "@/components/page-sections";
 import { GalleryLightbox } from "@/components/gallery-lightbox";
-import { getPublishedProjects, getPublishedPages, getPublicTeamMembers, getPublicMediaAssets, getPublicPageGallery, fetchPublishedPageSections, publicReadConfig } from "@/features/content/supabase-public";
+import { getPublishedProjects, getPublishedPages, getPublicTeamMembers, getPublicMediaAsset, getPublicPageGallery, fetchPublishedPageSections, publicReadConfig } from "@/features/content/supabase-public";
 import { mediaSource } from "@/features/content/media-url";
 import { cleanLegacyContent, sectionsFromMarkdown, withoutLegacyFullsizeLinks } from "@/features/content/page-sections";
 import { readLegacyPage, sourcePageUrl } from "@/lib/legacy-pages";
@@ -51,17 +51,18 @@ export default async function ContentRoute({ params }: Props) {
   const galleryImages = key === "the-self-we-find" ? await (async () => {
     const record = (await getPublishedPages()).find(page => page.source_key === key);
     if (!record) return [];
-    const [imageIds, assets] = await Promise.all([
-      getPublicPageGallery(record.id),
-      getPublicMediaAssets(),
-    ]);
-    const byId = new Map(assets.map(asset => [asset.id, asset]));
+    const imageIds = await getPublicPageGallery(record.id);
     const config = publicReadConfig();
-    return imageIds.flatMap((id, index) => {
-      const asset = byId.get(id);
+    const resolved = await Promise.all(imageIds.map(async (id, index) => {
+      const asset = await getPublicMediaAsset(id);
       const src = mediaSource(asset, { supabaseUrl: config.url, localBasePath: "" });
-      return src ? [{ src, alt: asset?.alt_text?.trim() || `The Self We Find scene ${index + 1}` }] : [];
-    });
+      if (!src) return null;
+      const storedAlt = asset?.alt_text?.trim() || "";
+      const alt = !storedAlt || /\.(png|jpe?g|gif|webp|jfif)$/i.test(storedAlt)
+        ? `The Self We Find scene ${index + 1}` : storedAlt;
+      return { src, alt };
+    }));
+    return resolved.filter((image): image is { src: string; alt: string } => image !== null);
   })() : [];
   const pageCopy = key === "the-self-we-find"
     ? withoutLegacyFullsizeLinks(archivedCopy) : archivedCopy;
