@@ -32,13 +32,28 @@ supabase migration list
 
 The existing `node scripts/export-supabase-seed.mjs` script produces `supabase/seed-content.sql` and `supabase/asset-upload-manifest.json` separately. Its preserved Squarespace content and image uploads require explicit review and a later import; neither is automatically applied on local reset. A future hosted deploy requires reviewing the target project's schema and migration history and explicitly selecting the remote target in Supabase CLI v3 (such as `supabase db push --remote` after approval).
 
-## Proposed Supabase deployment
-1. Create or designate the appropriate Supabase project, then review supabase/migrations/20261120000000_content_media_foundation.sql. It creates site_pages, projects, team_members, products, events, blog_posts, media_assets and explicit gallery and fixed-slot relations. Apply the migration to the chosen project only after reviewing its existing schema.
+## Complete schema-migration foundation
+
+The repository now includes **eight sequential migrations** under
+`supabase/migrations/`, creating 26 RLS-enabled application tables.
+Besides the original content/media baseline, they cover staff roles,
+fundraising campaigns, membership plans and applications, bookings and
+capacity holds, orders, payment events, entitlement records, subscriptions,
+and a private paid-download Storage bucket.
+
+The full migration list, local reset commands, pgTAP tests, security model,
+and hosted deployment procedure live in [supabase/README.md](../../supabase/README.md).
+The migration SQL is prepared in version control. It has **not** been applied
+to a hosted Supabase project, and live booking/commerce adapters are still
+unconnected. This preserves Squarespace operations until cutover.
+
+## Later content import and application integration
+1. Create or designate the appropriate Supabase project and review **all eight** migration files plus the target project's current schema and migration history. Apply the complete set only to the intended project after approval.
 2. Use the public site-media Storage bucket for public images. Files remain separate from Postgres metadata. Never upload paid digital downloads to this public bucket; paid assets need a separately secured private bucket.
 3. Run node scripts/export-supabase-seed.mjs to prepare supabase/seed-content.sql and supabase/asset-upload-manifest.json. Apply the SQL seed using an authenticated migration connection. It is idempotent by stable IDs and preserves the original Markdown bodies.
 4. Upload each manifest entry to the site-media bucket using the exact stored key. Verify object hashes/counts and public URLs before switching the media provider.
 5. Implement a Supabase-backed repository adapter with the same read functions as the local JSON adapter. Keep existing site routes and React components unchanged.
-6. Add authenticated roles and authorization-tested create/update/publish workflows before building an admin dashboard. By default, this schema grants public reads to published content and no public writes.
+6. Staff role records and explicit content read grants are prepared in SQL. Build authorized server-side create/update/publish workflows and complete integration tests before enabling an admin dashboard. Public browser roles still have no direct writes.
 
 ## Validation and remaining review
 Run npm run content:validate, npm run test, npm run build and npm run test:e2e. CI runs the browser tests at desktop and mobile sizes. The importer report lives in docs/migration/media-import-report.json.
