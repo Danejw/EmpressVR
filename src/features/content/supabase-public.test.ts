@@ -70,6 +70,7 @@ describe("public Supabase content adapter", () => {
 
   it("accepts browser publishable configuration without any secret key", () => {
     const env = {
+      NODE_ENV: "test",
       NEXT_PUBLIC_SUPABASE_URL: config.url,
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: config.publishableKey,
       SUPABASE_SERVICE_ROLE_KEY: "not-used",
