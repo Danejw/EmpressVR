@@ -20,7 +20,11 @@ jobs:
     if: github.ref == 'refs/heads/feat/squarespace-faithful-rebuild'
     runs-on: ubuntu-latest
     steps:
+      # GitHub Pages is currently restricted to this feature branch.
+      # Publish the actual main branch artifact until Pages settings allow main.
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
