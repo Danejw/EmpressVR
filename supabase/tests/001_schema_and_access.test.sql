@@ -12,9 +12,10 @@ select is(
      'site_media','page_media','project_media','product_media','staff_roles',
      'donation_campaigns','membership_plans','offerings','booking_slots','bookings',
      'customers','orders','order_items','payment_events','outbox_jobs','entitlements',
-     'membership_applications','memberships','subscriptions'
+     'membership_applications','memberships','subscriptions',
+       'product_downloads','booking_contacts','subscription_invoices','payment_adjustments'
    ]))::integer,
-  26, 'All 26 required EmpressVR public tables exist'
+  30, 'All 30 required EmpressVR public tables exist'
 );
 select is(
   (select count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace
@@ -24,9 +25,10 @@ select is(
        'site_media','page_media','project_media','product_media','staff_roles',
        'donation_campaigns','membership_plans','offerings','booking_slots','bookings',
        'customers','orders','order_items','payment_events','outbox_jobs','entitlements',
-       'membership_applications','memberships','subscriptions'
+       'membership_applications','memberships','subscriptions',
+       'product_downloads','booking_contacts','subscription_invoices','payment_adjustments'
      ]))::integer,
-  26, 'RLS is enabled on all 26 public tables'
+  30, 'RLS is enabled on all 30 public tables'
 );
 select ok(has_table_privilege('anon','public.site_pages','select'),
   'Anonymous visitors can query published content subject to RLS');
