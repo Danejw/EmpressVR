@@ -115,7 +115,7 @@ export async function fetchPublishedPageMarkdown(
     }
     // An empty authorized response means unpublished/missing: don't revive a
     // local archived page that staff intentionally unpublished.
-    return { connected: true, body: entry?.body_markdown ?? null };
+    return { connected: true, body: typeof entry?.body_markdown === "string" ? entry.body_markdown : null };
   } catch {
     return { connected: false, body: null };
   }
