@@ -52,6 +52,15 @@ export default async function ArchivedPage({ params }: Props) {
   const calendarStart = key === "community" ? markdown.indexOf(calendarHeading) : -1;
   const calendarEnd = calendarStart >= 0 ? markdown.indexOf(nextHeading, calendarStart) : -1;
   const hasCalendar = calendarStart >= 0 && calendarEnd > calendarStart;
+  // Replace nonfunctional Squarespace application-form text in the source
+  // snapshot. The real, live application remains on the existing site.
+  const membershipFormHeading = key === "join-the-coop"
+    ? "# Applications Are Open!"
+    : key === "join-the-coop-na" ? "# Applications Are Currently Closed" : null;
+  const membershipFormStart = membershipFormHeading
+    ? markdown.indexOf(membershipFormHeading)
+    : key === "join-the-community" ? markdown.indexOf("\nName\n") : -1;
+  const hasLegacyMembershipForm = membershipFormStart >= 0;
   const thisMonth = monthKey();
   const firstMonth = shiftMonth(thisMonth, -3);
   const lastMonth = shiftMonth(thisMonth, 12);
@@ -94,6 +103,18 @@ export default async function ArchivedPage({ params }: Props) {
           />
         </section>
         <LegacyMarkdown markdown={markdown.slice(calendarEnd)} />
+      </> : hasLegacyMembershipForm ? <>
+        <LegacyMarkdown markdown={markdown.slice(0, membershipFormStart)} />
+        <section className="membership-legacy-handoff" aria-label="Membership application">
+          <h2>{key === "join-the-coop-na" ? "Applications are currently closed" : "Explore membership applications"}</h2>
+          <p>Preview the membership types, application questions, and joining costs in our new interface. This preview does not submit an application.</p>
+          <div>
+            <Link className="pill-button" href="/membership">Explore the new membership form</Link>
+            <a href={sourcePageUrl(key)} rel="noopener noreferrer">
+              {key === "join-the-coop-na" ? "Check the current application status" : "Apply on the current EmpressVR website"}
+            </a>
+          </div>
+        </section>
       </> : <LegacyMarkdown markdown={productMarkdown} />}
       {key === "scheduling" || key === "fun-raiser" || key.startsWith("store__p__") ? (
         <p className="legacy-checkout-note">Booking and payment processing are still handled on the existing website during migration.{" "}

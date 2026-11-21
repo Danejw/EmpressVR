@@ -8,7 +8,9 @@ const routes = readdirSync(contentDir)
   .map((name) => name === "home.md" ? "/" : "/" + name.slice(0, -3).replaceAll("__", "/"))
   .concat("/home", "/book", "/cart", "/checkout",
     "/checkout/status/success", "/checkout/status/pending",
-    "/checkout/status/cancelled", "/checkout/status/error")
+    "/checkout/status/cancelled", "/checkout/status/error",
+    "/membership", "/membership/status/pending", "/membership/status/approved",
+    "/membership/status/rejected", "/membership/status/withdrawn")
   .sort();
 
 test.describe("migrated page inventory", () => {

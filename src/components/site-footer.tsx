@@ -13,6 +13,7 @@ export function SiteFooter() {
       <div className="footer-links">
         <Link href="/scheduling">Book a Social VR Class</Link>
         <Link href="/about">More About EmpressVR</Link>
+        <Link href="/membership">Memberships</Link>
         <a href="mailto:info@empressvr.com">info@empressvr.com</a>
         <a href="tel:+447340037783">+44 (0) 7340037783</a>
       </div>

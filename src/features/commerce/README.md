@@ -38,3 +38,34 @@ file access may derive from a redirect or a query string.
 Automated coverage: `src/features/commerce/cart.test.ts` and
 `e2e/store-checkout.spec.ts`, with all original browser and migration checks.
 No remote database, live Stripe product, or Squarespace checkout is modified.
+
+## Phase 1C: membership application preview
+
+`/membership` contains source-grounded cards for the free Community, £1
+Supporter, and £1 joining fee + £13–£52/quarter User memberships. Employee
+membership is informational only (the source site says there are no employees).
+The User quarterly slider illustrates the existing sliding-scale range;
+**it is not an approved or activated Stripe subscription price**.
+See `src/features/membership/preview.ts`.
+
+The application UI displays the membership-specific questions, communication
+preferences, privacy and co-op terms consents, and a validated review stage.
+It holds any typed details **only in current React component memory**. There
+is no submission, database write, browser storage, email transmission, account
+creation, charge, approval, or membership/voting entitlement.
+
+The archived, nonfunctional Squarespace form text is suppressed on
+`/join-the-community`, `/join-the-coop`, and `/join-the-coop-na`
+without changing the preserved Markdown source files. Those routes link to
+the new preview and the original official form. The North America archived
+page's "applications closed" message is preserved in the handoff.
+
+The four status routes `/membership/status/{pending,approved,rejected,withdrawn}`
+are nonindexable **examples only**, never real application lookups. Integrate
+with the existing RLS-protected `membership_applications`, `memberships`,
+`membership_plans`, and `subscriptions` tables only after a real authenticated
+application service, approved plan data, authorized reviewer workflow, and
+Stripe lifecycle are ready. No paid plan or member entitlement may be inferred
+from this preview, selected slider value, redirect, or customer-controlled data.
+Tests live in `src/features/membership/preview.test.ts` and
+`e2e/membership-preview.spec.ts`. No hosted resources have been changed.
