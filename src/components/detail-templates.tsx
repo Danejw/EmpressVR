@@ -3,13 +3,12 @@ import { PageSections } from "@/components/page-sections";
 import { MediaImage } from "@/components/media-image";
 import { StoreAddButton } from "@/components/store-add-button";
 import { displayMoney } from "@/features/commerce/cart";
-import { getPublicPageGallery, getPublicProductGallery } from "@/features/content/supabase-public";
-import { getPages } from "@/features/content/repository";
+import { getPublicPageGallery, getPublicProductGallery, getPublishedPages } from "@/features/content/supabase-public";
 import { cleanLegacyContent, sectionsFromMarkdown } from "@/features/content/page-sections";
 import type { StoreProduct } from "@/features/commerce/cart";
 
 export async function ArtworkDetail({ keyName, markdown }: { keyName: string; markdown: string }) {
-  const page = getPages().find(item => item.source_key === keyName);
+  const page = (await getPublishedPages()).find(item => item.source_key === keyName);
   const imageIds = page ? await getPublicPageGallery(page.id) : [];
   const heading = keyName === "projects-metalwork" ? "Metalwork" : "Digital 2D Art";
   const fallback = sectionsFromMarkdown(markdown);

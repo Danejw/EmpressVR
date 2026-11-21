@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanLegacyContent, isPageSections, sectionsFromMarkdown } from "./page-sections";
+import { cleanLegacyContent, isPageSections, sectionsFromMarkdown, splitLegacyFullsizeLinks } from "./page-sections";
 
 describe("typed content migration", () => {
   it("does not turn arbitrary JSON into UI", () => {
@@ -10,6 +10,24 @@ describe("typed content migration", () => {
     const parts = sectionsFromMarkdown("# Art\n\n![](https://images.example/a.png)\n\n![](https://images.example/b.png)");
     expect(parts.map(item => item.type)).toEqual(["rich_text", "gallery"]);
     expect(parts[1]).toMatchObject({ images: [{ sourceUrl: "https://images.example/a.png" }, { sourceUrl: "https://images.example/b.png" }] });
+  });
+  it("normalizes Community heading semantics without losing calendar markers", () => {
+    const source = "# Amplifying Diverse Voices\n### Community Listings!\n### Community Calendar!\n# Building a Global Community\n## Empowering Community Ownership";
+    const normalized = cleanLegacyContent("community", source);
+    expect(normalized).toContain("## Community Listings!");
+    expect(normalized).toContain("### Community Calendar!");
+    expect(normalized).toContain("## Building a Global Community");
+    expect(normalized).toContain("### Empowering Community Ownership");
+  });
+  it("cleans About links and Dominique's imported heading artifact", () => {
+    expect(cleanLegacyContent("about", "](https://www.empressvr.com/projects-digital-2d-art) ](https://www.empressvr.com/projects-metalwork)"))
+      .toBe("](/community) ](/education)");
+    expect(cleanLegacyContent("dominique-vyborna", "Virtual Reality\\ \\ Projects"))
+      .toBe("Virtual Reality Projects");
+  });
+  it("cuts obsolete full-size CDN links while retaining the introduction", () => {
+    const split = splitLegacyFullsizeLinks("Intro\n[View fullsize![Photo.jpg](https://old.example/x)](https://old.example/x)\n\nMore research");
+    expect(split).toEqual({ before: "Intro", after: "More research" });
   });
   it("strips dead imported contact and donation controls", () => {
     const about = cleanLegacyContent("about", "Contact us\n\nName\n\nFirst Name(required)\n\nLast Name(required)\n\nEmail(required)\n\nWhat can we help you with today?(required)\n\nSendSend\n\nSupporters");

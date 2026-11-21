@@ -30,7 +30,13 @@ export function cleanLegacyContent(key: string, markdown: string): string {
     copy = lines.filter((line, i) => !(i > 0 && line.startsWith("# ") &&
       first && line.replaceAll("\\*", "*").includes(first.replaceAll("\\*", "*").slice(2).repeat(2)))).join("\n");
   }
-  if (key === "community") copy = copy.replace(/^Item 1 of 6\s*$/gm, "");
+  if (key === "community") {
+    copy = copy.replace(/^Item 1 of 6\s*$/gm, "");
+    copy = copy.replace(/^### Community Listings!$/m, "## Community Listings!");
+    copy = copy.replace(/^# Building a Global Community$/m, "## Building a Global Community");
+    copy = copy.replace(/^## Empowering Community Ownership$/m, "### Empowering Community Ownership");
+    copy = copy.replace(/^## Monthly Pub Socials In Bristol UK!$/m, "### Monthly Pub Socials In Bristol UK!");
+  }
   if (key === "education") {
     copy = copy.replace("Schedule Appointment with Empress VR", "[Schedule an appointment](/scheduling)");
     copy = copy.replace(/(## John Howard - Cyrnus)([\s\S]*)$/, (_, title: string, rest: string) =>
@@ -51,7 +57,27 @@ export function cleanLegacyContent(key: string, markdown: string): string {
   if (key === "store__masks") {
     copy = copy.replace(/#### No results found[\s\S]*$/, "");
   }
+  if (key === "about") {
+    copy = copy.replace("](https://www.empressvr.com/projects-digital-2d-art)", "](/community)");
+    copy = copy.replace("](https://www.empressvr.com/projects-metalwork)", "](/education)");
+  }
+  if (key === "dominique-vyborna") {
+    copy = copy.replaceAll("Virtual Reality\\ \\ Projects", "Virtual Reality Projects");
+  }
   return copy.trim();
+}
+
+/** Split a contiguous legacy full-size image block without losing later article text. */
+export function splitLegacyFullsizeLinks(markdown: string): { before: string; after: string } {
+  const lines = markdown.split("\n");
+  const positions = lines.flatMap((line, index) => line.startsWith("[View fullsize![") ? [index] : []);
+  if (!positions.length) return { before: markdown.trim(), after: "" };
+  const first = positions[0], last = positions[positions.length - 1];
+  const between = lines.slice(first, last + 1);
+  if (between.some(line => line.trim() && !line.startsWith("[View fullsize!["))) {
+    return { before: lines.filter(line => !line.startsWith("[View fullsize![")).join("\n").trim(), after: "" };
+  }
+  return { before: lines.slice(0, first).join("\n").trim(), after: lines.slice(last + 1).join("\n").trim() };
 }
 
 /** Extracts media into reusable gallery sections instead of parsing images as text. */

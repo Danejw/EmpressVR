@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { PageSections } from "@/components/page-sections";
-import { getPublishedProjects, getPublicTeamMembers, fetchPublishedPageSections } from "@/features/content/supabase-public";
-import { cleanLegacyContent, sectionsFromMarkdown } from "@/features/content/page-sections";
+import { GalleryLightbox } from "@/components/gallery-lightbox";
+import { getPublishedProjects, getPublishedPages, getPublicTeamMembers, getPublicMediaAsset, getPublicPageGallery, fetchPublishedPageSections, publicReadConfig } from "@/features/content/supabase-public";
+import { mediaSource } from "@/features/content/media-url";
+import { cleanLegacyContent, sectionsFromMarkdown, splitLegacyFullsizeLinks } from "@/features/content/page-sections";
 import { readLegacyPage, sourcePageUrl } from "@/lib/legacy-pages";
 
 type Props = { params: Promise<{ slug: string[] }> };
@@ -42,8 +44,34 @@ export default async function ContentRoute({ params }: Props) {
   const membershipStart = membershipFormHeading ? copy.indexOf(membershipFormHeading) :
     key === "join-the-community" ? copy.indexOf("\nName\n") : -1;
   const archivedCopy = membershipStart >= 0 ? copy.slice(0, membershipStart) : copy;
-  const sections = !name && membershipStart < 0
+  const gallerySpec: { title: string; skip: number } | undefined = ({
+    "the-self-we-find": { title: "The Self We Find", skip: 0 },
+    "shadows-of-combat": { title: "Shadows of Combat", skip: 3 },
+    "dndstreettheatre": { title: "Shadows of Combat", skip: 3 },
+  } as Record<string, { title: string; skip: number }>)[key];
+  const sections = !gallerySpec && !name && membershipStart < 0
     ? await fetchPublishedPageSections(key) : null;
+  // The imported full-size links still point to Squarespace. Use the live
+  // database gallery and its public Storage objects instead.
+  const galleryImages = gallerySpec ? await (async () => {
+    const record = (await getPublishedPages()).find(page => page.source_key === key);
+    if (!record) return [];
+    const imageIds = (await getPublicPageGallery(record.id)).slice(gallerySpec.skip);
+    const config = publicReadConfig();
+    const resolved = await Promise.all(imageIds.map(async (id, index) => {
+      const asset = await getPublicMediaAsset(id);
+      const src = mediaSource(asset, { supabaseUrl: config.url, localBasePath: "" });
+      if (!src) return null;
+      const storedAlt = asset?.alt_text?.trim() || "";
+      const alt = !storedAlt || /\.(png|jpe?g|gif|webp|jfif)$/i.test(storedAlt)
+        ? `${gallerySpec.title} scene ${index + 1}` : storedAlt;
+      return { src, alt };
+    }));
+    return resolved.filter((image): image is { src: string; alt: string } => image !== null);
+  })() : [];
+  const { before: pageCopy, after: laterCopy } = gallerySpec
+    ? splitLegacyFullsizeLinks(archivedCopy)
+    : { before: archivedCopy, after: "" };
 
   return <article className="legacy-page"><div className="page-container">
     {name ? <header className="detail-heading">
@@ -57,7 +85,9 @@ export default async function ContentRoute({ params }: Props) {
       <Link className="pill-button" href="/book">Explore the new booking calendar</Link>
       <a href={sourcePageUrl(key)} rel="noopener noreferrer">Book on the current EmpressVR website</a>
     </div> : null}
-    <PageSections sections={sections ?? sectionsFromMarkdown(archivedCopy)}/>
+    <PageSections sections={sections ?? sectionsFromMarkdown(pageCopy)}/>
+    {galleryImages.length ? <GalleryLightbox title={gallerySpec?.title || "Gallery"} images={galleryImages}/> : null}
+    {laterCopy ? <PageSections sections={sectionsFromMarkdown(laterCopy)}/> : null}
     {membershipStart >= 0 ? <section className="membership-legacy-handoff">
       <h2>{key === "join-the-coop-na" ? "Applications are currently closed" : "Explore membership applications"}</h2>
       <p>The new membership form is a preview and does not submit an application.</p>

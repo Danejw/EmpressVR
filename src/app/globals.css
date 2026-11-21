@@ -508,3 +508,26 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
 /* Reserve a visible surface for media before loading; maintain aspect ratio. */
 .source-image, .gallery-image { background: var(--soft-blue); }
 .media-placeholder { background: var(--soft-blue); border-radius: 10px; }
+
+/* Accessible page hierarchy and database-backed project gallery. */
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.gallery-lightbox-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin: 32px 0 50px; }
+.gallery-lightbox-trigger { display: block; width: 100%; border: 0; padding: 0; background: transparent; color: #9f2c98; text-align: left; cursor: zoom-in; }
+.gallery-lightbox-trigger img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; background: var(--soft-blue); }
+.gallery-lightbox-trigger span { display: inline-block; padding: 8px 0; font-size: .85rem; text-decoration: underline; }
+.gallery-lightbox-trigger:focus-visible { outline: 3px solid var(--magenta); outline-offset: 5px; }
+.gallery-lightbox-dialog { position: fixed; width: min(95vw, 1120px); max-height: 96vh; margin: auto; padding: 18px; border: none; border-radius: 14px; background: white; color: var(--navy); }
+.gallery-lightbox-dialog::backdrop { background: rgba(7, 9, 24, .91); }
+.gallery-lightbox-dialog .gallery-lightbox-top { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.gallery-lightbox-dialog button { border: 1px solid #5d3568; border-radius: 999px; padding: 8px 15px; background: #fff; color: var(--navy); font-weight: 600; cursor: pointer; }
+.gallery-lightbox-dialog button:focus-visible { outline: 3px solid var(--magenta); }
+.gallery-lightbox-dialog .gallery-lightbox-body { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; }
+.gallery-lightbox-dialog figure { margin: 0; min-width: 0; text-align: center; }
+.gallery-lightbox-dialog figure img { display: block; width: auto; height: auto; max-width: 100%; max-height: 73vh; margin: auto; object-fit: contain; }
+.gallery-lightbox-dialog figcaption { padding-top: 10px; color: #515067; font-size: .85rem; }
+@media (max-width: 640px) {
+  .gallery-lightbox-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .gallery-lightbox-dialog { padding: 12px; }
+  .gallery-lightbox-dialog .gallery-lightbox-body { gap: 6px; }
+  .gallery-lightbox-dialog .gallery-lightbox-body > button { padding: 7px 10px; }
+}
