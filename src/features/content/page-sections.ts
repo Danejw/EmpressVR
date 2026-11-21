@@ -40,7 +40,7 @@ export function cleanLegacyContent(key: string, markdown: string): string {
     copy = copy.replace(/\nName\s+First Name\(required\)[\s\S]*?SendSend\s*/, "\n");
   }
   if (key === "fun-raiser") {
-    copy = copy.replace(/Choose Which Project to Contribute to:[\s\S]*?(?=We operate as a business,)/, "");
+    copy = copy.replace(/Choose Which Project to Contribute to:[\s\S]*?(?=We operate as a business)/, "");
     copy = copy.replace(/^\[There's no page for this one yet[^\n]+\n?/gm, "");
   }
   if (key === "techalchemy26") {
