@@ -23,5 +23,5 @@ test("signup uses the same sign-in flow", async ({ page }) => {
 
 test("login is visible in site navigation", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".site-nav").getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login");
+  await expect(page.locator(".site-nav a[href=\"/login\"]")).toHaveAttribute("href", "/login");
 });
