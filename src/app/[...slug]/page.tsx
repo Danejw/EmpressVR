@@ -3,22 +3,18 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { LegacyMarkdown } from "@/components/legacy-markdown";
 import { CommunityCalendar } from "@/components/community-calendar";
+import { PublishedEvents } from "@/components/published-events";
 import { StoreAddButton } from "@/components/store-add-button";
 import { getStoreCatalog } from "@/features/commerce/store-catalog";
 import { displayMoney } from "@/features/commerce/cart";
 import { monthKey, shiftMonth } from "@/features/scheduling/calendar-month";
 import { fetchCommunityEvents } from "@/features/scheduling/google-calendar";
-import { listLegacySlugs, readLegacyPage, sourcePageUrl } from "@/lib/legacy-pages";
+import { readLegacyPage, sourcePageUrl } from "@/lib/legacy-pages";
 
 type Props = { params: Promise<{ slug: string[] }> };
 const specialPages = new Set(["home", "projects", "who-we-are", "store"]);
 
-export async function generateStaticParams() {
-  const pages = await listLegacySlugs();
-  return pages.filter((slug) => !specialPages.has(slug)).map((slug) => ({ slug: slug.split("__") }));
-}
-
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -68,7 +64,7 @@ export default async function ArchivedPage({ params }: Props) {
   const lastMonth = shiftMonth(thisMonth, 12);
   const [startYear, startMonth] = firstMonth.split("-").map(Number);
   const [endYear, endMonth] = lastMonth.split("-").map(Number);
-  const feed = hasCalendar && process.env.GITHUB_PAGES_PREVIEW !== "true"
+  const feed = hasCalendar
     ? await fetchCommunityEvents(
         new Date(Date.UTC(startYear, startMonth - 1, 0)),
         new Date(Date.UTC(endYear, endMonth, 2)),
@@ -118,6 +114,7 @@ export default async function ArchivedPage({ params }: Props) {
           </div>
         </section>
       </> : <LegacyMarkdown markdown={productMarkdown} />}
+      {key === "community" ? <PublishedEvents /> : null}
       {key === "scheduling" || key === "fun-raiser" || key.startsWith("store__p__") ? (
         <p className="legacy-checkout-note">Booking and payment processing are still handled on the existing website during migration.{" "}
           <a href={sourcePageUrl(key)} rel="noopener noreferrer">Continue on the current EmpressVR site ↗</a>

@@ -37,16 +37,3 @@ jobs:
           path: test-results/
           if-no-files-found: ignore
 
-  refresh-preview:
-    name: Refresh Supabase branch preview
-    needs: checks
-    if: github.ref == 'refs/heads/supabase-integration' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: read
-    steps:
-      - name: Rebuild both public preview sites from latest branch heads
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run pages-preview.yml --repo Danejw/EmpressVR --ref feat/squarespace-faithful-rebuild

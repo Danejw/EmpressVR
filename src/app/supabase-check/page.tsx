@@ -24,9 +24,8 @@ export default function SupabaseCheckPage() {
         <Link className="outline-button" href="/membership">Memberships</Link>
       </div>
       <SupabaseLiveCheck />
-      <p className="supabase-preview-caveat">GitHub Pages is static hosting. The site pages above render
-        from the committed content snapshot, while the checks read live Supabase public data.
-        Testing dynamic server-side rendering and authenticated editing requires a server-capable preview.</p>
+      <p className="supabase-preview-caveat">On server-capable hosting, published pages, projects, team members, products,
+        events and images are read from Supabase on each refresh. This page tests direct public database access.</p>
     </div>
   </section>;
 }
