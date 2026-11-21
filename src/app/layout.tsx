@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
+import { CartProvider } from "@/components/cart-provider";
+import { getStoreCatalog } from "@/features/commerce/store-catalog";
 import { SiteFooter } from "@/components/site-footer";
 import "./globals.css";
 
@@ -26,9 +28,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         <a className="skip-link" href="#main-content">Skip to content</a>
-        <SiteHeader />
-        <main id="main-content">{children}</main>
-        <SiteFooter />
+        <CartProvider catalog={getStoreCatalog()}>
+          <SiteHeader />
+          <main id="main-content">{children}</main>
+          <SiteFooter />
+        </CartProvider>
       </body>
     </html>
   );

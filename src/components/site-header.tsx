@@ -2,6 +2,7 @@ import Link from "next/link";
 import {siteSections} from "@/lib/site-sections";
 import {MediaImage} from "@/components/media-image";
 import {getSiteMediaId} from "@/features/content/repository";
+import {CartHeaderLink} from "@/components/cart-header-link";
 
 const schedule = "/scheduling";
 export function SiteHeader() {
@@ -13,14 +14,14 @@ export function SiteHeader() {
       </Link>
       <nav className="site-nav" aria-label="Primary navigation">
         {siteSections.map(section=><Link key={section.slug} href={"/"+section.slug}>{section.title}</Link>)}
-        <a href="https://www.empressvr.com/cart" rel="noopener noreferrer">Cart</a>
+        <CartHeaderLink />
       </nav>
       <Link className="header-cta" href={schedule}>View Classes &amp; Socials</Link>
       <details className="mobile-menu">
         <summary aria-label="Open navigation">Menu <span aria-hidden="true">☰</span></summary>
         <nav aria-label="Mobile navigation">
           {siteSections.map(section=><Link key={section.slug} href={"/"+section.slug}>{section.title}</Link>)}
-          <a href="https://www.empressvr.com/cart" rel="noopener noreferrer">Cart</a>
+          <CartHeaderLink />
           <Link href={schedule}>View Classes &amp; Socials</Link>
         </nav>
       </details>

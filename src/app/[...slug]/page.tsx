@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { LegacyMarkdown } from "@/components/legacy-markdown";
 import { CommunityCalendar } from "@/components/community-calendar";
+import { StoreAddButton } from "@/components/store-add-button";
+import { getStoreCatalog } from "@/features/commerce/store-catalog";
+import { displayMoney } from "@/features/commerce/cart";
 import { monthKey, shiftMonth } from "@/features/scheduling/calendar-month";
 import { fetchCommunityEvents } from "@/features/scheduling/google-calendar";
 import { listLegacySlugs, readLegacyPage, sourcePageUrl } from "@/lib/legacy-pages";
@@ -34,6 +37,13 @@ export default async function ArchivedPage({ params }: Props) {
   const key = slug.join("__");
   const markdown = await readLegacyPage(key);
   if (!markdown || specialPages.has(key)) notFound();
+  const productSlug = key.startsWith("store__p__") ? key.slice("store__p__".length) : null;
+  const storeProduct = productSlug ? getStoreCatalog().find((item) => item.slug === productSlug) : null;
+  // The Squarespace scrape included non-functional button labels. The real
+  // shopping control is rendered separately and those stale labels are removed.
+  const productMarkdown = storeProduct
+    ? markdown.replace(/Add To Cart\s+Added!/g, "")
+    : markdown;
 
   // Preserve the archived community copy while replacing the captured, nonfunctional
   // Squarespace calendar table with a live Google-backed calendar display.
@@ -64,6 +74,13 @@ export default async function ArchivedPage({ params }: Props) {
       ) : key === "fun-raiser" ? (
         <p className="legacy-checkout-note"><a href={sourcePageUrl(key)} rel="noopener noreferrer">Continue donating on the existing EmpressVR site</a></p>
       ) : null}
+      {storeProduct ? <div className="store-detail-purchase">
+        <div>
+          <span className="commerce-eyebrow">Store product</span>
+          <strong>{displayMoney(storeProduct.priceMinor, storeProduct.currency)}</strong>
+        </div>
+        <StoreAddButton productId={storeProduct.id} />
+      </div> : null}
       {hasCalendar ? <>
         <LegacyMarkdown markdown={markdown.slice(0, calendarStart)} />
         <section className="community-calendar-section" aria-label="Community Calendar">
@@ -77,7 +94,7 @@ export default async function ArchivedPage({ params }: Props) {
           />
         </section>
         <LegacyMarkdown markdown={markdown.slice(calendarEnd)} />
-      </> : <LegacyMarkdown markdown={markdown} />}
+      </> : <LegacyMarkdown markdown={productMarkdown} />}
       {key === "scheduling" || key === "fun-raiser" || key.startsWith("store__p__") ? (
         <p className="legacy-checkout-note">Booking and payment processing are still handled on the existing website during migration.{" "}
           <a href={sourcePageUrl(key)} rel="noopener noreferrer">Continue on the current EmpressVR site ↗</a>
