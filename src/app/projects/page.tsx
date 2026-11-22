@@ -15,7 +15,7 @@ export default async function Projects() {
   return <section className="projects-page" aria-label="EmpressVR projects">
     <div className="project-grid">
       {projects.map((project,index) => {
-        const href = localPaths.has("/" + project.slug) ? "/" + project.slug : "https://www.empressvr.com/" + project.slug;
+        const href = localPaths.has("/" + project.slug) ? "/" + project.slug : "/projects/" + project.slug;
         return <article className={"project-tile project-tone-" + (index % 4)} key={project.id}>
           <div className="project-image">
             <MediaImage assetId={project.featured_media_id} alt={project.title} loading={index < 2 ? "eager" : "lazy"} />
