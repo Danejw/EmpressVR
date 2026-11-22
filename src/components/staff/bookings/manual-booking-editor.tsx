@@ -1,6 +1,7 @@
 "use client";
 import { formatSessionTime } from "@/features/scheduling/admin-view";
 import { useState, type FormEvent } from "react";
+import { AppSelect } from "@/components/ui/app-select";
 import type { Offering, Session } from "@/features/scheduling/admin-types";
 import { dayInZone } from "@/features/scheduling/booking-view";
 import { makeFreeReservation } from "@/app/staff/bookings/actions";
@@ -40,15 +41,13 @@ export function ManualBookingEditor({ offerings,sessions,onSaved,referenceNow }:
     {error?<p role="alert" className="auth-error">{error}</p>:null}
     {!eligible.length?<p className="booking-empty-state">Create a free offering and an open future session first.</p>:null}
     <label htmlFor="manual-session">Session</label>
-    <select id="manual-session" value={slotId} required disabled={!eligible.length}
-      onChange={event=>{setSlotId(event.target.value);setSeats(1);}}>
-      {eligible.map(slot=>{
-        const offering=offerings.find(o=>o.id===slot.offering_id);
-        return <option key={slot.id} value={slot.id}>
-          {offering?.title??"Offering"} · {dayInZone(slot.starts_at,slot.time_zone)} · {formatSessionTime(slot)}
-        </option>;
-      })}
-    </select>
+    <AppSelect id="manual-session" value={slotId} required disabled={!eligible.length}
+      onChange={value=>{setSlotId(value);setSeats(1);}}
+      options={eligible.map(slot=>({
+        value:slot.id,
+        label:(offerings.find(o=>o.id===slot.offering_id)?.title??"Offering")+
+          " · "+dayInZone(slot.starts_at,slot.time_zone)+" · "+formatSessionTime(slot),
+      }))}/>
     <label htmlFor="manual-name">Attendee name</label>
     <input id="manual-name" required maxLength={200} autoComplete="name"
       value={name} onChange={event=>setName(event.target.value)}/>

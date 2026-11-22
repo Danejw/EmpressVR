@@ -1,5 +1,6 @@
 "use client";
 import { useCallback,useMemo,useState } from "react";
+import { AppSelect } from "@/components/ui/app-select";
 import { useRouter } from "next/navigation";
 import { MonthGrid } from "@/components/calendar/month-grid";
 import { EditorPanel } from "@/components/staff/editor-panel";
@@ -71,10 +72,9 @@ export function EventsWorkspace({events,images,initialMonth}:{
           <input type="search" value={query} onChange={e=>setQuery(e.target.value)}
             placeholder="Title or location"/></label>
         <label className="booking-filter"><span>Status</span>
-          <select value={filter} onChange={e=>setFilter(e.target.value)}>
-            <option value="all">All</option><option value="draft">Draft</option>
-            <option value="published">Published</option><option value="archived">Archived</option>
-          </select></label>
+          <AppSelect ariaLabel="Event status" value={filter} onChange={setFilter}
+            options={[{value:"all",label:"All"},{value:"draft",label:"Draft"},
+              {value:"published",label:"Published"},{value:"archived",label:"Archived"}]}/></label>
       </div>}
     <section className="booking-admin-section" aria-label="Events">
       <div className="booking-section-heading">
