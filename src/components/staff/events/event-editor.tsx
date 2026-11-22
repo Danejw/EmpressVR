@@ -1,5 +1,7 @@
 "use client";
-import { useState,type FormEvent } from "react";
+import { useMemo,useState,type FormEvent } from "react";
+import { AppSelect } from "@/components/ui/app-select";
+import { supportedTimeZoneOptions } from "@/features/scheduling/time-zone-options";
 import { saveStaffEvent } from "@/app/staff/events/actions";
 import { initialEventDates,type EventStatus,type StaffEvent } from "@/features/events/event-validation";
 import type { ContentImage } from "@/features/staff/editor-options";
@@ -19,6 +21,7 @@ export function EventEditor({event,images,onSaved}:{
   const [status,setStatus]=useState<EventStatus>(event?.status??"draft");
   const [allDay,setAllDay]=useState(event?.all_day??false);
   const [zone,setZone]=useState(event?.time_zone??"Europe/London");
+  const timeZones=useMemo(() => supportedTimeZoneOptions(), []);
   const [start,setStart]=useState(dates.start_local);
   const [end,setEnd]=useState(dates.end_local);
   const [location,setLocation]=useState(event?.location??"");
@@ -55,22 +58,17 @@ export function EventEditor({event,images,onSaved}:{
     <textarea id="event-description" rows={6} maxLength={12000}
       value={description} onChange={e=>setDescription(e.target.value)}/>
     <label htmlFor="event-status">Publication</label>
-    <select id="event-status" value={status} onChange={e=>setStatus(e.target.value as EventStatus)}>
-      <option value="draft">Draft</option>
-      <option value="published">Published</option>
-      <option value="archived">Archived</option>
-    </select>
+    <AppSelect id="event-status" value={status}
+      onChange={value=>setStatus(value as EventStatus)}
+      options={[{value:"draft",label:"Draft"},{value:"published",label:"Published"},
+        {value:"archived",label:"Archived"}]}/>
     <label className="booking-switch"><input type="checkbox" checked={allDay}
       onChange={e=>{setAllDay(e.target.checked);setStart("");setEnd("");}}/>
       <span>All-day event</span>
     </label>
     <label htmlFor="event-zone">Time zone</label>
-    <input id="event-zone" required maxLength={80} list="event-time-zones"
-      value={zone} onChange={e=>setZone(e.target.value)}/>
-    <datalist id="event-time-zones">
-      <option value="Europe/London"/><option value="Pacific/Honolulu"/>
-      <option value="America/New_York"/><option value="UTC"/>
-    </datalist>
+    <AppSelect id="event-zone" value={zone} required searchable
+      searchPlaceholder="Search time zones" onChange={setZone} options={timeZones}/>
     <label htmlFor="event-start">Start {allDay?"date":"time"}</label>
     <input id="event-start" type={allDay?"date":"datetime-local"}
       value={start} onChange={e=>setStart(e.target.value)}/>
@@ -85,10 +83,9 @@ export function EventEditor({event,images,onSaved}:{
     <input id="event-link" type="url" maxLength={500} value={url}
       onChange={e=>setUrl(e.target.value)}/>
     <label htmlFor="event-image">Featured image</label>
-    <select id="event-image" value={featured} onChange={e=>setFeatured(e.target.value)}>
-      <option value="">None</option>
-      {images.map(img=><option key={img.id} value={img.id}>{img.alt}</option>)}
-    </select>
+    <AppSelect id="event-image" value={featured} onChange={setFeatured} searchable
+      searchPlaceholder="Search images"
+      options={[{value:"",label:"None"},...images.map(img=>({value:img.id,label:img.alt}))]}/>
     <button className="pill-button" disabled={busy} type="submit">
       {busy?"Saving...":"Save event"}
     </button>

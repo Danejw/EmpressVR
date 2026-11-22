@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AppSelect } from "@/components/ui/app-select";
 import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent } from "react";
 import ReactMarkdown from "react-markdown";
@@ -115,16 +116,13 @@ export function BlogEditor({
       <aside className="auth-panel cms-editor-sidebar">
         <h2>Post settings</h2>
         <label htmlFor="cms-author">Author</label>
-        <select id="cms-author" value={author} onChange={e=>setAuthor(e.target.value)}>
-          <option value="">EmpressVR</option>
-          {authors.map(person=><option value={person.id} key={person.id}>{person.name}</option>)}
-        </select>
+        <AppSelect id="cms-author" value={author} onChange={setAuthor} searchable
+          options={[{value:"",label:"EmpressVR"},...authors.map(person=>({value:person.id,label:person.name}))]}/>
         <label htmlFor="cms-cover">Cover image</label>
         {currentCover ? <img className="cms-cover-preview" src={currentCover.url} alt={currentCover.alt} /> : null}
-        <select id="cms-cover" value={cover} onChange={e=>setCover(e.target.value)}>
-          <option value="">No image</option>
-          {media.map(image=><option key={image.id} value={image.id}>{image.alt || "Image"}</option>)}
-        </select>
+        <AppSelect id="cms-cover" value={cover} onChange={setCover} searchable
+          searchPlaceholder="Search images"
+          options={[{value:"",label:"No image"},...media.map(image=>({value:image.id,label:image.alt||"Image"}))]}/>
         <label htmlFor="cms-upload">Upload an image</label>
         <input id="cms-upload" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
           disabled={uploading || saving} onChange={uploadCover}/>

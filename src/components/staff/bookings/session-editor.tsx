@@ -1,16 +1,32 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
+import { AppSelect } from "@/components/ui/app-select";
+import { supportedTimeZoneOptions } from "@/features/scheduling/time-zone-options";
+import { minimumStartLocal, minimumEndLocal } from "@/features/scheduling/future-session";
 import { saveSession } from "@/app/staff/bookings/actions";
 import { formatLocalInput, localToUtc } from "@/features/scheduling/zoned-time";
 import type { Offering, Session } from "@/features/scheduling/admin-types";
 
-export function SessionEditor({ session, offerings, initialOfferingId, onSaved }: {
-  session?: Session; offerings: readonly Offering[]; initialOfferingId?: string; onSaved:()=>void;
+export function SessionEditor({ session, offerings, initialOfferingId, onSaved, referenceNow }: {
+  session?: Session; offerings: readonly Offering[]; initialOfferingId?: string; onSaved:()=>void; referenceNow:string;
 }) {
   const [offeringId,setOfferingId] = useState(session?.offering_id??initialOfferingId??offerings[0]?.id??"");
   const [zone,setZone] = useState(session?.time_zone??"Europe/London");
+  const [nowIso,setNowIso] = useState(referenceNow);
+  const timeZones = useMemo(() => supportedTimeZoneOptions(), []);
   const [starts,setStarts] = useState(session?formatLocalInput(session.starts_at,session.time_zone):"");
   const [ends,setEnds] = useState(session?formatLocalInput(session.ends_at,session.time_zone):"");
+  const minStart = minimumStartLocal(nowIso,zone);
+  const minEnd = minimumEndLocal(nowIso,zone,starts);
+  function changeZone(next:string) {
+    try {
+      if(starts) setStarts(formatLocalInput(localToUtc(starts,zone),next));
+      if(ends) setEnds(formatLocalInput(localToUtc(ends,zone),next));
+    } catch {
+      setStarts("");setEnds("");
+    }
+    setZone(next);
+  }
   const [capacity,setCapacity] = useState(session?.capacity??10);
   const [maxSeats,setMaxSeats] = useState(session?.max_seats_per_booking??1);
   const [available,setAvailable] = useState(session?.available??false);
@@ -37,21 +53,20 @@ export function SessionEditor({ session, offerings, initialOfferingId, onSaved }
   return <form className="booking-editor-form" onSubmit={event=>void submit(event)}>
     {error?<p role="alert" className="auth-error">{error}</p>:null}
     <label htmlFor="booking-session-offering">Offering</label>
-    <select id="booking-session-offering" required value={offeringId} disabled={Boolean(session)}
-      onChange={event=>setOfferingId(event.target.value)}>
-      {bookableOfferings.map(item=><option key={item.id} value={item.id}>{item.title}</option>)}
-    </select>
+    <AppSelect id="booking-session-offering" required value={offeringId}
+      disabled={Boolean(session)} onChange={setOfferingId}
+      options={bookableOfferings.map(item=>({value:item.id,label:item.title}))}/>
     {!bookableOfferings.length?<p className="auth-small">Create a class or appointment first.</p>:null}
     <label htmlFor="booking-session-zone">Time zone (IANA)</label>
-    <input id="booking-session-zone" value={zone} required maxLength={64}
-      list="booking-time-zones" onChange={event=>setZone(event.target.value)}/>
-    <datalist id="booking-time-zones"><option value="Europe/London"/><option value="Pacific/Honolulu"/>
-      <option value="America/New_York"/><option value="UTC"/></datalist>
+    <AppSelect id="booking-session-zone" value={zone} required searchable
+      searchPlaceholder="Search time zones" onChange={changeZone} options={timeZones}/>
     <label htmlFor="booking-session-start">Start time in selected time zone</label>
     <input id="booking-session-start" type="datetime-local" required value={starts}
+      min={minStart} onFocus={()=>setNowIso(new Date().toISOString())}
       onChange={event=>setStarts(event.target.value)}/>
     <label htmlFor="booking-session-end">End time in selected time zone</label>
     <input id="booking-session-end" type="datetime-local" required value={ends}
+      min={minEnd} onFocus={()=>setNowIso(new Date().toISOString())}
       onChange={event=>setEnds(event.target.value)}/>
     <p className="auth-small">Times are stored in UTC. Ambiguous or missing daylight-saving times are rejected.</p>
     <div className="booking-editor-fields">

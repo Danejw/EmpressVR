@@ -1,5 +1,6 @@
 "use client";
 import { useState, type FormEvent } from "react";
+import { AppSelect } from "@/components/ui/app-select";
 import { saveOffering } from "@/app/staff/bookings/actions";
 import type { Offering } from "@/features/scheduling/admin-types";
 
@@ -49,11 +50,10 @@ export function OfferingEditor({ offering, onSaved }: {
     <input id="booking-offering-slug" required maxLength={128} disabled={Boolean(offering)}
       value={slug} onChange={event=>{setSlug(slugify(event.target.value));setEditedSlug(true);}}/>
     <label htmlFor="booking-offering-type">Type</label>
-    <select id="booking-offering-type" value={kind} onChange={event=>setKind(event.target.value as Offering["kind"])}>
-      <option value="class">Class</option>
-      <option value="appointment">Appointment</option>
-      <option value="informational">Informational</option>
-    </select>
+    <AppSelect id="booking-offering-type" value={kind}
+      onChange={value=>setKind(value as Offering["kind"])}
+      options={[{value:"class",label:"Class"},{value:"appointment",label:"Appointment"},
+        {value:"informational",label:"Informational"}]}/>
     <label htmlFor="booking-offering-description">Description</label>
     <textarea id="booking-offering-description" rows={5} maxLength={4000} value={description}
       onChange={event=>setDescription(event.target.value)}/>

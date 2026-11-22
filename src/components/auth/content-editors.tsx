@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { AppSelect } from "@/components/ui/app-select";
 import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent } from "react";
 import { slugify, type ProjectInput, type TeamInput } from "@/features/staff/content-validation";
@@ -35,10 +36,9 @@ function ImageSelect({ images, value, label, onChange, onUploaded }: ImagesProps
   return <div className="cms-image-select">
     <label htmlFor={"image-" + label}>{label}</label>
     {selected ? <img src={selected.url} alt={selected.alt} className="cms-image-preview" /> : null}
-    <select id={"image-" + label} value={value} onChange={event => onChange(event.target.value)}>
-      <option value="">No image</option>
-      {images.map(image => <option value={image.id} key={image.id}>{image.alt}</option>)}
-    </select>
+    <AppSelect id={"image-" + label} value={value} onChange={onChange} searchable
+      searchPlaceholder="Search images"
+      options={[{value:"",label:"No image"},...images.map(image=>({value:image.id,label:image.alt}))]}/>
     <label className="cms-upload-label" htmlFor={"upload-" + label}>Upload image</label>
     <input id={"upload-" + label} type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
       disabled={uploading} onChange={upload}/>
@@ -111,9 +111,10 @@ export function ProjectEditor({ initial, images: options }: { initial?: ProjectI
       <aside className="auth-panel cms-editor-sidebar">
         <h2>Project settings</h2>
         <label htmlFor="project-status">Visibility</label>
-        <select id="project-status" value={status} onChange={e => setStatus(e.target.value as ProjectInput["status"])}>
-          <option value="draft">Draft</option><option value="published">Published</option><option value="archived">Archived</option>
-        </select>
+        <AppSelect id="project-status" value={status}
+          onChange={value=>setStatus(value as ProjectInput["status"])}
+          options={[{value:"draft",label:"Draft"},{value:"published",label:"Published"},
+            {value:"archived",label:"Archived"}]}/>
         <label htmlFor="project-order">Sort order</label>
         <input id="project-order" type="number" min={0} max={10000} step={1} value={sortOrder}
           onChange={e => setSortOrder(Number(e.target.value))}/>
@@ -122,11 +123,10 @@ export function ProjectEditor({ initial, images: options }: { initial?: ProjectI
         <h2>Gallery</h2>
         <div className="cms-gallery-picker">
           <label htmlFor="project-gallery-add">Add from media library</label>
-          <select id="project-gallery-add" value={galleryChoice} onChange={e => setGalleryChoice(e.target.value)}>
-            <option value="">Select an image</option>
-            {images.filter(image => !gallery.includes(image.id)).map(image =>
-              <option value={image.id} key={image.id}>{image.alt}</option>)}
-          </select>
+          <AppSelect id="project-gallery-add" value={galleryChoice} onChange={setGalleryChoice} searchable
+            searchPlaceholder="Search images"
+            options={[{value:"",label:"Select an image"},...images.filter(image=>!gallery.includes(image.id))
+              .map(image=>({value:image.id,label:image.alt}))]}/>
           <button type="button" className="auth-text-button" disabled={!galleryChoice || gallery.length >= 30}
             onClick={() => {setGallery(prev => [...prev, galleryChoice]); setGalleryChoice("");}}>Add image</button>
           {gallery.map((imageId, index) => {
@@ -211,9 +211,10 @@ export function TeamEditor({ initial, images: options }: { initial?: TeamInput; 
     <aside className="auth-panel cms-editor-sidebar">
       <h2>Profile settings</h2>
       <label htmlFor="team-group">Team group</label>
-      <select id="team-group" value={group} onChange={e => setGroup(e.target.value as TeamInput["group_name"])}>
-        <option value="current">Current</option><option value="other">Other</option><option value="past">Past</option>
-      </select>
+      <AppSelect id="team-group" value={group}
+        onChange={value=>setGroup(value as TeamInput["group_name"])}
+        options={[{value:"current",label:"Current"},{value:"other",label:"Other"},
+          {value:"past",label:"Past"}]}/>
       <label htmlFor="team-order">Sort order</label>
       <input id="team-order" type="number" min={0} max={10000} step={1}
         value={sortOrder} onChange={e => setSortOrder(Number(e.target.value))}/>

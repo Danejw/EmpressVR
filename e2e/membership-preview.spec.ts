@@ -14,7 +14,9 @@ test("free community application validates required fields, reviews locally, nev
   await page.getByRole("textbox", { name: "Last name" }).fill("Taylor");
   await page.getByRole("textbox", { name: "Email" }).fill("avery@example.com");
   await page.getByRole("textbox", { name: "Country of residence" }).fill("United Kingdom");
-  await page.getByRole("combobox", { name: "How did you hear about us?" }).selectOption("friend");
+  await page.getByRole("combobox", { name: "How did you hear about us?" }).click();
+  await page.getByRole("listbox", { name: "How did you hear about us?" })
+    .getByRole("option", { name: "A friend in the community" }).click();
   await page.getByRole("textbox", { name: "Community contribution" }).fill("I can share VR storytelling resources.");
   await page.getByRole("checkbox", { name: /I accept the Privacy Policy/ }).check();
   await page.getByRole("button", { name: "Review application" }).click();

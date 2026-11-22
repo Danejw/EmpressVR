@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AppSelect } from "@/components/ui/app-select";
 import { useState } from "react";
 import {
   discoveryOptions, initialMembershipDraft, membershipCost,
@@ -129,11 +130,9 @@ export function MembershipPlanner() {
                     value={draft.country} onChange={(event) => change("country", event.target.value)}/>
                 </label>
                 <label>How did you hear about us? <span aria-hidden="true">*</span>
-                  <select aria-label="How did you hear about us?" required value={draft.discovery}
-                    onChange={(event) => change("discovery", event.target.value as MembershipDraft["discovery"])}>
-                    <option value="">Select an option</option>
-                    {discoveryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </select>
+                  <AppSelect ariaLabel="How did you hear about us?" required value={draft.discovery}
+                    onChange={value=>change("discovery",value as MembershipDraft["discovery"])}
+                    options={[{value:"",label:"Select an option"},...discoveryOptions]}/>
                 </label>
               </div>
               <fieldset className="membership-fieldset">

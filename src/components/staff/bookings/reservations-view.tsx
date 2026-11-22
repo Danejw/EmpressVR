@@ -1,6 +1,7 @@
 "use client";
 import { formatSessionTime } from "@/features/scheduling/admin-view";
 import { useMemo,useState } from "react";
+import { AppSelect } from "@/components/ui/app-select";
 import type { Offering,Session,Reservation,BookingContact } from "@/features/scheduling/admin-types";
 
 export function ReservationsView({ reservations, contacts, offerings, sessions, onView, onNew }: {
@@ -28,11 +29,10 @@ export function ReservationsView({ reservations, contacts, offerings, sessions, 
       <label className="booking-filter"><span>Search</span><input type="search" value={search}
         placeholder="Name, email or class" onChange={event=>setSearch(event.target.value)}/></label>
       <label className="booking-filter"><span>Status</span>
-        <select value={status} onChange={event=>setStatus(event.target.value)}>
-          <option value="all">All</option><option value="confirmed">Confirmed</option>
-          <option value="held">Held</option><option value="cancelled">Cancelled</option>
-          <option value="expired">Expired</option>
-        </select></label>
+        <AppSelect ariaLabel="Reservation status" value={status} onChange={setStatus}
+          options={[{value:"all",label:"All"},{value:"confirmed",label:"Confirmed"},
+            {value:"held",label:"Held"},{value:"cancelled",label:"Cancelled"},
+            {value:"expired",label:"Expired"}]}/></label>
     </div>
     {!filtered.length?<p className="booking-empty-state">
       {reservations.length?"No bookings match those filters.":"No reservations yet."}
