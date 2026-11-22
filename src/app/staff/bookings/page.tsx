@@ -14,6 +14,7 @@ export default async function StaffBookingsPage(){
     auth.from("booking_admin_audit").select("id,booking_id,action,actor_id,created_at").order("created_at",{ascending:false}).limit(1000),
   ]);
   const error=offerings.error||sessions.error||reservations.error||contacts.error||audit.error;
+  const referenceNow = new Date().toISOString();
   return <section className="auth-page"><div className="page-container booking-admin-page">
     <div className="auth-dashboard-heading"><div>
       <p className="auth-eyebrow"><Link href="/staff">Dashboard</Link> / Bookings</p>
@@ -22,7 +23,7 @@ export default async function StaffBookingsPage(){
     {error?<div className="auth-panel">
       <p role="alert" className="auth-error">Unable to load booking administration. Check the booking RLS migration and administrator MFA.</p>
     </div>:
-    <BookingWorkspace
+    <BookingWorkspace referenceNow={referenceNow}
       offerings={(offerings.data??[]) as Offering[]}
       sessions={(sessions.data??[]) as Session[]}
       reservations={(reservations.data??[]) as Reservation[]}

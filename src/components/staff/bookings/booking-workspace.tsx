@@ -23,8 +23,8 @@ const tabs: { key:Tab;title:string }[]=[
   { key:"schedule",title:"Schedule" },
 ];
 
-export function BookingWorkspace({offerings,sessions,reservations,contacts,audit}:{
-  offerings:readonly Offering[]; sessions:readonly Session[];
+export function BookingWorkspace({offerings,sessions,reservations,contacts,audit,referenceNow}:{
+  referenceNow:string; offerings:readonly Offering[]; sessions:readonly Session[];
   reservations:readonly Reservation[];contacts:readonly BookingContact[];audit:readonly BookingAudit[];
 }) {
   const router=useRouter();
@@ -32,7 +32,7 @@ export function BookingWorkspace({offerings,sessions,reservations,contacts,audit
   const [panel,setPanel]=useState<Panel|null>(null);
   const close=useCallback(()=>setPanel(null),[]);
   const saved=useCallback(()=>{setPanel(null);router.refresh();},[router]);
-  const upcoming=sessions.filter(item=>Date.parse(item.starts_at)>Date.now()).length;
+  const upcoming=sessions.filter(item=>Date.parse(item.starts_at)>Date.parse(referenceNow)).length;
   const confirmed=reservations.filter(item=>item.status==="confirmed").length;
   const selectedOffering=panel?.kind==="offering"?offerings.find(o=>o.id===panel.id):undefined;
   const selectedSession=panel?.kind==="session"?sessions.find(s=>s.id===panel.id):undefined;
@@ -58,7 +58,7 @@ export function BookingWorkspace({offerings,sessions,reservations,contacts,audit
          onEdit={id=>setPanel({kind:"offering",id})}
          onNew={()=>setPanel({kind:"offering"})}
          onNewSession={offeringId=>setPanel({kind:"session",offeringId})}/>:
-       <ScheduleView offerings={offerings}sessions={sessions}reservations={reservations}
+       <ScheduleView referenceNow={referenceNow} offerings={offerings}sessions={sessions}reservations={reservations}
          onEdit={id=>setPanel({kind:"session",id})}
          onNew={()=>setPanel({kind:"session"})}onRefresh={saved}/>}
     </div>
@@ -70,7 +70,7 @@ export function BookingWorkspace({offerings,sessions,reservations,contacts,audit
       {panel.kind==="offering"?<OfferingEditor offering={selectedOffering} onSaved={saved}/>:
        panel.kind==="session"?<SessionEditor session={selectedSession} offerings={offerings}
          initialOfferingId={panel.offeringId} onSaved={saved}/>:
-       panel.kind==="new-reservation"?<ManualBookingEditor
+       panel.kind==="new-reservation"?<ManualBookingEditor referenceNow={referenceNow}
          offerings={offerings}sessions={sessions}onSaved={saved}/>:
        selectedReservation?<ReservationDetails
          reservation={selectedReservation}

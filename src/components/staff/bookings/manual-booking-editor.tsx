@@ -5,12 +5,12 @@ import type { Offering, Session } from "@/features/scheduling/admin-types";
 import { dayInZone } from "@/features/scheduling/booking-view";
 import { makeFreeReservation } from "@/app/staff/bookings/actions";
 
-export function ManualBookingEditor({ offerings,sessions,onSaved }: {
-  offerings:readonly Offering[]; sessions:readonly Session[]; onSaved:()=>void;
+export function ManualBookingEditor({ offerings,sessions,onSaved,referenceNow }: {
+  referenceNow:string; offerings:readonly Offering[]; sessions:readonly Session[]; onSaved:()=>void;
 }) {
   const eligible=sessions.filter(slot=>{
     const offering=offerings.find(o=>o.id===slot.offering_id);
-    return slot.available&&!slot.requires_payment && Date.parse(slot.starts_at)>Date.now()
+    return slot.available&&!slot.requires_payment && Date.parse(slot.starts_at)>Date.parse(referenceNow)
       && offering?.price_minor===0 && offering.kind!=="informational";
   });
   const [slotId,setSlotId]=useState(eligible[0]?.id??"");

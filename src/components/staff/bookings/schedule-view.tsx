@@ -7,8 +7,8 @@ import { dayInZone } from "@/features/scheduling/booking-view";
 import type { Offering, Session, Reservation } from "@/features/scheduling/admin-types";
 import { closeSession } from "@/app/staff/bookings/actions";
 
-export function ScheduleView({ offerings, sessions, reservations, onEdit, onNew, onRefresh }: {
-  offerings: readonly Offering[]; sessions: readonly Session[]; reservations: readonly Reservation[];
+export function ScheduleView({ offerings, sessions, reservations, onEdit, onNew, onRefresh, referenceNow }: {
+  referenceNow:string; offerings: readonly Offering[]; sessions: readonly Session[]; reservations: readonly Reservation[];
   onEdit:(id:string)=>void; onNew:()=>void; onRefresh:()=>void;
 }) {
   const [month,setMonth] = useState(()=>monthKey());
@@ -50,9 +50,9 @@ export function ScheduleView({ offerings, sessions, reservations, onEdit, onNew,
       {!visible.length?<p className="booking-empty-state">No sessions for this period.</p>:
         <div className="booking-admin-list">{visible.map(session=>{
           const occupied=reservations.filter(b=>b.slot_id===session.id &&
-            (b.status==="confirmed" || (b.status==="held" && Date.parse(b.expires_at)>Date.now())))
+            (b.status==="confirmed" || (b.status==="held" && Date.parse(b.expires_at)>Date.parse(referenceNow))))
             .reduce((sum,b)=>sum+b.seats,0);
-          const canEdit=occupied===0 && Date.parse(session.starts_at)>Date.now();
+          const canEdit=occupied===0 && Date.parse(session.starts_at)>Date.parse(referenceNow);
           return <article className="booking-admin-list-row" key={session.id}>
             <div className="booking-admin-list-primary">
               <strong>{offeringTitles.get(session.offering_id)??"Offering"}</strong>
