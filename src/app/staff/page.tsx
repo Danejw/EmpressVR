@@ -10,10 +10,12 @@ export default async function StaffDashboard({
   searchParams,
 }: { searchParams: Promise<{ invite?: string }> }) {
   const { auth, user, role } = await requireStaff();
-  const [{ count }, { count: projectCount }, { count: teamCount }, { data: invitations }] = await Promise.all([
+  const [{ count }, { count: projectCount }, { count: teamCount }, { count: bookingCount }, { data: invitations }] = await Promise.all([
     auth.from("blog_posts").select("id", { count: "exact", head: true }),
     auth.from("projects").select("id", { count: "exact", head: true }),
     auth.from("team_members").select("id", { count: "exact", head: true }),
+    role === "admin" ? auth.from("bookings").select("id", { count: "exact", head: true })
+      : Promise.resolve({ count: null }),
     role === "admin" ? auth.from("staff_invitations")
       .select("email,role,expires_at,accepted_at")
       .is("accepted_at", null).order("created_at", { ascending: false }).limit(25) :
@@ -47,6 +49,11 @@ export default async function StaffDashboard({
         </Link>
         <Link href="/staff/team/new" className="cms-dashboard-add" aria-label="Create team profile" title="Create team profile">+</Link>
       </div>
+      {role === "admin" ? <div className="cms-dashboard-row">
+        <Link href="/staff/bookings" className="cms-dashboard-link">
+          <strong>Bookings</strong><span>{bookingCount ?? 0} reservations</span>
+        </Link>
+      </div> : null}
     </nav>
     <Link href="/staff/security" className="auth-link">Account security</Link>
     {role === "admin" ? <details className="cms-dashboard-invitations" open={Boolean(invite)}>

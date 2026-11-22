@@ -4,6 +4,10 @@ For **every UI, content, navigation or visual change**, read `docs/brand.md` bef
 
 Read `docs/architecture.md`, `docs/implementation-plan.md`, `docs/brand.md`, and the relevant **official publisher-authored** `.cursor/skills/*/SKILL.md` before changing a feature. See `.skills/README.md` for skill provenance and coverage. Apply `.cursor/rules/*.mdc` for project-specific decisions.
 
+## Database and persistence reference
+
+Before any Supabase table, schema, RLS, database query, CMS, staff, commerce, membership or scheduling change, read **`docs/database-schema.md`**. It documents all current application tables, their purposes, columns, real foreign keys and feature boundaries. Check that reference and the corresponding `supabase/migrations/` files before designing new tables or introducing duplicate records. Verify the actual target database when details may have changed, since the reference is a snapshot. **Update `docs/database-schema.md` in the same PR whenever tables, columns, relationships or their responsibilities change.** Distinguish `products`, `offerings` and `events`, and distinguish public `team_members` profiles from authorization in `staff_roles`.
+
 Principles: simple, modular, composable, reusable, interoperable, verifiable, portable and compoundable.
 
 - Review existing code before proposing new abstractions or dependencies.
