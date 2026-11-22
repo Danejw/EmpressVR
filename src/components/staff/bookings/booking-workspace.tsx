@@ -34,9 +34,6 @@ export function BookingWorkspace({offerings,sessions,reservations,contacts,audit
   const saved=useCallback(()=>{setPanel(null);router.refresh();},[router]);
   const upcoming=sessions.filter(item=>Date.parse(item.starts_at)>Date.now()).length;
   const confirmed=reservations.filter(item=>item.status==="confirmed").length;
-  const activePanel=panel?.kind==="offering"?"Offering":
-    panel?.kind==="session"?"Session":
-    panel?.kind==="reservation"?"Reservation":"Free reservation";
   const selectedOffering=panel?.kind==="offering"?offerings.find(o=>o.id===panel.id):undefined;
   const selectedSession=panel?.kind==="session"?sessions.find(s=>s.id===panel.id):undefined;
   const selectedReservation=panel?.kind==="reservation"?reservations.find(b=>b.id===panel.id):undefined;
