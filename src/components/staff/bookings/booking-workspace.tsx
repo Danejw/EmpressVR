@@ -9,9 +9,10 @@ import { ScheduleView } from "./schedule-view";
 import { ReservationsView } from "./reservations-view";
 import { ManualBookingEditor } from "./manual-booking-editor";
 import { ReservationDetails } from "./reservation-details";
-import type { Offering,Session,Reservation,BookingContact,BookingAudit } from "@/features/scheduling/admin-types";
+import { ResourcesView } from "./resources-view";
+import type { Offering,Session,Reservation,BookingContact,BookingAudit,BookingResource } from "@/features/scheduling/admin-types";
 
-type Tab = "reservations" | "offerings" | "schedule";
+type Tab = "reservations" | "offerings" | "schedule" | "resources";
 type Panel =
   | { kind: "offering"; id?: string }
   | { kind: "session"; id?: string; offeringId?: string }
@@ -21,11 +22,13 @@ const tabs: { key:Tab;title:string }[]=[
   { key:"reservations",title:"Reservations" },
   { key:"offerings",title:"Offerings" },
   { key:"schedule",title:"Schedule" },
+  { key:"resources",title:"Resources" },
 ];
 
-export function BookingWorkspace({offerings,sessions,reservations,contacts,audit,referenceNow}:{
+export function BookingWorkspace({offerings,sessions,reservations,contacts,audit,resources,referenceNow}:{
   referenceNow:string; offerings:readonly Offering[]; sessions:readonly Session[];
   reservations:readonly Reservation[];contacts:readonly BookingContact[];audit:readonly BookingAudit[];
+  resources:readonly BookingResource[];
 }) {
   const router=useRouter();
   const [tab,setTab]=useState<Tab>("reservations");
@@ -54,6 +57,7 @@ export function BookingWorkspace({offerings,sessions,reservations,contacts,audit
         reservations={reservations}contacts={contacts}offerings={offerings}sessions={sessions}
         onView={id=>setPanel({kind:"reservation",id})}
         onNew={()=>setPanel({kind:"new-reservation"})}/>:
+       tab==="resources"?<ResourcesView resources={resources} onSaved={saved}/>:
        tab==="offerings"?<OfferingsView offerings={offerings}sessions={sessions}
          onEdit={id=>setPanel({kind:"offering",id})}
          onNew={()=>setPanel({kind:"offering"})}
@@ -68,7 +72,7 @@ export function BookingWorkspace({offerings,sessions,reservations,contacts,audit
       panel.kind==="reservation"?"Booking details":"New free reservation"
     } onClose={close}>
       {panel.kind==="offering"?<OfferingEditor offering={selectedOffering} onSaved={saved}/>:
-       panel.kind==="session"?<SessionEditor session={selectedSession} offerings={offerings}
+       panel.kind==="session"?<SessionEditor session={selectedSession} offerings={offerings} resources={resources}
          referenceNow={referenceNow} initialOfferingId={panel.offeringId} onSaved={saved}/>:
        panel.kind==="new-reservation"?<ManualBookingEditor referenceNow={referenceNow}
          offerings={offerings}sessions={sessions}onSaved={saved}/>:
@@ -80,6 +84,6 @@ export function BookingWorkspace({offerings,sessions,reservations,contacts,audit
          audit={audit.filter(item=>item.booking_id===selectedReservation.id)}
          onSaved={saved}/>:<p>Reservation unavailable.</p>}
     </EditorPanel>:null}
-    <p className="booking-workspace-note">Public online bookings are still disabled. The existing Acuity booking system remains active.</p>
+    <p className="booking-workspace-note">Free bookings are available only when staff publish an offering and open its sessions. Paid bookings still use the existing booking system.</p>
   </div>;
 }

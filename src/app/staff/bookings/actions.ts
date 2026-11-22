@@ -40,6 +40,8 @@ export async function saveSession(value: unknown): Promise<ActionResult> {
   const { id, ...fields } = checked.data;
   const { data: offering } = await auth.from("offerings").select("id,kind").eq("id", fields.offering_id).maybeSingle();
   if (!offering || offering.kind === "informational") return fail("Choose a class or appointment.");
+  if (offering.kind==="appointment" && fields.available && !fields.resource_id)
+    return fail("Assign an active resource to open appointment availability.");
   const { data: collision, error: collisionError } = await auth.from("booking_slots").select("id")
     .eq("offering_id", fields.offering_id)
     .lt("starts_at", fields.ends_at).gt("ends_at", fields.starts_at).limit(10);
@@ -95,4 +97,22 @@ export async function cancelFreeReservation(id: string): Promise<ActionResult> {
   const { error, data } = await auth.rpc("admin_cancel_free_booking", { p_booking_id: id });
   if (error || data !== true) return fail(error?.message ?? "Could not cancel reservation.");
   refreshed(); return { ok: true, id };
+}
+
+export async function saveBookingResource(value:unknown):Promise<ActionResult> {
+  if(!value || typeof value!=="object")return fail("Invalid resource.");
+  const v=value as Record<string,unknown>;
+  const id=v.id;
+  if(id!==undefined && (typeof id!=="string"||!validId(id)))return fail("Invalid resource ID.");
+  if(typeof v.name!=="string"||v.name.trim().length<1||v.name.trim().length>120 ||
+     typeof v.active!=="boolean")return fail("Enter a resource name (up to 120 characters).");
+  const {auth}=await requireBookingAdmin();
+  const data={name:v.name.trim(),active:v.active};
+  const result=id?
+    await auth.from("booking_resources").update(data).eq("id",id).select("id").maybeSingle():
+    await auth.from("booking_resources").insert(data).select("id").maybeSingle();
+  if(result.error||!result.data)return fail(result.error?.code==="23505"?
+    "A resource with that name already exists.":"Unable to save resource.");
+  refreshed();
+  return {ok:true,id:result.data.id};
 }

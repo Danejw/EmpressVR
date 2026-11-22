@@ -17,6 +17,7 @@ export function OfferingEditor({ offering, onSaved }: {
   const [description,setDescription] = useState(offering?.description??"");
   const [kind,setKind] = useState<Offering["kind"]>(offering?.kind??"class");
   const [published,setPublished] = useState(offering?.published??false);
+  const [accepting,setAccepting] = useState(offering?.accepting_bookings??false);
   const [price,setPrice] = useState(String((offering?.price_minor??0)/100));
   const [currency,setCurrency] = useState(offering?.currency??"GBP");
   const [busy,setBusy] = useState(false);
@@ -31,6 +32,7 @@ export function OfferingEditor({ offering, onSaved }: {
     try {
       const result=await saveOffering({
         ...(offering?{id:offering.id}:{}),title,slug,description,kind,published,
+        accepting_bookings:accepting,
         price_minor:Math.round(p*100),currency:currency.toUpperCase(),
       });
       if (!result.ok) {setError(result.error);return;}
@@ -67,7 +69,11 @@ export function OfferingEditor({ offering, onSaved }: {
     </div>
     <label className="booking-switch"><input type="checkbox" checked={published}
       onChange={event=>setPublished(event.target.checked)}/><span>Publish offering details</span></label>
-    <p className="auth-small">Publishing does not activate online reservations. Bookings remain disabled until the public booking integration is ready.</p>
+    <label className="booking-switch"><input type="checkbox" checked={accepting}
+      disabled={!published || kind==="informational" || Number(price)!==0}
+      onChange={event=>setAccepting(event.target.checked)}/>
+      <span>Accept free online reservations</span></label>
+    <p className="auth-small">A published, free offering can accept bookings when sessions are open. Paid bookings remain unavailable until payments are connected.</p>
     <button className="pill-button" type="submit" disabled={busy}>{busy?"Saving...":"Save offering"}</button>
   </form>;
 }
