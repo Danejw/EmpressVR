@@ -25,25 +25,19 @@ export default async function StaffDashboard({
         <p>Signed in as {user.email} · {role === "admin" ? "Administrator" : "Editor"}</p>
       </div><SignOutButton />
     </div>
-    <div className="cms-dashboard-grid">
-      <Link href="/staff/blog" className="cms-dashboard-card">
-        <span className="cms-card-icon">✎</span>
-        <strong>Blog posts</strong>
-        <span>{count ?? 0} posts · Create and publish</span>
-      </Link>
-      <Link href="/staff/blog/new" className="cms-dashboard-card">
-        <span className="cms-card-icon">+</span>
-        <strong>Write a post</strong>
-        <span>Start a new draft</span>
-      </Link>
-      <Link href="/staff/security" className="cms-dashboard-card">
-        <span className="cms-card-icon">⚙</span>
-        <strong>Account security</strong>
-        <span>Staff MFA protection</span>
-      </Link>
-    </div>
-    {role === "admin" ? <section className="auth-panel">
-      <h2>Staff invitations</h2>
+    <nav className="cms-dashboard-list" aria-label="Content management">
+      <div className="cms-dashboard-row">
+        <Link href="/staff/blog" className="cms-dashboard-link">
+          <strong>Blog</strong>
+          <span>{count ?? 0} posts</span>
+        </Link>
+        <Link href="/staff/blog/new" className="cms-dashboard-add" aria-label="Create blog post" title="Create blog post">+</Link>
+      </div>
+    </nav>
+    <Link href="/staff/security" className="auth-link">Account security</Link>
+    {role === "admin" ? <details className="cms-dashboard-invitations" open={Boolean(invite)}>
+      <summary>Staff invitations</summary>
+      <div className="auth-panel">
       <p className="auth-small">Invite an editor or administrator. Invitations expire after seven days.
         Share the <Link className="auth-link" href="/login">sign-in page</Link> with the invited person.</p>
       {invite === "created" ? <p className="auth-message" role="status">Invitation created.</p> : null}
@@ -70,6 +64,7 @@ export default async function StaffDashboard({
           </form>
         </div>)}
       </div> : null}
-    </section> : null}
+      </div>
+    </details> : null}
   </div></section>;
 }
