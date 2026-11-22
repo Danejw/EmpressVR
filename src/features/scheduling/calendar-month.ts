@@ -6,6 +6,7 @@ export type PublicCalendarEvent = Readonly<{
   end: string;
   allDay: boolean;
   url: string | null;
+  timeZone?: string;
 }>;
 
 export function monthKey(date: Date = new Date()): string {

@@ -10,10 +10,11 @@ export default async function StaffDashboard({
   searchParams,
 }: { searchParams: Promise<{ invite?: string }> }) {
   const { auth, user, role } = await requireStaff();
-  const [{ count }, { count: projectCount }, { count: teamCount }, { count: bookingCount }, { data: invitations }] = await Promise.all([
+  const [{ count }, { count: projectCount }, { count: teamCount }, { count: eventCount }, { count: bookingCount }, { data: invitations }] = await Promise.all([
     auth.from("blog_posts").select("id", { count: "exact", head: true }),
     auth.from("projects").select("id", { count: "exact", head: true }),
     auth.from("team_members").select("id", { count: "exact", head: true }),
+    auth.from("events").select("id", { count: "exact", head: true }),
     role === "admin" ? auth.from("bookings").select("id", { count: "exact", head: true })
       : Promise.resolve({ count: null }),
     role === "admin" ? auth.from("staff_invitations")
@@ -48,6 +49,13 @@ export default async function StaffDashboard({
           <strong>Team</strong><span>{teamCount ?? 0} profiles</span>
         </Link>
         <Link href="/staff/team/new" className="cms-dashboard-add" aria-label="Create team profile" title="Create team profile">+</Link>
+      </div>
+      <div className="cms-dashboard-row">
+        <Link href="/staff/events" className="cms-dashboard-link">
+          <strong>Events</strong><span>{eventCount ?? 0} events</span>
+        </Link>
+        <Link href="/staff/events" className="cms-dashboard-add"
+          aria-label="Manage events" title="Manage events">›</Link>
       </div>
       {role === "admin" ? <div className="cms-dashboard-row">
         <Link href="/staff/bookings" className="cms-dashboard-link">

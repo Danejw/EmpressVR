@@ -1,4 +1,4 @@
-import { localToUtc, formatLocalInput } from "@/features/scheduling/zoned-time";
+import { localToUtc, formatLocalInput } from "../scheduling/zoned-time";
 
 export type EventStatus = "draft" | "published" | "archived";
 export type StaffEvent = {

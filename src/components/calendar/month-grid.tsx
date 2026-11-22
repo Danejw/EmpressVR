@@ -6,7 +6,7 @@ const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
 /** Reusable, data-agnostic monthly calendar. Public and staff consumers supply markers. */
 export function MonthGrid({
-  month, onMonthChange, selectedDay, onDaySelect, markers = [], disabledDay,
+  month, onMonthChange, selectedDay, onDaySelect, markers = [], disabledDay, markerLabel = "sessions",
 }: {
   month: string;
   onMonthChange: (month: string) => void;
@@ -14,6 +14,7 @@ export function MonthGrid({
   onDaySelect?: (day: string) => void;
   markers?: readonly CalendarMarker[];
   disabledDay?: (day: string) => boolean;
+  markerLabel?: string;
 }) {
   const dates = monthCells(month);
   const monthLabel = new Intl.DateTimeFormat("en-GB",{ month:"long",year:"numeric",timeZone:"UTC" })
@@ -39,7 +40,7 @@ export function MonthGrid({
         const disabled = disabledDay?.(day) ?? false;
         return <button type="button" key={day}
           disabled={!onDaySelect || disabled}
-          aria-label={day + (marker ? ", "+ marker.count + " sessions" : "")}
+          aria-label={day + (marker ? ", "+ marker.count + " "+markerLabel : "")}
           aria-pressed={selectedDay===day}
           className={selectedDay===day?"is-selected":marker?"has-events":""}
           title={marker?.labels.join(", ") || day}

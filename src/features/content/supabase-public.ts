@@ -120,8 +120,12 @@ export async function getPublicSiteMediaId(slot: string): Promise<string | undef
     ?? (publicReadConfig().url ? undefined : getSiteMediaId(slot));
 }
 
-export function getPublishedEvents(): Promise<EventRecord[]> {
-  return fetchPublicRows("events", () => getEvents().filter((event) =>
+export type PublicEventRecord = EventRecord & {
+  time_zone?: string; all_day?: boolean;
+  location?: string | null; external_url?: string | null;
+};
+export function getPublishedEvents(): Promise<PublicEventRecord[]> {
+  return fetchPublicRows<PublicEventRecord>("events", () => getEvents().filter((event) =>
     event.status === "published" && !event.date_review_required
   ));
 }

@@ -1,4 +1,4 @@
-import type { PublicCalendarEvent } from "@/features/scheduling/calendar-month";
+import type { PublicCalendarEvent } from "../scheduling/calendar-month";
 import { COMMUNITY_TIME_ZONE } from "@/features/scheduling/calendar-month";
 
 /** Provider-independent projection: the database owns event state and identity. */
