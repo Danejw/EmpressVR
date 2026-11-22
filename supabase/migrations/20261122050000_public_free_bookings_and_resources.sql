@@ -93,11 +93,12 @@ begin
   return new;
 end; $$;
 
--- Opening customer-facing booking is explicit and FREE only until Stripe
--- confirmations and refunds have been integrated.
-alter table public.offerings add constraint open_public_booking_is_free
+-- Keep historically bookable paid offerings valid for existing payment
+-- ledgers; the NEW public reservation RPC and availability feed exclusively
+-- allow price_minor=0, and staff UI blocks enabling paid public reservations.
+alter table public.offerings add constraint open_public_booking_is_eligible
   check (not accepting_bookings or
-    (published and kind <> 'informational' and price_minor=0));
+    (published and kind <> 'informational'));
 grant update (accepting_bookings) on public.offerings to authenticated;
 
 -- Central trigger guards direct Data API writes by staff and all trusted
