@@ -1,8 +1,8 @@
-import { formatSessionTime } from "@/features/scheduling/admin-view";
 "use client";
+import { formatSessionTime } from "@/features/scheduling/admin-view";
 import { useState } from "react";
 import type { Offering,Session,Reservation,BookingContact,BookingAudit } from "@/features/scheduling/admin-types";
-import {  dayInZone } from "@/features/scheduling/booking-view";
+import { dayInZone } from "@/features/scheduling/booking-view";
 import { cancelFreeReservation } from "@/app/staff/bookings/actions";
 
 export function ReservationDetails({

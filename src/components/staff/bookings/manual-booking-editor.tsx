@@ -1,5 +1,5 @@
-import { formatSessionTime } from "@/features/scheduling/admin-view";
 "use client";
+import { formatSessionTime } from "@/features/scheduling/admin-view";
 import { useState, type FormEvent } from "react";
 import type { Offering, Session } from "@/features/scheduling/admin-types";
 import { dayInZone } from "@/features/scheduling/booking-view";

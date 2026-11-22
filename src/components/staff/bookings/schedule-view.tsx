@@ -1,5 +1,5 @@
-import { formatSessionTime } from "@/features/scheduling/admin-view";
 "use client";
+import { formatSessionTime } from "@/features/scheduling/admin-view";
 import { useMemo,useState } from "react";
 import { MonthGrid } from "@/components/calendar/month-grid";
 import { monthKey } from "@/features/scheduling/calendar-month";

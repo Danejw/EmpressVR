@@ -1,8 +1,7 @@
-import { formatSessionTime } from "@/features/scheduling/admin-view";
 "use client";
+import { formatSessionTime } from "@/features/scheduling/admin-view";
 import { useMemo,useState } from "react";
 import type { Offering,Session,Reservation,BookingContact } from "@/features/scheduling/admin-types";
-import { } from "@/features/scheduling/booking-view";
 
 export function ReservationsView({ reservations, contacts, offerings, sessions, onView, onNew }: {
   reservations: readonly Reservation[]; contacts: readonly BookingContact[];
