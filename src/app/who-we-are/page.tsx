@@ -26,7 +26,7 @@ export default async function WhoWeAre() {
       <div className="people-grid">
         {members.filter(m=>m.group==="current").map(member => {
           const href = member.slug
-            ? imported.has(member.slug) ? "/" + member.slug : "https://www.empressvr.com/" + member.slug
+            ? imported.has(member.slug) ? "/" + member.slug : "/team/" + member.slug
             : member.external_url || (member.name === "Eirian Soar" ? "https://www.linkedin.com/in/eiriansoar/" : null);
           return <article className="member-card" key={member.id}>
             <MediaImage assetId={member.headshot_media_id} alt={member.name} />

@@ -1,6 +1,6 @@
 # Staff content management roadmap
 
-Status: Plan only for Projects and Team. No database policies or management screens for these sections have been deployed by this plan.
+Status: Implemented on the unmerged staff feature branch. Server actions, CMS screens, uploads, linked page descriptions, public detail routes, and SQL migration have been added. Live authenticated end-to-end verification and CI still required.
 
 ## Dashboard pattern
 
@@ -31,3 +31,12 @@ Once create and edit are verified, add a **Team** row with count and `+` link. D
 ## Verification gates
 
 For each phase: verify server actions and RLS across anonymous, ordinary member, editor with and without MFA, and admin; test valid and invalid data; verify previews/public output and image handling; test mobile and keyboard interactions; run lint, TypeScript, unit tests, production build, and browser smoke tests. Keep all changes on the feature branch pending review and explicit merge approval.
+
+
+## Implementation notes
+
+The compact dashboard includes Blog, Projects, and Team rows with separate + links. Existing linked legacy page URLs are preserved. New project and team detail pages use /projects/[slug] and /team/[slug]. Project gallery changes reuse project_media; content uploads use content/<uuid> in the existing public media bucket. No staff roles or content records are created by this implementation. The site_pages body is edited only for a page already linked to the selected item, or a new page created for that item. The publication status of imported legacy pages is not altered.
+
+## Release gate
+
+Do not merge until authenticated AAL2 CRUD, image upload, content visibility, browser QA and CI are verified. Migration must be applied to the connected EmpressVR database before the screens can save.
