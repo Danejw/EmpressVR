@@ -1,0 +1,20 @@
+-- Booking management access checks. Run with supabase test db.
+begin;
+create extension if not exists pgtap with schema extensions;
+set local search_path=public,extensions;
+select plan(13);
+select ok(not has_table_privilege('anon','public.bookings','select'),'Visitors cannot read bookings');
+select ok(not has_table_privilege('anon','public.booking_contacts','select'),'Visitors cannot read attendee contacts');
+select ok(not has_table_privilege('anon','public.booking_admin_audit','select'),'Visitors cannot read audit history');
+select ok(not has_table_privilege('authenticated','public.bookings','delete'),'Users cannot delete reservations');
+select ok(not has_table_privilege('authenticated','public.booking_admin_audit','insert'),'Users cannot forge audit history');
+select ok(not has_function_privilege('anon','public.admin_reserve_free_booking(uuid,text,text,integer,text)','execute'),'Visitors cannot book through admin endpoint');
+select ok(not has_function_privilege('anon','public.admin_cancel_free_booking(uuid)','execute'),'Visitors cannot cancel through admin endpoint');
+select ok(not (select prosecdef from pg_proc where oid='public.admin_reserve_free_booking(uuid,text,text,integer,text)'::regprocedure),'Reservation RPC runs with caller privileges');
+select ok(not (select prosecdef from pg_proc where oid='public.admin_cancel_free_booking(uuid)'::regprocedure),'Cancellation RPC runs with caller privileges');
+select is((select count(*)::integer from pg_trigger where tgname='booking_admin_guard_insert' and not tgisinternal),1,'Capacity guard installed');
+select is((select count(*)::integer from pg_trigger where tgname='booking_admin_guard_cancel' and not tgisinternal),1,'Cancellation guard installed');
+select is((select count(*)::integer from pg_trigger where tgname='booking_admin_log_cancel' and not tgisinternal),1,'Cancellation audit trigger installed');
+select ok((select count(*) from pg_policies where schemaname='public' and tablename='booking_contacts' and policyname='mfa admins read attendee contacts')=1,'Contact RLS enabled for admins');
+select * from finish();
+rollback;
