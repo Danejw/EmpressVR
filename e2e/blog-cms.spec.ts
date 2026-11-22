@@ -18,6 +18,14 @@ test("unauthenticated visitors cannot access staff dashboard and editor", async 
   }
 });
 
+test("unauthenticated media uploads are rejected without storing a file", async ({ request }) => {
+  const response = await request.post("/api/staff/blog-media", {
+    headers: { origin: "http://127.0.0.1:3000" },
+    multipart: { file: { name: "image.png", mimeType: "image/png", buffer: Buffer.from([137,80,78,71,13,10,26,10]) } },
+  });
+  expect(response.status()).toBe(403);
+});
+
 test("public navigation shows sign-in, without exposing dashboard to visitors", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".site-nav a[href='/login']")).toHaveCount(1);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStaffContext } from "@/lib/auth/staff";
+import { matchesImageSignature } from "@/features/blog/image-validation";
 
 const imageTypes = new Map([
   ["image/png", "png"], ["image/jpeg", "jpg"], ["image/webp", "webp"],
@@ -23,6 +24,10 @@ export async function POST(request: NextRequest) {
   const file = body.get("file");
   if (!(file instanceof File) || !imageTypes.has(file.type) || !file.size || file.size > maxBytes)
     return NextResponse.json({ error: "Upload a PNG, JPEG, WebP, GIF or AVIF under 8 MB." }, { status: 400 });
+
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  if (!matchesImageSignature(bytes, file.type))
+    return NextResponse.json({ error: "File contents do not match the image format." }, { status: 400 });
 
   const id = crypto.randomUUID();
   const key = "blog/" + id + "." + imageTypes.get(file.type);
