@@ -1,8 +1,9 @@
+import { formatSessionTime } from "@/features/scheduling/admin-view";
 "use client";
 import { useMemo,useState } from "react";
 import { MonthGrid } from "@/components/calendar/month-grid";
 import { monthKey } from "@/features/scheduling/calendar-month";
-import { dayInZone, formatSlotTime } from "@/features/scheduling/booking-view";
+import { dayInZone } from "@/features/scheduling/booking-view";
 import type { Offering, Session, Reservation } from "@/features/scheduling/admin-types";
 import { closeSession } from "@/app/staff/bookings/actions";
 
@@ -55,7 +56,7 @@ export function ScheduleView({ offerings, sessions, reservations, onEdit, onNew,
           return <article className="booking-admin-list-row" key={session.id}>
             <div className="booking-admin-list-primary">
               <strong>{offeringTitles.get(session.offering_id)??"Offering"}</strong>
-              <small>{dayInZone(session.starts_at,session.time_zone)} · {formatSlotTime(session)}</small>
+              <small>{dayInZone(session.starts_at,session.time_zone)} · {formatSessionTime(session)}</small>
               <small>{occupied}/{session.capacity} seats · {session.time_zone}</small>
             </div>
             <span className={"booking-chip "+(session.available?"is-live":"")}>{session.available?"Open":"Closed"}</span>

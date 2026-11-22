@@ -1,7 +1,8 @@
+import { formatSessionTime } from "@/features/scheduling/admin-view";
 "use client";
 import { useState } from "react";
 import type { Offering,Session,Reservation,BookingContact,BookingAudit } from "@/features/scheduling/admin-types";
-import { formatSlotTime, dayInZone } from "@/features/scheduling/booking-view";
+import {  dayInZone } from "@/features/scheduling/booking-view";
 import { cancelFreeReservation } from "@/app/staff/bookings/actions";
 
 export function ReservationDetails({
@@ -32,7 +33,7 @@ export function ReservationDetails({
       <div><dt>Attendee</dt><dd>{contact?.display_name??"Not provided"}</dd></div>
       <div><dt>Email</dt><dd>{contact?.email??"Not provided"}</dd></div>
       <div><dt>Offering</dt><dd>{offering?.title??"Unknown offering"}</dd></div>
-      <div><dt>Session</dt><dd>{session?dayInZone(session.starts_at,session.time_zone)+" · "+formatSlotTime(session):"Unavailable"}</dd></div>
+      <div><dt>Session</dt><dd>{session?dayInZone(session.starts_at,session.time_zone)+" · "+formatSessionTime(session):"Unavailable"}</dd></div>
       <div><dt>Seats</dt><dd>{reservation.seats}</dd></div>
       <div><dt>Payment</dt><dd>{reservation.requires_payment?"Required":"Free"}</dd></div>
       <div><dt>Created</dt><dd>{new Date(reservation.created_at).toLocaleString("en-GB")}</dd></div>

@@ -1,7 +1,8 @@
+import { formatSessionTime } from "@/features/scheduling/admin-view";
 "use client";
 import { useMemo,useState } from "react";
 import type { Offering,Session,Reservation,BookingContact } from "@/features/scheduling/admin-types";
-import { formatSlotTime } from "@/features/scheduling/booking-view";
+import { } from "@/features/scheduling/booking-view";
 
 export function ReservationsView({ reservations, contacts, offerings, sessions, onView, onNew }: {
   reservations: readonly Reservation[]; contacts: readonly BookingContact[];
@@ -43,7 +44,7 @@ export function ReservationsView({ reservations, contacts, offerings, sessions, 
         key={item.id} onClick={()=>onView(item.id)}>
         <span className="booking-admin-list-primary">
           <strong>{contact?.display_name||contact?.email||"Attendee"}</strong>
-          <small>{offeringNames.get(item.offering_id)??"Offering"} · {session?formatSlotTime(session):"Session"}</small>
+          <small>{offeringNames.get(item.offering_id)??"Offering"} · {session?formatSessionTime(session):"Session"}</small>
           <small>{item.seats} seats · {new Date(item.created_at).toLocaleDateString("en-GB")}</small>
         </span>
         <span className={"booking-chip "+(item.status==="confirmed"?"is-live":"")}>{item.status}</span>

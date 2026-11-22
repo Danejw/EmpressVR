@@ -1,7 +1,8 @@
+import { formatSessionTime } from "@/features/scheduling/admin-view";
 "use client";
 import { useState, type FormEvent } from "react";
 import type { Offering, Session } from "@/features/scheduling/admin-types";
-import { formatSlotTime,dayInZone } from "@/features/scheduling/booking-view";
+import { dayInZone } from "@/features/scheduling/booking-view";
 import { makeFreeReservation } from "@/app/staff/bookings/actions";
 
 export function ManualBookingEditor({ offerings,sessions,onSaved }: {
@@ -44,7 +45,7 @@ export function ManualBookingEditor({ offerings,sessions,onSaved }: {
       {eligible.map(slot=>{
         const offering=offerings.find(o=>o.id===slot.offering_id);
         return <option key={slot.id} value={slot.id}>
-          {offering?.title??"Offering"} · {dayInZone(slot.starts_at,slot.time_zone)} · {formatSlotTime(slot)}
+          {offering?.title??"Offering"} · {dayInZone(slot.starts_at,slot.time_zone)} · {formatSessionTime(slot)}
         </option>;
       })}
     </select>
