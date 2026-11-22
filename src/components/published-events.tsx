@@ -4,7 +4,7 @@ import { MediaImage } from "@/components/media-image";
 /** Published and date-reviewed events only. Never display archived import dates. */
 export async function PublishedEvents({ showEmpty = false }: { showEmpty?: boolean }) {
   const [events,pages]=await Promise.all([getPublishedEvents(),getPublishedPages()]);
-  const pageText=new Map(pages.map(page=>[page.id,page.body_markdown]));
+  const pageText=new Map(pages.map(page=>[page.id,page.body_markdown??""]));
   if (!events.length && !showEmpty) return null;
   return <section className="page-container" aria-label="Published EmpressVR events">
     <h2>Events</h2>
