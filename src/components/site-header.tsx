@@ -33,23 +33,23 @@ export async function SiteHeader() {
         <MediaImage assetId={logoId} alt="EmpressVR" width={210} height={53}
           className="site-brand-logo" loading="eager" />
       </Link>
-      <nav className="site-nav" aria-label="Primary navigation">
-        {siteSections.map(section => <Link key={section.slug} href={"/" + section.slug}>{section.title}</Link>)}
-        <Link href="/blog">Blog</Link>
-        <CartHeaderLink />
-        {accountLinks}
-      </nav>
-      <Link className="header-cta" href={schedule}>View Classes &amp; Socials</Link>
-      <details className="mobile-menu">
-        <summary aria-label="Open navigation">Menu <span aria-hidden="true">☰</span></summary>
-        <nav aria-label="Mobile navigation">
-          {siteSections.map(section => <Link key={section.slug} href={"/" + section.slug}>{section.title}</Link>)}
-          <Link href="/blog">Blog</Link>
-          <CartHeaderLink />
-          {accountLinks}
-          <Link href={schedule}>View Classes &amp; Socials</Link>
-        </nav>
-      </details>
+      <div className="header-actions">
+        <Link className="header-cta" href={schedule}>View Classes &amp; Socials</Link>
+        <details className="header-menu">
+          <summary aria-label="Navigation menu" title="Navigation menu">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </summary>
+          <nav aria-label="Primary navigation">
+            {siteSections.map(section => <Link key={section.slug} href={"/" + section.slug}>{section.title}</Link>)}
+            <Link href="/blog">Blog</Link>
+            <CartHeaderLink />
+            {accountLinks}
+          </nav>
+        </details>
+      </div>
     </div>
   </header>;
 }
