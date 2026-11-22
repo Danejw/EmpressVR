@@ -23,10 +23,12 @@ This does not enable booking writes or change existing Squarespace/Acuity links.
 `/book` is a standalone, tested booking-planner interface with class selection,
 month/day navigation, time selection, attendee quantity and contact fields, and a
 booking review. It deliberately **does not submit** or store customer data.
-The current class cards are taken from the archived product catalog, which
-marks all three as sold out. No verified future offering/slot records exist
-in that snapshot, so every date is disabled and the official booking site
-remains linked. The /scheduling page links to this preview.
+On connected hosting, public class cards are read from published `offerings`
+using the publishable Supabase API and public RLS. Static previews without
+Supabase credentials retain clearly labeled archived product snapshots.
+No public booking slots are connected yet, so every date is disabled and the
+operational Squarespace/Acuity site remains linked. The /scheduling page
+links to this preview.
 
 Only published, accepting offerings and future slots from trusted persistence
 may populate the `BookingPlanner` props. The `bookableSlots` utility filters
