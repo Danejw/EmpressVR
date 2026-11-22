@@ -2,7 +2,7 @@
 
 import { getBrowserAuth } from "./browser";
 
-/** Provision only after Supabase returns a verified, authenticated user. */
+/** Provision the member profile, then read the staff role granted by database-owned invitation triggers. */
 export async function completeSignIn(): Promise<"/staff" | "/account"> {
   const auth = getBrowserAuth();
   if (!auth) throw new Error("Authentication is not configured.");
@@ -21,11 +21,8 @@ export async function completeSignIn(): Promise<"/staff" | "/account"> {
       throw new Error("Signed in, but your member profile could not be created.");
   }
 
-  // This server-owned RPC checks the verified address against a live invite.
-  // No user-controlled metadata, role, or email arguments can grant staff access.
-  const { error: inviteError } = await auth.rpc("claim_staff_invitation");
-  if (inviteError) throw new Error("Your staff invitation could not be checked.");
-
+  // ASVS 4.1: no privileged RPC is exposed to or called by the browser.
+  // Only the verified-email and admin-invitation database triggers can assign staff roles.
   const { data: staff, error: staffError } = await auth.from("staff_roles")
     .select("role").eq("user_id", user.id).maybeSingle();
   if (staffError) throw new Error("Could not verify your access permissions.");
