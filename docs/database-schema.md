@@ -2,9 +2,9 @@
 
 **Purpose:** The developer-facing inventory of the application database. Read this before proposing a new table, duplicating a catalogue or changing persistence models.
 
-**Verified against:** Live Supabase project `zxsrixbjsmyzmqywukwa`, schema `public`, on 2026-11-21 (Hawaii time), and the `feat/staff-booking-management` code and migrations. This is a point-in-time snapshot. The current schema and migrations win if they differ from this document.
+**Verified against:** The live Supabase project `zxsrixbjsmyzmqywukwa` and current migration/schema design, updated in the public-booking PR on 2026-11-21 (Hawaii time). Migration-only additions are included in this inventory and require applying the named migration before they are live. This is a point-in-time snapshot. The current schema and migrations win if they differ from this document.
 
-**Scope:** **32 application tables**, **58 actual foreign-key constraints**, all 32 with RLS enabled. Supabase-managed `auth` and `storage` tables are outside this inventory, but are identified where referenced. The “Links” column contains actual database foreign keys, not inferred joins.
+**Scope:** **33 application tables**, **59 actual foreign-key constraints**, all 33 with RLS enabled after migration `20261122050000_public_free_bookings_and_resources.sql` is applied. Supabase-managed `auth` and `storage` tables are outside this inventory, but are identified where referenced. The “Links” column contains actual database foreign keys, not inferred joins.
 
 ## Before adding or changing a table
 
@@ -22,6 +22,7 @@ Content:       site_pages -> {projects, team_members, blog_posts, events, produc
 Store:         products -> order_items -> orders <- payment_events / payment_adjustments
                products -> product_downloads; order_items -> entitlements
 Bookings:      offerings -> booking_slots -> bookings -> {booking_contacts, booking_admin_audit}
+               booking_resources -> booking_slots (resource assignment)
                bookings <-> orders (optional payment linkage); order_items -> offerings
 Donations:     donation_campaigns -> {order_items, subscriptions}
 Memberships:   membership_plans -> membership_applications -> memberships -> subscriptions
@@ -65,7 +66,8 @@ Arrows show primary domain flow, not FK direction in every case. The authoritati
 | Table | Purpose | Key columns | Foreign-key links (outgoing) |
 |---|---|---|---|
 | [`offerings`](#offerings) | Classes, appointments and informational activities with booking price and publication/acceptance controls. | `id`, `slug`, `title`, `kind`, `price_minor`, `currency`, `published`, `accepting_bookings` | None |
-| [`booking_slots`](#booking_slots) | Real scheduled occurrences with timezone, capacity, seat limits, payment flag and optional external calendar ID. | `id`, `offering_id`, `starts_at`, `ends_at`, `time_zone`, `capacity`, `max_seats_per_booking`, `available`, `requires_payment`, `google_calendar_event_id` | `offering_id` → `offerings(id)` |
+| [`booking_resources`](#booking_resources) | Shared staff/room resources used for cross-offering conflict prevention. | `id`, `name`, `active` | None |
+| [`booking_slots`](#booking_slots) | Real scheduled occurrences with timezone, capacity, seat limits and resource assignment. | `id`, `offering_id`, `resource_id`, `starts_at`, `ends_at`, `time_zone`, `capacity`, `max_seats_per_booking`, `available`, `requires_payment`, `google_calendar_event_id` | `offering_id` → `offerings(id)`; `resource_id` → `booking_resources(id)` |
 | [`bookings`](#bookings) | Seat reservations/holds against a specific offering and slot; booking lifecycle and optional linked payment/customer. | `id`, `offering_id`, `slot_id`, `attendee_ref`, `seats`, `status`, `idempotency_key`, `requires_payment`, `payment_order_id`, `customer_id` | `payment_order_id` → `orders(id)`; `slot_id, offering_id` → `booking_slots(id, offering_id)`; `customer_id` → `customers(id)` |
 | [`booking_contacts`](#booking_contacts) | Private attendee email/name for a booking, kept separate from the reservation ledger. | `booking_id`, `email`, `display_name` | `booking_id` → `bookings(id)` |
 | [`booking_admin_audit`](#booking_admin_audit) | Append-only history of manual staff booking creation and cancellation, with actor. | `id`, `booking_id`, `action`, `actor_id`, `created_at` | `actor_id` → `auth.users(id)`; `booking_id` → `bookings(id)` |
@@ -238,12 +240,19 @@ The lists below show **all currently observed columns** in schema order, not jus
 - **Purpose:** Classes, appointments and informational activities with booking price and publication/acceptance controls.
 - **FKs:** None.
 
+#### `booking_resources`
+
+- **Primary key:** `id`. **RLS:** enabled.
+- **All columns (4):** `id`, `name`, `active`, `created_at`.
+- **Purpose:** Shared staff, rooms or equipment assigned to sessions so a reservation blocks overlapping times across offerings.
+- **FKs:** None (referenced by `booking_slots.resource_id`).
+
 #### `booking_slots`
 
 - **Primary key:** `id`. **RLS:** enabled.
-- **All columns (12):** `id`, `offering_id`, `starts_at`, `ends_at`, `time_zone`, `capacity`, `max_seats_per_booking`, `available`, `requires_payment`, `google_calendar_event_id`, `created_at`, `updated_at`.
+- **All columns (13):** `id`, `offering_id`, `starts_at`, `ends_at`, `time_zone`, `capacity`, `max_seats_per_booking`, `available`, `requires_payment`, `google_calendar_event_id`, `created_at`, `updated_at`, `resource_id`.
 - **Purpose:** Real scheduled occurrences with timezone, capacity, seat limits, payment flag and optional external calendar ID.
-- **FKs:** `offering_id` → `offerings(id)`.
+- **FKs:** `offering_id` → `offerings(id)`; `resource_id` → `booking_resources(id)`.
 
 #### `bookings`
 
@@ -334,7 +343,7 @@ The lists below show **all currently observed columns** in schema order, not jus
 
 **Current overlap, do not amplify:** Three legacy class listings appear in both `products` and `offerings` with the same titles and GBP prices, but **there is no FK linking the two catalogues**. Editing one does not synchronize the other. The live source classes were imported into `offerings` for staff booking work; they remain non-bookable (`accepting_bookings = false`). The Fox Mask STL remains only a store product. Treat this as a migration overlap, not a model for creating more copies. Preserve existing store URLs until the public booking/store cutover is explicitly approved.
 
-**Public page vs admin page.** The current public `/book` page still reads archived product snapshot data and has no bookable sessions. The draft `/staff/bookings` reads the live `offerings`, `booking_slots`, `bookings`, contacts and audit tables. A published offering does not imply an open session or valid booking.
+**Public page vs admin page.** Connected public `/book` reads published `offerings` plus privacy-safe, actual free-slot capacity from `public_free_booking_slots()`. Booking is explicit: `published=true`, `accepting_bookings=true`, a future `available` session, `price_minor=0` and no payment requirement. Offline previews keep clearly labeled archived product snapshots. Authenticated, email-confirmed customers reserve with `reserve_public_free_booking()`, view only their own bookings with `my_free_bookings()`, and cancel eligible bookings with `cancel_my_free_booking()`. Staff `/staff/bookings` manages offerings, sessions, resources and private contacts. The public RPCs expose no other customer data; `booking_contacts` remains private. Resource locking serializes overlapping appointment reservations, while slot locking enforces class capacity.
 
 **Images and storage.** Media bytes live in Supabase Storage. `media_assets.storage_key` and `product_downloads.storage_key` are **text references**, not foreign keys to `storage.objects`. `site_media` is keyed by a named UI slot; `page_media`, `project_media` and `product_media` are ordered join tables. `featured_media_id` and `headshot_media_id` link directly to `media_assets`.
 
@@ -348,7 +357,7 @@ The lists below show **all currently observed columns** in schema order, not jus
 
 ## Where to check implementation
 
-- **Authoritative schema history:** `supabase/migrations/`, particularly `20261120000000_content_media_foundation.sql`, `20261120000002_commerce_catalogs.sql`, `20261120000003_booking_reservations.sql`, `20261120000004_order_payment_ledger.sql`, `20261120000005_memberships_subscriptions.sql`, `20261120000008_backend_relationships.sql`, `20261121220615_member_staff_auth.sql`, `20261122010000_staff_projects_team_cms.sql`, and `20261122030000_booking_admin_workspace.sql`, and `20261122040000_staff_events_management.sql`.
+- **Authoritative schema history:** `supabase/migrations/`, particularly `20261120000000_content_media_foundation.sql`, `20261120000002_commerce_catalogs.sql`, `20261120000003_booking_reservations.sql`, `20261120000004_order_payment_ledger.sql`, `20261120000005_memberships_subscriptions.sql`, `20261120000008_backend_relationships.sql`, `20261121220615_member_staff_auth.sql`, `20261122010000_staff_projects_team_cms.sql`, and `20261122030000_booking_admin_workspace.sql`, `20261122040000_staff_events_management.sql`, and `20261122050000_public_free_bookings_and_resources.sql`.
 - **Content queries:** `src/features/content/`, `src/features/blog/`, `src/features/commerce/store-catalog.ts`.
 - **Booking admin:** `src/app/staff/bookings/`, `src/components/staff/bookings/`, `src/features/scheduling/`.
 - **Authorization:** `src/lib/auth/` and `docs/authentication.md`.
