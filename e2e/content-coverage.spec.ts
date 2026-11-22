@@ -54,16 +54,11 @@ test.describe("migrated page inventory", () => {
   }
 });
 
-test("header navigation reaches the community page", async ({ page }, testInfo) => {
+test("header navigation reaches the community page", async ({ page }) => {
   await page.goto("/");
-  if (testInfo.project.name === "mobile-chromium") {
-    await page.locator(".mobile-menu summary").click();
-    await page.getByRole("navigation", { name: "Mobile navigation" })
-      .getByRole("link", { name: "Community" }).click();
-  } else {
-    await page.getByRole("navigation", { name: "Primary navigation" })
-      .getByRole("link", { name: "Community" }).click();
-  }
+  await page.locator(".header-menu summary").click();
+  await page.getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("link", { name: "Community" }).click();
   await expect(page).toHaveURL(/\/community\/?$/);
   await expect(page.locator("#main-content")).toBeVisible();
 });
