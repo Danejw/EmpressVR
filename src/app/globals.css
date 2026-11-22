@@ -36,6 +36,7 @@ a:hover { text-decoration-thickness: 2px; }
 .header-menu summary::-webkit-details-marker { display: none; }
 .header-menu summary:hover, .header-menu[open] summary { background: #f1ecf5; }
 .header-menu nav { position: absolute; right: 0; top: calc(100% + 10px); width: min(310px, calc(100vw - 32px)); max-height: min(70vh, 600px); overflow-y: auto; background: white; box-shadow: 0 14px 36px #171d3a26; border: 1px solid #ebe5ef; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 2px; z-index: 30; }
+.header-menu:not([open]) nav { display: none; }
 .header-menu nav a { display: block; padding: 9px 12px; border-radius: 7px; font-size: .91rem; font-weight: 500; line-height: 1.35; }
 .header-menu nav a:hover, .header-menu nav a:focus-visible { background: #f6eef8; color: #8c238e; }
 h1, h2, h3, h4 { font-family: var(--heading-font); line-height: 1.2; font-weight: 400; }
