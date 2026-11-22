@@ -13,7 +13,7 @@ import {
   type Project, type Product, type TeamMember, type EventRecord, type PageRecord, type MediaAsset,
 } from "./repository";
 
-type PublicTable = "projects" | "products" | "team_members" | "events" | "site_pages" | "media_assets" | "site_media";
+type PublicTable = "projects" | "products" | "offerings" | "team_members" | "events" | "site_pages" | "media_assets" | "site_media";
 export type PublicReadConfig = Readonly<{
   url: string;
   publishableKey: string;
@@ -23,6 +23,7 @@ export type PublicReadConfig = Readonly<{
 const predicates: Readonly<Record<PublicTable, string>> = {
   projects: "status=eq.published&order=sort_order.asc",
   products: "status=in.(active,sold_out)&order=sort_order.asc",
+  offerings: "published=eq.true&order=title.asc",
   team_members: "order=sort_order.asc",
   events: "status=eq.published&date_review_required=eq.false&order=start_at.asc",
   site_pages: "published=eq.true&order=path.asc",
@@ -78,6 +79,19 @@ export function getPublishedProjects(): Promise<Project[]> {
 
 export function getPublishedProducts(): Promise<Product[]> {
   return fetchPublicRows("products", getProducts);
+}
+
+/** Public class catalogue from offerings. Only published records are exposed by RLS. */
+export type PublicOffering = Readonly<{
+  id: string; title: string; description: string;
+  kind: "class" | "appointment" | "informational";
+  price_minor: number; currency: string;
+  published: boolean; accepting_bookings: boolean;
+}>;
+
+export function getPublishedOfferings(): Promise<PublicOffering[]> {
+  // Do not silently substitute store products for the booking source of truth.
+  return fetchPublicRows("offerings", () => []);
 }
 
 export async function getPublicTeamMembers(): Promise<TeamMember[]> {
