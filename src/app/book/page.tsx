@@ -1,40 +1,53 @@
-import type { Metadata } from "next";
-import { BookingPlanner } from "@/components/booking-planner";
-import { getProducts } from "@/features/content/repository";
-import { monthKey } from "@/features/scheduling/calendar-month";
+import type {Metadata} from "next";
+import {BookingPlanner} from "@/components/booking-planner";
+import {getProducts} from "@/features/content/repository";
+import {getPublishedOfferings,publicReadConfig} from "@/features/content/supabase-public";
+import {getPublicFreeSlots} from "@/features/scheduling/public-booking";
+import {getServerAuth} from "@/lib/auth/server";
+import {monthKey} from "@/features/scheduling/calendar-month";
 
-export const metadata: Metadata = {
-  title: "Classes and bookings",
-  description: "Explore EmpressVR classes, community sessions, and booking dates.",
-  alternates: { canonical: "/book" },
-  robots: { index: false, follow: false }, // Hold search indexing until real bookings are enabled.
+export const dynamic="force-dynamic";
+export const metadata:Metadata={
+  title:"Classes and bookings",
+  description:"Explore EmpressVR classes and book available free sessions.",
+  alternates:{canonical:"/book"},
 };
 
-/**
- * Snapshot mode: historical product data is real, but contains no bookable slots.
- * Once published offerings and slots are connected, provide them as trusted
- * server-side props. Never infer availability from archived products or events.
+/** Staff-controlled offerings and actual resource-aware capacity, never archived
+ * product or event dates. Published offerings without open slots stay visible.
  */
-export default function BookingPage() {
-  const archivedCourses = getProducts()
-    .filter((product) => product.sold_out && product.slug !== "fox-mask-stl-file-for-3d-printing")
-    .map((product) => ({
-      id: product.id,
-      slug: product.slug,
-      title: product.title,
-      description: product.description,
-      priceMinor: product.price_minor,
-      currency: product.currency,
-      soldOut: product.sold_out,
-    }));
-  return <section className="booking-page">
-    <div className="page-container">
-      <BookingPlanner
-        archivedCourses={archivedCourses}
-        offerings={[]}
-        slots={[]}
-        initialMonth={monthKey()}
-      />
-    </div>
-  </section>;
+export default async function BookingPage(){
+  const config=publicReadConfig();
+  const [rows,slots,auth]=await Promise.all([
+    getPublishedOfferings(),getPublicFreeSlots(),getServerAuth(),
+  ]);
+  const {data:{user}}=auth
+    ? await auth.auth.getUser()
+    : {data:{user:null}};
+  const offerings=rows.filter(o=>
+    (o.kind==="class"||o.kind==="appointment") && o.published===true &&
+    typeof o.id==="string"&&typeof o.title==="string"&&
+    typeof o.description==="string"&&
+    Number.isSafeInteger(o.price_minor)&&o.price_minor>=0 &&
+    typeof o.currency==="string" && /^[A-Z]{3}$/.test(o.currency) &&
+    typeof o.accepting_bookings==="boolean"
+  ).map(o=>({
+    id:o.id,title:o.title,description:o.description,
+    kind:o.kind as "class"|"appointment",
+    priceMinor:o.price_minor,currency:o.currency,
+    acceptingBookings:o.accepting_bookings,
+  }));
+  const snapshotOnly=config.staticPreview||!config.url||!config.publishableKey;
+  const archivedCourses=snapshotOnly?getProducts()
+    .filter(p=>p.sold_out&&p.slug!=="fox-mask-stl-file-for-3d-printing")
+    .map(p=>({
+      id:p.id,slug:p.slug,title:p.title,description:p.description,
+      priceMinor:p.price_minor,currency:p.currency,soldOut:p.sold_out,
+    })):[];
+  return <section className="booking-page"><div className="page-container">
+    <BookingPlanner offerings={offerings} slots={slots}
+      archivedCourses={archivedCourses} initialMonth={monthKey()}
+      referenceNow={new Date().toISOString()}
+      signedInEmail={user?.email_confirmed_at?user.email??null:null}/>
+  </div></section>;
 }
