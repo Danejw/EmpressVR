@@ -741,3 +741,34 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
   .shared-month-grid { padding: 8px; }
   .shared-month-days button { min-height: 44px; font-size: .83rem; }
 }
+
+/* Shared custom select: same control in staff CMS, booking, membership and public forms. */
+.app-select { position: relative; width: 100%; min-width: 0; }
+.app-select-trigger { width: 100%; min-height: 46px; padding: 10px 12px;
+  background: white; color: var(--navy); border: 1px solid #c3c0d0; border-radius: 9px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  text-align: left; font: inherit; font-size: .95rem; cursor: pointer; }
+.app-select-trigger > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.app-select-trigger svg { flex: 0 0 auto; }
+.app-select-trigger:disabled { opacity: .55; cursor: not-allowed; }
+.app-select-trigger:hover:not(:disabled), .app-select-trigger[aria-expanded="true"] {
+  border-color: var(--violet); }
+.app-select-placeholder { color: #696d7d; }
+.app-select-popup { position: absolute; z-index: 70; top: calc(100% + 6px);
+  right: 0; left: 0; min-width: min(100%, 240px); padding: 6px;
+  background: white; border: 1px solid #d9d4e1; box-shadow: 0 12px 32px #171d3a24;
+  border-radius: 12px; }
+.booking-editor-form .app-select input.app-select-search,
+.app-select input.app-select-search {
+  display: block; width: 100%; min-width: 0; padding: 10px 12px;
+  margin: 0 0 5px; border: 1px solid #d9d4e1; border-radius: 8px;
+  color: var(--navy); background: #fff; font: inherit; font-size: .86rem; }
+.app-select-options { display: flex; flex-direction: column; max-height: min(290px, 45vh);
+  overflow-y: auto; overscroll-behavior: contain; }
+.app-select-option { flex: 0 0 auto; padding: 10px 12px; border: none; border-radius: 7px;
+  font: inherit; font-size: .87rem; text-align: left; color: var(--navy);
+  background: transparent; cursor: pointer; overflow-wrap: anywhere; }
+.app-select-option:hover, .app-select-option.is-active { background: #f3edfa; }
+.app-select-option[aria-selected="true"] { color: #6413a0; font-weight: 700; }
+.app-select-option:disabled { opacity: .45; cursor: not-allowed; }
+.app-select-empty { padding: 12px; margin: 0; color: #60667b; font-size: .85rem; }
