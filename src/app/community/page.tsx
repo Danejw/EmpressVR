@@ -5,7 +5,9 @@ import { CommunityCalendar } from "@/components/community-calendar";
 import { PublishedEvents } from "@/components/published-events";
 import { cleanLegacyContent, sectionsFromMarkdown } from "@/features/content/page-sections";
 import { monthKey, shiftMonth } from "@/features/scheduling/calendar-month";
-import { fetchCommunityEvents } from "@/features/scheduling/google-calendar";
+import { getPublishedEvents, publicReadConfig } from "@/features/content/supabase-public";
+import { toCalendarEvent } from "@/features/events/calendar-adapter";
+import type { PublicCalendarEvent } from "@/features/scheduling/calendar-month";
 import { readLegacyPage } from "@/lib/legacy-pages";
 
 export const metadata: Metadata = { title: "Community" };
@@ -19,17 +21,20 @@ export default async function Community() {
   const month = monthKey();
   const firstMonth = shiftMonth(month, -3);
   const lastMonth = shiftMonth(month, 12);
-  const [sy,sm] = firstMonth.split("-").map(Number);
-  const [ey,em] = lastMonth.split("-").map(Number);
-  const feed = start >= 0 && end > start ? await fetchCommunityEvents(
-    new Date(Date.UTC(sy, sm-1, 0)), new Date(Date.UTC(ey, em, 2)),
-  ) : { status: "unconfigured" as const, events: [] };
+  // Supabase is the canonical event catalogue. Google Calendar integration is
+  // deferred to a separately authorized one-way synchronization adapter.
+  const rows = start >= 0 && end > start ? await getPublishedEvents() : [];
+  const events = rows.map(toCalendarEvent)
+    .filter((item): item is PublicCalendarEvent => item !== null);
+  const config = publicReadConfig();
+  const status = config.staticPreview || !config.url || !config.publishableKey
+    ? "unconfigured" as const : "connected" as const;
   return <article className="legacy-page"><div className="page-container">
     <PageSections sections={sectionsFromMarkdown(start >= 0 && end > start ? markdown.slice(0,start) : markdown)}/>
     {start >= 0 && end > start ? <>
       <section className="community-calendar-section" aria-label="Community Calendar">
         <h2>Community Calendar!</h2>
-        <CommunityCalendar events={feed.events} status={feed.status} initialMonth={month}
+        <CommunityCalendar events={events} status={status} initialMonth={month}
           firstMonth={firstMonth} lastMonth={lastMonth}/>
       </section>
       <PageSections sections={sectionsFromMarkdown(markdown.slice(end))}/>

@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { EditorPanel } from "./editor-panel";
+import { EditorPanel } from "@/components/staff/editor-panel";
 import { OfferingEditor } from "./offering-editor";
 import { SessionEditor } from "./session-editor";
 import { OfferingsView } from "./offering-list";

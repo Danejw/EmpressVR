@@ -43,7 +43,7 @@ test("invalid callback redirects to login instead of opening private pages", asy
 });
 
 test("unauthenticated account and staff routes redirect to login", async ({ page }) => {
-  for (const path of ["/account", "/staff", "/staff/bookings", "/staff/security"]) {
+  for (const path of ["/account", "/staff", "/staff/bookings", "/staff/events", "/staff/security"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login$/);
     await expect(page.getByRole("heading", { name: "Sign in to EmpressVR" })).toBeVisible();

@@ -16,7 +16,7 @@ function monthLabel(month: string): string {
 function eventTime(event: PublicCalendarEvent): string {
   if (event.allDay) return "All day";
   return new Intl.DateTimeFormat("en-GB", {
-    timeZone: COMMUNITY_TIME_ZONE, hour: "2-digit", minute: "2-digit",
+    timeZone: event.timeZone || COMMUNITY_TIME_ZONE, hour: "2-digit", minute: "2-digit",
   }).format(new Date(event.start));
 }
 
