@@ -29,6 +29,7 @@ test("menu links navigate and retain account access",async({page})=>{
   await menu.locator("summary").click();
   await menu.getByRole("link",{name:"Blog"}).click();
   await expect(page).toHaveURL(/\/blog$/);
+  await expect(page.locator(".site-header .header-menu")).not.toHaveAttribute("open", "");
   await page.locator(".site-header .header-menu summary").click();
   await expect(page.getByRole("navigation",{name:"Primary navigation"}).getByRole("link",{name:"Sign in"})).toBeVisible();
 });
