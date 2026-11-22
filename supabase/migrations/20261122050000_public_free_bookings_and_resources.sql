@@ -151,7 +151,7 @@ begin
 
   select price_minor,kind,published,accepting_bookings
     into v_price,v_kind,v_published,v_accepts
-  from public.offerings where id=new.offering_id;
+  from public.offerings where id=new.offering_id for share;
   if v_price is null or v_price<>0 or v_kind='informational' or
     (not v_admin and (not v_published or not v_accepts)) then
     raise exception 'Offering does not accept free online bookings';
@@ -221,7 +221,8 @@ begin
   if found then
     select * into v_contact from public.booking_contacts
       where booking_id=v_existing.id;
-    if v_existing.attendee_ref='account_'||v_user::text
+    if v_existing.status='confirmed'
+      and v_existing.attendee_ref='account_'||v_user::text
       and v_existing.slot_id=p_slot_id
       and v_existing.seats=p_seats
       and v_contact.display_name=trim(p_attendee_name)
