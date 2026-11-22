@@ -11,6 +11,18 @@ export async function saveOffering(value: unknown): Promise<ActionResult> {
   if (!checked.data) return fail(checked.error);
   const { auth } = await requireBookingAdmin();
   const { id, ...fields } = checked.data;
+  if (id) {
+    const { data: existing, error: readError } = await auth.from("offerings")
+      .select("slug,kind").eq("id", id).maybeSingle();
+    if (readError || !existing) return fail("Offering not found.");
+    if (existing.slug !== fields.slug) return fail("Offering URLs cannot be changed after creation.");
+    if (existing.kind !== fields.kind) {
+      const { count, error: sessionsError } = await auth.from("booking_slots")
+        .select("id", { count:"exact", head:true }).eq("offering_id", id);
+      if (sessionsError) return fail("Could not check related sessions.");
+      if (count) return fail("Offering type cannot change while it has sessions.");
+    }
+  }
   const newId = id ?? crypto.randomUUID();
   // No public reservation handler exists. Leave accepting_bookings disabled for new offerings.
   const payload = { ...fields, updated_at: new Date().toISOString() };
@@ -37,7 +49,9 @@ export async function saveSession(value: unknown): Promise<ActionResult> {
     const { data: existing } = await auth.from("booking_slots").select("id,offering_id,starts_at").eq("id", id).maybeSingle();
     if (!existing || existing.offering_id !== fields.offering_id) return fail("Session not found.");
     if (Date.parse(existing.starts_at) <= Date.now()) return fail("Past sessions cannot be edited.");
-    const { data: held } = await auth.from("bookings").select("seats,status,expires_at").eq("slot_id",id);
+    const { data: held, error: readBookingsError } = await auth.from("bookings")
+      .select("seats,status,expires_at").eq("slot_id",id);
+    if (readBookingsError) return fail("Could not verify reservations on this session.");
     const active = (held ?? []).filter(row =>
       row.status === "confirmed" || (row.status === "held" && Date.parse(row.expires_at) > Date.now()));
     if (active.length) return fail("This session has reservations. Close availability instead of changing its details.");
