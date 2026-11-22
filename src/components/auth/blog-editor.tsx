@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import { slugify, type BlogStatus, type BlogInput } from "@/features/blog/validation";
+import { formatMarkdown, type MarkdownFormat } from "@/features/blog/markdown-formatting";
 import { saveBlogPost } from "@/app/staff/blog/actions";
 import type { BlogAuthorOption, BlogImageOption } from "@/features/blog/editor-data";
 
@@ -14,6 +15,7 @@ export function BlogEditor({
   initial, authors, images,
 }: { initial?: EditableBlog; authors: BlogAuthorOption[]; images: BlogImageOption[] }) {
   const router = useRouter();
+  const articleRef = useRef<HTMLTextAreaElement>(null);
   const [title, setTitle] = useState(initial?.title ?? "");
   const [slug, setSlug] = useState(initial?.slug ?? "");
   const [slugEdited, setSlugEdited] = useState(false);
@@ -35,6 +37,17 @@ export function BlogEditor({
   function editTitle(value: string) {
     setTitle(value);
     if (!initial && !slugEdited) setSlug(slugify(value));
+  }
+
+  function applyFormatting(action: MarkdownFormat) {
+    const article = articleRef.current;
+    if (!article) return;
+    const edit = formatMarkdown(body, article.selectionStart, article.selectionEnd, action);
+    setBody(edit.text);
+    requestAnimationFrame(() => {
+      article.focus();
+      article.setSelectionRange(edit.selectionStart, edit.selectionEnd);
+    });
   }
 
   async function save(next: BlogStatus) {
@@ -107,8 +120,18 @@ export function BlogEditor({
             <button type="button" className="auth-text-button" onClick={()=>setPreview(p=>!p)}>{preview?"Edit article":"Preview article"}</button>
           </div>
           {preview ? <div className="cms-markdown-preview"><ReactMarkdown>{body || "*Nothing to preview yet.*"}</ReactMarkdown></div> :
-            <textarea id="cms-body" className="cms-markdown-source" rows={17} value={body} onChange={e=>setBody(e.target.value)}
-              placeholder="Write your post in Markdown. Use # for headings, **bold**, and [text](https://example.com) for links."/>}
+            <>
+              <div className="cms-format-toolbar" role="toolbar" aria-label="Article formatting">
+                <button type="button" aria-label="Heading" onClick={()=>applyFormatting("heading")}>H2</button>
+                <button type="button" aria-label="Bold" onClick={()=>applyFormatting("bold")}><strong>B</strong></button>
+                <button type="button" aria-label="Italic" onClick={()=>applyFormatting("italic")}><em>I</em></button>
+                <button type="button" aria-label="Link" onClick={()=>applyFormatting("link")}>Link</button>
+                <button type="button" aria-label="List" onClick={()=>applyFormatting("list")}>List</button>
+              </div>
+              <textarea ref={articleRef} id="cms-body" className="cms-markdown-source" rows={17} value={body}
+                onChange={e=>setBody(e.target.value)}
+                placeholder="Write your post in Markdown."/>
+            </>}
           <p className="auth-small">Markdown formatting is supported. Preview before publishing.</p>
         </div>
       </div>

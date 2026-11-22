@@ -648,3 +648,9 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
 .cms-content-gallery img { width: 100%; height: 220px; object-fit: cover; }
 .cms-content-markdown { line-height: 1.7; overflow-wrap: anywhere; }
 .cms-content-markdown img { max-width: 100%; height: auto; }
+
+/* Lightweight Markdown toolbar shared by the staff blog editor. */
+.cms-format-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.cms-format-toolbar button { border: 1px solid var(--soft-blue); background: var(--white); color: var(--navy); border-radius: 6px; padding: 6px 12px; font: inherit; font-size: .85rem; cursor: pointer; }
+.cms-format-toolbar button:hover { background: var(--soft-blue); }
+.cms-format-toolbar button:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
