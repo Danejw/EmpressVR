@@ -35,14 +35,14 @@ Arrows show primary domain flow, not FK direction in every case. The authoritati
 
 | Table | Purpose | Key columns | Foreign-key links (outgoing) |
 |---|---|---|---|
-| [`site_pages`](#site-pages) | CMS source pages, imported paths and full Markdown copy for public routes. | `id`, `path`, `source_key`, `title`, `body_markdown`, `published` | None |
-| [`media_assets`](#media-assets) | Metadata for public media files; links original source information to a Supabase Storage key. | `id`, `source_key`, `source_url`, `storage_key`, `status`, `alt_text` | None |
-| [`site_media`](#site-media) | Named site-wide image placements such as hero or navigation imagery. | `slot`, `media_asset_id` | `media_asset_id` → `media_assets(id)` |
-| [`page_media`](#page-media) | Ordered images attached to a CMS page, with placement role. | `id`, `page_id`, `media_asset_id`, `role`, `position` | `media_asset_id` → `media_assets(id)`; `page_id` → `site_pages(id)` |
+| [`site_pages`](#site_pages) | CMS source pages, imported paths and full Markdown copy for public routes. | `id`, `path`, `source_key`, `title`, `body_markdown`, `published` | None |
+| [`media_assets`](#media_assets) | Metadata for public media files; links original source information to a Supabase Storage key. | `id`, `source_key`, `source_url`, `storage_key`, `status`, `alt_text` | None |
+| [`site_media`](#site_media) | Named site-wide image placements such as hero or navigation imagery. | `slot`, `media_asset_id` | `media_asset_id` → `media_assets(id)` |
+| [`page_media`](#page_media) | Ordered images attached to a CMS page, with placement role. | `id`, `page_id`, `media_asset_id`, `role`, `position` | `media_asset_id` → `media_assets(id)`; `page_id` → `site_pages(id)` |
 | [`projects`](#projects) | Public portfolio/project catalogue with publication status and featured media. | `id`, `page_id`, `slug`, `title`, `status`, `featured_media_id` | `featured_media_id` → `media_assets(id)`; `page_id` → `site_pages(id)` |
-| [`project_media`](#project-media) | Ordered gallery images for projects. | `id`, `project_id`, `media_asset_id`, `position` | `media_asset_id` → `media_assets(id)`; `project_id` → `projects(id)` |
-| [`team_members`](#team-members) | Public-facing profiles, bios/roles and headshots, distinct from login permissions. | `id`, `page_id`, `name`, `slug`, `roles`, `group_name`, `headshot_media_id` | `headshot_media_id` → `media_assets(id)`; `page_id` → `site_pages(id)` |
-| [`blog_posts`](#blog-posts) | CMS blog entries, author attribution, featured image, draft/publish lifecycle. | `id`, `page_id`, `slug`, `status`, `author_id`, `featured_media_id`, `created_by`, `updated_by` | `author_id` → `team_members(id)`; `created_by` → `auth.users(id)`; `featured_media_id` → `media_assets(id)`; `page_id` → `site_pages(id)`; `updated_by` → `auth.users(id)` |
+| [`project_media`](#project_media) | Ordered gallery images for projects. | `id`, `project_id`, `media_asset_id`, `position` | `media_asset_id` → `media_assets(id)`; `project_id` → `projects(id)` |
+| [`team_members`](#team_members) | Public-facing profiles, bios/roles and headshots, distinct from login permissions. | `id`, `page_id`, `name`, `slug`, `roles`, `group_name`, `headshot_media_id` | `headshot_media_id` → `media_assets(id)`; `page_id` → `site_pages(id)` |
+| [`blog_posts`](#blog_posts) | CMS blog entries, author attribution, featured image, draft/publish lifecycle. | `id`, `page_id`, `slug`, `status`, `author_id`, `featured_media_id`, `created_by`, `updated_by` | `author_id` → `team_members(id)`; `created_by` → `auth.users(id)`; `featured_media_id` → `media_assets(id)`; `page_id` → `site_pages(id)`; `updated_by` → `auth.users(id)` |
 | [`events`](#events) | Public event catalogue and archived date information; not a source of bookable capacity. | `id`, `page_id`, `slug`, `start_at`, `end_at`, `date_review_required`, `status` | `featured_media_id` → `media_assets(id)`; `page_id` → `site_pages(id)` |
 
 ## Store and commerce
@@ -50,14 +50,14 @@ Arrows show primary domain flow, not FK direction in every case. The authoritati
 | Table | Purpose | Key columns | Foreign-key links (outgoing) |
 |---|---|---|---|
 | [`products`](#products) | Store merchandise/digital goods catalogue, including price, sold-out state, images and future Stripe IDs. | `id`, `page_id`, `slug`, `title`, `price_minor`, `currency`, `status`, `sold_out`, `featured_media_id`, `stripe_price_id` | `featured_media_id` → `media_assets(id)`; `page_id` → `site_pages(id)` |
-| [`product_media`](#product-media) | Ordered product gallery images. | `id`, `product_id`, `media_asset_id`, `position` | `media_asset_id` → `media_assets(id)`; `product_id` → `products(id)` |
-| [`product_downloads`](#product-downloads) | Private file metadata for purchased digital downloads and fulfillment. | `id`, `product_id`, `storage_bucket`, `storage_key`, `available` | `product_id` → `products(id)` |
+| [`product_media`](#product_media) | Ordered product gallery images. | `id`, `product_id`, `media_asset_id`, `position` | `media_asset_id` → `media_assets(id)`; `product_id` → `products(id)` |
+| [`product_downloads`](#product_downloads) | Private file metadata for purchased digital downloads and fulfillment. | `id`, `product_id`, `storage_bucket`, `storage_key`, `available` | `product_id` → `products(id)` |
 | [`customers`](#customers) | Commerce/member profile linked to a Supabase Auth account when present, plus Stripe/customer contact IDs. | `id`, `user_id`, `contact_email`, `stripe_customer_id` | `user_id` → `auth.users(id)` |
 | [`orders`](#orders) | Server-owned payment order ledger, including product, donation, membership or booking orders. | `id`, `customer_id`, `booking_id`, `kind`, `amount_minor`, `currency`, `status`, `provider_session_id` | `booking_id` → `bookings(id)`; `customer_id` → `customers(id)` |
-| [`order_items`](#order-items) | Individual purchased/pledged catalogue lines, referencing exactly one product, offering, donation campaign or membership plan. | `id`, `order_id`, `product_id`, `offering_id`, `campaign_id`, `membership_plan_id`, `quantity`, `unit_amount_minor` | `campaign_id` → `donation_campaigns(id)`; `membership_plan_id` → `membership_plans(id)`; `offering_id` → `offerings(id)`; `order_id` → `orders(id)`; `product_id` → `products(id)` |
-| [`payment_events`](#payment-events) | Idempotent record of received payment-provider success/failure/refund events. | `event_id`, `order_id`, `provider_session_id`, `kind`, `amount_minor` | `order_id` → `orders(id)` |
-| [`payment_adjustments`](#payment-adjustments) | Separate partial/full refunds and dispute event records associated with an order. | `id`, `order_id`, `stripe_event_id`, `kind`, `amount_minor` | `order_id` → `orders(id)` |
-| [`outbox_jobs`](#outbox-jobs) | Deduplicated queued work for completed orders and booking confirmation/cancellation side effects. | `id`, `dedupe_key`, `kind`, `order_id`, `booking_id`, `status`, `attempt_count` | `booking_id` → `bookings(id)`; `order_id` → `orders(id)` |
+| [`order_items`](#order_items) | Individual purchased/pledged catalogue lines, referencing exactly one product, offering, donation campaign or membership plan. | `id`, `order_id`, `product_id`, `offering_id`, `campaign_id`, `membership_plan_id`, `quantity`, `unit_amount_minor` | `campaign_id` → `donation_campaigns(id)`; `membership_plan_id` → `membership_plans(id)`; `offering_id` → `offerings(id)`; `order_id` → `orders(id)`; `product_id` → `products(id)` |
+| [`payment_events`](#payment_events) | Idempotent record of received payment-provider success/failure/refund events. | `event_id`, `order_id`, `provider_session_id`, `kind`, `amount_minor` | `order_id` → `orders(id)` |
+| [`payment_adjustments`](#payment_adjustments) | Separate partial/full refunds and dispute event records associated with an order. | `id`, `order_id`, `stripe_event_id`, `kind`, `amount_minor` | `order_id` → `orders(id)` |
+| [`outbox_jobs`](#outbox_jobs) | Deduplicated queued work for completed orders and booking confirmation/cancellation side effects. | `id`, `dedupe_key`, `kind`, `order_id`, `booking_id`, `status`, `attempt_count` | `booking_id` → `bookings(id)`; `order_id` → `orders(id)` |
 | [`entitlements`](#entitlements) | Rights granted to a customer for a paid product line, including revocation status. | `id`, `order_item_id`, `product_id`, `customer_id`, `status` | `order_item_id, product_id` → `order_items(id, product_id)`; `customer_id` → `customers(id)`; `order_item_id` → `order_items(id)`; `product_id` → `products(id)` |
 
 ## Scheduling and reservations
@@ -65,28 +65,28 @@ Arrows show primary domain flow, not FK direction in every case. The authoritati
 | Table | Purpose | Key columns | Foreign-key links (outgoing) |
 |---|---|---|---|
 | [`offerings`](#offerings) | Classes, appointments and informational activities with booking price and publication/acceptance controls. | `id`, `slug`, `title`, `kind`, `price_minor`, `currency`, `published`, `accepting_bookings` | None |
-| [`booking_slots`](#booking-slots) | Real scheduled occurrences with timezone, capacity, seat limits, payment flag and optional external calendar ID. | `id`, `offering_id`, `starts_at`, `ends_at`, `time_zone`, `capacity`, `max_seats_per_booking`, `available`, `requires_payment`, `google_calendar_event_id` | `offering_id` → `offerings(id)` |
+| [`booking_slots`](#booking_slots) | Real scheduled occurrences with timezone, capacity, seat limits, payment flag and optional external calendar ID. | `id`, `offering_id`, `starts_at`, `ends_at`, `time_zone`, `capacity`, `max_seats_per_booking`, `available`, `requires_payment`, `google_calendar_event_id` | `offering_id` → `offerings(id)` |
 | [`bookings`](#bookings) | Seat reservations/holds against a specific offering and slot; booking lifecycle and optional linked payment/customer. | `id`, `offering_id`, `slot_id`, `attendee_ref`, `seats`, `status`, `idempotency_key`, `requires_payment`, `payment_order_id`, `customer_id` | `payment_order_id` → `orders(id)`; `slot_id, offering_id` → `booking_slots(id, offering_id)`; `customer_id` → `customers(id)` |
-| [`booking_contacts`](#booking-contacts) | Private attendee email/name for a booking, kept separate from the reservation ledger. | `booking_id`, `email`, `display_name` | `booking_id` → `bookings(id)` |
-| [`booking_admin_audit`](#booking-admin-audit) | Append-only history of manual staff booking creation and cancellation, with actor. | `id`, `booking_id`, `action`, `actor_id`, `created_at` | `actor_id` → `auth.users(id)`; `booking_id` → `bookings(id)` |
+| [`booking_contacts`](#booking_contacts) | Private attendee email/name for a booking, kept separate from the reservation ledger. | `booking_id`, `email`, `display_name` | `booking_id` → `bookings(id)` |
+| [`booking_admin_audit`](#booking_admin_audit) | Append-only history of manual staff booking creation and cancellation, with actor. | `id`, `booking_id`, `action`, `actor_id`, `created_at` | `actor_id` → `auth.users(id)`; `booking_id` → `bookings(id)` |
 
 ## Donations and memberships
 
 | Table | Purpose | Key columns | Foreign-key links (outgoing) |
 |---|---|---|---|
-| [`donation_campaigns`](#donation-campaigns) | Donation/fundraising campaigns, accepted contribution ranges, cadence options and publication state. | `id`, `slug`, `currency`, `minimum_minor`, `maximum_minor`, `allowed_cadences`, `published`, `accepting_contributions` | None |
-| [`membership_plans`](#membership-plans) | Paid membership tiers with joining and quarterly fees plus publication/acceptance state. | `id`, `slug`, `joining_fee_minor`, `quarterly_amount_minor`, `published`, `accepting_applications` | None |
-| [`membership_applications`](#membership-applications) | Customer applications awaiting separate community/co-op membership approval; may reference an order. | `id`, `customer_id`, `plan_id`, `kind`, `order_id`, `status`, `reviewed_by` | `customer_id` → `customers(id)`; `order_id` → `orders(id)`; `plan_id` → `membership_plans(id)`; `reviewed_by` → `auth.users(id)` |
+| [`donation_campaigns`](#donation_campaigns) | Donation/fundraising campaigns, accepted contribution ranges, cadence options and publication state. | `id`, `slug`, `currency`, `minimum_minor`, `maximum_minor`, `allowed_cadences`, `published`, `accepting_contributions` | None |
+| [`membership_plans`](#membership_plans) | Paid membership tiers with joining and quarterly fees plus publication/acceptance state. | `id`, `slug`, `joining_fee_minor`, `quarterly_amount_minor`, `published`, `accepting_applications` | None |
+| [`membership_applications`](#membership_applications) | Customer applications awaiting separate community/co-op membership approval; may reference an order. | `id`, `customer_id`, `plan_id`, `kind`, `order_id`, `status`, `reviewed_by` | `customer_id` → `customers(id)`; `order_id` → `orders(id)`; `plan_id` → `membership_plans(id)`; `reviewed_by` → `auth.users(id)` |
 | [`memberships`](#memberships) | Approved customer memberships associated with an application and optional plan. | `id`, `application_id`, `customer_id`, `plan_id`, `status`, `approved_at` | `application_id` → `membership_applications(id)`; `customer_id` → `customers(id)`; `plan_id` → `membership_plans(id)` |
 | [`subscriptions`](#subscriptions) | Recurring Stripe billing for either a membership or donation campaign, with lifecycle and billing cadence. | `id`, `customer_id`, `membership_id`, `campaign_id`, `stripe_subscription_id`, `cadence`, `status` | `campaign_id` → `donation_campaigns(id)`; `customer_id` → `customers(id)`; `membership_id` → `memberships(id)` |
-| [`subscription_invoices`](#subscription-invoices) | Stripe invoice lifecycle and amounts for a recurring subscription. | `id`, `subscription_id`, `order_id`, `stripe_invoice_id`, `amount_due_minor`, `amount_paid_minor`, `status` | `order_id` → `orders(id)`; `subscription_id` → `subscriptions(id)` |
+| [`subscription_invoices`](#subscription_invoices) | Stripe invoice lifecycle and amounts for a recurring subscription. | `id`, `subscription_id`, `order_id`, `stripe_invoice_id`, `amount_due_minor`, `amount_paid_minor`, `status` | `order_id` → `orders(id)`; `subscription_id` → `subscriptions(id)` |
 
 ## Staff access
 
 | Table | Purpose | Key columns | Foreign-key links (outgoing) |
 |---|---|---|---|
-| [`staff_roles`](#staff-roles) | App authorization role (`editor` or `admin`) for one Supabase Auth user. | `user_id`, `role`, `assigned_at` | `user_id` → `auth.users(id)` |
-| [`staff_invitations`](#staff-invitations) | Time-limited invitation to grant a verified email a staff role, with issuer and acceptance timestamp. | `email`, `role`, `invited_by`, `expires_at`, `accepted_at` | `invited_by` → `auth.users(id)` |
+| [`staff_roles`](#staff_roles) | App authorization role (`editor` or `admin`) for one Supabase Auth user. | `user_id`, `role`, `assigned_at` | `user_id` → `auth.users(id)` |
+| [`staff_invitations`](#staff_invitations) | Time-limited invitation to grant a verified email a staff role, with issuer and acceptance timestamp. | `email`, `role`, `invited_by`, `expires_at`, `accepted_at` | `invited_by` → `auth.users(id)` |
 
 ## Per-table column index
 
