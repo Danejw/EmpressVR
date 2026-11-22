@@ -69,7 +69,7 @@ export function BookingWorkspace({offerings,sessions,reservations,contacts,audit
     } onClose={close}>
       {panel.kind==="offering"?<OfferingEditor offering={selectedOffering} onSaved={saved}/>:
        panel.kind==="session"?<SessionEditor session={selectedSession} offerings={offerings}
-         initialOfferingId={panel.offeringId} onSaved={saved}/>:
+         referenceNow={referenceNow} initialOfferingId={panel.offeringId} onSaved={saved}/>:
        panel.kind==="new-reservation"?<ManualBookingEditor referenceNow={referenceNow}
          offerings={offerings}sessions={sessions}onSaved={saved}/>:
        selectedReservation?<ReservationDetails
