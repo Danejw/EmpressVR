@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { getBrowserAuth } from "@/lib/auth/browser";
 import { completeSignIn } from "@/lib/auth/complete-sign-in";
 
-export function LoginForm({ notice }: { notice?: "verified" | "reset" | "error" }) {
+export function LoginForm({ notice, returnTo }: { notice?: "verified" | "reset" | "error"; returnTo?: "/book" }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +25,7 @@ export function LoginForm({ notice }: { notice?: "verified" | "reset" | "error" 
       });
       if (loginError) throw loginError;
       const destination = await completeSignIn();
-      router.replace(destination);
+      router.replace(returnTo ?? destination);
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to sign in.");

@@ -202,7 +202,7 @@ export function BookingPlanner({
         </div>:null}
         {error?<p role="alert" className="auth-error">{error}</p>:null}
         {!signedInEmail?<p className="booking-availability-note">
-          <Link href="/login">Sign in</Link> or <Link href="/signup">create an account</Link>
+          <Link href="/login?returnTo=/book">Sign in</Link> or <Link href="/signup">create an account</Link>
           {" "}with a verified email to reserve a free session.
         </p>:null}
         {offering&&offering.priceMinor>0?<p className="booking-availability-note">

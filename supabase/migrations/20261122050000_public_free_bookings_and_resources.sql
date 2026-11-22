@@ -211,6 +211,11 @@ begin
     raise exception 'Invalid reservation details';
   end if;
 
+  -- Serialize retries carrying the same idempotency key before checking
+  -- uniqueness, so racing duplicate submits return the first booking.
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(p_idempotency_key,0)
+  );
   select * into v_existing from public.bookings
     where idempotency_key=p_idempotency_key;
   if found then
