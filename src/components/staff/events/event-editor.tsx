@@ -21,7 +21,7 @@ export function EventEditor({event,images,onSaved}:{
   const [status,setStatus]=useState<EventStatus>(event?.status??"draft");
   const [allDay,setAllDay]=useState(event?.all_day??false);
   const [zone,setZone]=useState(event?.time_zone??"Europe/London");
-  const timeZones=useMemo(supportedTimeZoneOptions,[]);
+  const timeZones=useMemo(() => supportedTimeZoneOptions(), []);
   const [start,setStart]=useState(dates.start_local);
   const [end,setEnd]=useState(dates.end_local);
   const [location,setLocation]=useState(event?.location??"");
