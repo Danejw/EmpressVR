@@ -3,6 +3,7 @@ import { siteSections } from "@/lib/site-sections";
 import { MediaImage } from "@/components/media-image";
 import { getPublicSiteMediaId } from "@/features/content/supabase-public";
 import { CartHeaderLink } from "@/components/cart-header-link";
+import { HeaderMenu } from "@/components/header-menu";
 import { getServerAuth } from "@/lib/auth/server";
 import { isStaffRole } from "@/lib/auth/permissions";
 
@@ -35,20 +36,12 @@ export async function SiteHeader() {
       </Link>
       <div className="header-actions">
         <Link className="header-cta" href={schedule}>View Classes &amp; Socials</Link>
-        <details className="header-menu">
-          <summary aria-label="Navigation menu" title="Navigation menu">
-            <svg width="23" height="23" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </summary>
-          <nav aria-label="Primary navigation">
-            {siteSections.map(section => <Link key={section.slug} href={"/" + section.slug}>{section.title}</Link>)}
-            <Link href="/blog">Blog</Link>
-            <CartHeaderLink />
-            {accountLinks}
-          </nav>
-        </details>
+        <HeaderMenu>
+          {siteSections.map(section => <Link key={section.slug} href={"/" + section.slug}>{section.title}</Link>)}
+          <Link href="/blog">Blog</Link>
+          <CartHeaderLink />
+          {accountLinks}
+        </HeaderMenu>
       </div>
     </div>
   </header>;
