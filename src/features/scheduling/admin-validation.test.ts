@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 import { validateOffering, validateSession, validateManualBooking } from "./admin-validation";
 const offering = {
   title: "XR Workshop", slug: "xr-workshop", kind: "class",
-  description: "", price_minor: 0, currency: "GBP", published: false,
+  description: "", price_minor: 0, currency: "GBP", published: false, accepting_bookings:false,
 };
 const session = {
   offering_id: "a8f45e72-5952-4ec3-86d5-e0baba58be26",
   starts_at: "2030-04-10T10:00:00.000Z", ends_at: "2030-04-10T11:00:00.000Z",
   time_zone: "Europe/London", capacity: 10, max_seats_per_booking: 2,
-  available: false, requires_payment: false,
+  available: false, requires_payment: false, resource_id:null,
 };
 describe("booking admin server inputs", () => {
   it("accepts draft offering and rejects invalid publish values", () => {
@@ -16,6 +16,8 @@ describe("booking admin server inputs", () => {
     expect(validateOffering({ ...offering, kind: "other" }).error).toBeTruthy();
     expect(validateOffering({ ...offering, price_minor: -2 }).error).toBeTruthy();
     expect(validateOffering({ ...offering, slug: "../foo" }).error).toBeTruthy();
+    expect(validateOffering({ ...offering, published:true, accepting_bookings:true }).data?.accepting_bookings).toBe(true);
+    expect(validateOffering({ ...offering, accepting_bookings:true }).error).toBeTruthy();
   });
   it("validates session range, zone, and capacity", () => {
     expect(validateSession(session,new Date("2029-01-01")).data?.capacity).toBe(10);

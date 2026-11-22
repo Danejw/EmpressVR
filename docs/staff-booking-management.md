@@ -1,43 +1,64 @@
-# Booking Management Staff Workspace (EVR-23)
+# Staff Booking Management
 
-**Status:** Feature branch draft PR, do not merge without QA and user review.
-**Route:** \`/staff/bookings\` (one page, three in-page tabs).
+The admin-only workspace remains at `/staff/bookings`. It uses one route with
+modular **Reservations, Offerings, Schedule, Resources** tabs and a shared
+editor panel. Staff access requires administrator role and MFA.
 
-## Scope
+## Offerings and schedules
 
-Administrators with AAL2 MFA see Bookings in \`/staff\`. Editors remain able to manage website content but cannot view private bookings or attendee contacts. One booking workspace composes independent reservations, offerings, schedule, and editor components. The side panel is shared between editors and details. The reusable \`MonthGrid\` is data-agnostic and uses the existing date utilities. Local session dates are converted using the selected IANA time zone, rejecting DST gaps and repeated times.
+`offerings` owns class/appointment details, publication, GBP price and
+whether the offering accepts online booking. New offerings start with
+`accepting_bookings=false`. Admins explicitly enable online reservations
+**only for published free offerings**. Paid offerings remain unavailable
+until Stripe payment and refund verification exists.
 
-### Offerings
+`booking_slots` owns real future times, IANA time zone, capacity, seat limits,
+availability, payment requirement and `resource_id`. Staff must assign an
+active `booking_resources` member (person, room or shared equipment) to
+any appointment before opening availability. Classes can optionally share
+resources. Each session is edited manually; recurring availability generation
+is deferred until there is a supported calendar integration.
 
-Admins may create/edit classes, appointments, and informational offerings; enter price, currency, title, description, and published status. New offerings always have \`accepting_bookings=false\`. No feature in this PR enables public customer booking. Existing offerings stay unchanged until edited.
+When a reservation occupies a session, its time, price model, capacity
+and resource cannot be changed. Staff may close a session to new reservations.
 
-### Sessions
+## Public reservations
 
-Admins may create/edit future sessions (time zone, start/end, seat limit, capacity, availability, payment requirement). Overlaps for the same offering are rejected in the server action. Sessions with active bookings cannot be moved or resized; they can be closed without cancelling existing bookings. The database guards both capacity and these changes when administrators use the Data API directly.
+Connected `/book` reads `offerings` for the catalogue and calls the
+privacy-safe `public_free_booking_slots()` aggregate to display only future,
+free, enabled, remaining-capacity sessions. Its data never includes attendee
+names, emails or booking IDs.
 
-### Reservations
+A customer must have a signed-in, **email-confirmed account**. The server
+action validates the request, then `reserve_public_free_booking()` performs
+an atomic transaction. It enforces repeat-request idempotency, a per-account
+burst limit, real available seat counts, and a resource lock. When a resource
+is busy in another overlapping session, no additional reservations can be made
+for that time, even across different offerings. Multiple attendees may reserve
+the same class session up to its capacity.
 
-Admins can view reservations with attendee names, emails, statuses, and history. The manual reservation action accepts free sessions only, where **both** the offering price is zero and the slot does not require payment. It uses \`public.admin_reserve_free_booking\` as a **SECURITY INVOKER** SQL transaction. It locks a session before checking confirmed seats and unexpired holds, enforces an idempotency key, inserts a confirmed booking and a contact atomically, and creates a deduplicated outbox item. Admins may cancel only unpaid held/confirmed reservations. Paid bookings are view-only until verified Stripe refund and cancellation workflows exist.
+Customers can see their own free bookings at `/account/bookings` and cancel
+eligible upcoming free bookings. Cancellation immediately releases capacity and
+restores other unoccupied overlapping resource slots. Staff can still inspect
+and cancel unpaid reservations through the existing admin workflow.
 
-A separate append-only \`booking_admin_audit\` records manual creations and cancellations. No actor has write API privileges to forge audit entries. Internal database triggers generate audit/outbox events.
+The private `booking_contacts` and `bookings` ledger have no public read
+permissions. The public functions are SECURITY DEFINER only where required
+to read complete capacity and write an atomic private booking. They validate
+identity and expose narrowly scoped outputs. No service-role credential is
+shipped to the browser. Events are tracked in the append-only outbox; the
+current deployment does **not** send confirmation emails.
 
-## Authorization and data
+## Boundaries and verification
 
-The database migration \`20261122030000_booking_admin_workspace.sql\` adds MFA-gated administrator RLS for offerings, sessions, bookings, attendee contact details, and booking audit history. It uses narrow table grants and server-side validation. RPC endpoints never run with elevated PostgreSQL owner privileges. The booking admin UI gets database data through a cookie-backed server client; credentials are never sent to the browser. No public booking submission API is added.
+No offering or session is automatically opened by the migration. Existing
+Acuity/Squarespace booking, store, and paid sessions are preserved.
+No Stripe, Google Calendar synchronization, automatic reminders or
+recurring-schedule generator is included.
 
-Only existing database records may be shown. Current Supabase booking tables are empty. No seed bookings or offerings are created in production by the feature.
-
-## Out of scope
-
-Public booking submission, payment collection/refunds, Google Calendar booking synchronisation, email confirmations, recurring-session generation, rescheduling, and replacing Squarespace/Acuity. \`/book\` stays preview-only. The read-only community calendar remains independent.
-
-## Verification checklist
-
-- Database migration applied and advisor review; check admin AAL2 and ordinary-user RLS denial.
-- Create and edit draft offering; verify published state does not activate public bookings.
-- Create future session with a London time zone across DST; invalid overlapping session denied.
-- A free manual booking respects seat capacity, retries are idempotent and conflicting keys are denied.
-- Editing a session with confirmed reservations fails, while closing availability succeeds.
-- Cancel an unpaid booking; append one audit/outbox entry; reject paid cancellation.
-- Run unit tests, TypeScript, lint, Vercel build, and a real authenticated desktop/mobile QA pass.
-- Keep draft PR unmerged until the user approves. Preserve the existing Squarespace/Acuity operation.
+Database migration:
+`20261122050000_public_free_bookings_and_resources.sql`.
+Regression suite:
+`supabase/tests/009_public_bookings_and_resources.test.sql`.
+Additional validation tests live in
+`src/features/scheduling/public-booking-validation.test.ts`.

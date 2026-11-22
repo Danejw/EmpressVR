@@ -8,7 +8,7 @@ Read `docs/architecture.md`, `docs/implementation-plan.md`, `docs/brand.md`, and
 
 Before any Supabase table, schema, RLS, database query, CMS, staff, commerce, membership or scheduling change, read **`docs/database-schema.md`**. It documents all current application tables, their purposes, columns, real foreign keys and feature boundaries. Check that reference and the corresponding `supabase/migrations/` files before designing new tables or introducing duplicate records. Verify the actual target database when details may have changed, since the reference is a snapshot. **Update `docs/database-schema.md` in the same PR whenever tables, columns, relationships or their responsibilities change.** Distinguish `products`, `offerings` and `events`, and distinguish public `team_members` profiles from authorization in `staff_roles`.
 
-For new or modified dropdowns, reuse `src/components/ui/app-select.tsx` and follow `docs/ui-controls.md`. For bookable sessions, preserve the timezone-aware future-only date/time input rules and server validation.
+Before changing public bookings, booking resource conflicts, reservation permissions, or available-slot UI, read `docs/staff-booking-management.md` and the current booking migration. Never bypass server-side capacity checks or enable paid bookings before Stripe verification. For new or modified dropdowns, reuse `src/components/ui/app-select.tsx` and follow `docs/ui-controls.md`. For bookable sessions, preserve the timezone-aware future-only date/time input rules and server validation.
 
 Principles: simple, modular, composable, reusable, interoperable, verifiable, portable and compoundable.
 

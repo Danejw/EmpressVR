@@ -5,10 +5,10 @@ import { supportedTimeZoneOptions } from "@/features/scheduling/time-zone-option
 import { minimumStartLocal, minimumEndLocal } from "@/features/scheduling/future-session";
 import { saveSession } from "@/app/staff/bookings/actions";
 import { formatLocalInput, localToUtc } from "@/features/scheduling/zoned-time";
-import type { Offering, Session } from "@/features/scheduling/admin-types";
+import type { Offering, Session, BookingResource } from "@/features/scheduling/admin-types";
 
-export function SessionEditor({ session, offerings, initialOfferingId, onSaved, referenceNow }: {
-  session?: Session; offerings: readonly Offering[]; initialOfferingId?: string; onSaved:()=>void; referenceNow:string;
+export function SessionEditor({ session, offerings, resources, initialOfferingId, onSaved, referenceNow }: {
+  session?: Session; offerings: readonly Offering[]; resources: readonly BookingResource[]; initialOfferingId?: string; onSaved:()=>void; referenceNow:string;
 }) {
   const [offeringId,setOfferingId] = useState(session?.offering_id??initialOfferingId??offerings[0]?.id??"");
   const [zone,setZone] = useState(session?.time_zone??"Europe/London");
@@ -31,9 +31,11 @@ export function SessionEditor({ session, offerings, initialOfferingId, onSaved, 
   const [maxSeats,setMaxSeats] = useState(session?.max_seats_per_booking??1);
   const [available,setAvailable] = useState(session?.available??false);
   const [requiresPayment,setRequiresPayment] = useState(session?.requires_payment??false);
+  const [resourceId,setResourceId] = useState(session?.resource_id??"");
   const [busy,setBusy] = useState(false);
   const [error,setError] = useState("");
   const bookableOfferings = offerings.filter(item=>item.kind!=="informational");
+  const selectedOffering=offerings.find(item=>item.id===offeringId);
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (busy) return;
@@ -44,6 +46,7 @@ export function SessionEditor({ session, offerings, initialOfferingId, onSaved, 
       const result=await saveSession({
         ...(session?{id:session.id}:{}),offering_id:offeringId,starts_at,ends_at,time_zone:zone,
         capacity,max_seats_per_booking:maxSeats,available,requires_payment:requiresPayment,
+        resource_id:resourceId||null,
       });
       if (!result.ok) {setError(result.error);return;}
       onSaved();
@@ -57,6 +60,13 @@ export function SessionEditor({ session, offerings, initialOfferingId, onSaved, 
       disabled={Boolean(session)} onChange={setOfferingId}
       options={bookableOfferings.map(item=>({value:item.id,label:item.title}))}/>
     {!bookableOfferings.length?<p className="auth-small">Create a class or appointment first.</p>:null}
+    <label htmlFor="booking-session-resource">Staff member or shared resource</label>
+    <AppSelect id="booking-session-resource" value={resourceId} onChange={setResourceId}
+      options={[{value:"",label:"No resource"},...resources.filter(r=>r.active||r.id===resourceId)
+        .map(r=>({value:r.id,label:r.name+(r.active?"":" (inactive)")}))]}/>
+    {selectedOffering?.kind==="appointment"?<p className="auth-small">
+      An appointment must have an active resource before its availability can be opened.
+    </p>:null}
     <label htmlFor="booking-session-zone">Time zone (IANA)</label>
     <AppSelect id="booking-session-zone" value={zone} required searchable
       searchPlaceholder="Search time zones" onChange={changeZone} options={timeZones}/>

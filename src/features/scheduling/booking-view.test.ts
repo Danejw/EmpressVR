@@ -10,7 +10,7 @@ const future = new Date("2027-06-01T10:00:00.000Z");
 const slot: BookingSlot = {
   id: "live", offeringId: "approved", startsAt: "2027-06-01T18:00:00.000Z",
   endsAt: "2027-06-01T19:00:00.000Z", timeZone: "Europe/London",
-  capacity: 4, maxSeatsPerBooking: 2, available: true, requiresPayment: true,
+  capacity: 4, maxSeatsPerBooking: 2, available: true, requiresPayment: false, remainingSeats:4,
 };
 
 describe("booking interface view contract", () => {
@@ -27,6 +27,8 @@ describe("booking interface view contract", () => {
       { ...slot, id: "closed", available: false },
       { ...slot, id: "invalid", maxSeatsPerBooking: 5 },
       { ...slot, id: "timezone", timeZone: "Mars/Crater" },
+      { ...slot, id: "full", remainingSeats:0 },
+      { ...slot, id: "paid", requiresPayment:true },
     ];
     expect(bookableSlots(offering, input, future)).toEqual([slot]);
   });

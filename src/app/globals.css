@@ -274,7 +274,9 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
 .booking-contact-fields label { font-size: 13px; font-weight: 600; margin-top: 5px; }
 .booking-contact-fields input, .booking-contact-fields select { width: 100%; border: 1px solid #cfd0df; border-radius: 5px; background: white; min-height: 46px; padding: 10px 12px; font-size: 14px; color: var(--navy); }
 .booking-contact-fields input:disabled, .booking-contact-fields select:disabled { background: #f4f2f7; color: #777a8c; }
-.booking-reserve-button { width: 100%; border: 0; border-radius: 999px; padding: 14px 18px; margin-top: 12px; background: #d8d5e3; color: #54576e; font-size: 14px; font-weight: 700; cursor: not-allowed; }
+.booking-reserve-button { width: 100%; border: 0; border-radius: 999px; padding: 14px 18px; margin-top: 12px; background: var(--magenta); color: var(--navy); font-size: 14px; font-weight: 700; cursor: pointer; }
+.booking-reserve-button:disabled { background: #d8d5e3; color: #54576e; cursor: not-allowed; }
+.booking-reserve-button:not(:disabled):hover { filter: brightness(.96); }
 .booking-live-link { font-size: 13px; text-align: center; line-height: 1.5; }
 .booking-live-link a { text-decoration: underline; }
 .booking-archived { margin-top: 70px; }
@@ -661,7 +663,7 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
 .booking-stats > div { border: 1px solid #e7e3ef; background: #faf9fc; border-radius: 14px; padding: 16px 20px; display: grid; gap: 3px; }
 .booking-stats strong { font-family: var(--heading-font); font-size: 1.7rem; font-weight: 400; line-height: 1.2; }
 .booking-stats span { color: #5a6178; font-size: .83rem; }
-.booking-workspace-tabs { display: flex; align-items: stretch; gap: 28px; border-bottom: 1px solid #d8d8e3; }
+.booking-workspace-tabs { display: flex; align-items: stretch; gap: 28px; border-bottom: 1px solid #d8d8e3; overflow-x: auto; }
 .booking-workspace-tabs button { font: inherit; color: #555d75; font-weight: 600; font-size: .92rem; border: none; border-bottom: 3px solid transparent; background: transparent; cursor: pointer; padding: 10px 3px 13px; }
 .booking-workspace-tabs button.is-active { color: var(--navy); border-bottom-color: var(--violet); }
 .booking-admin-section { display: grid; gap: 20px; }

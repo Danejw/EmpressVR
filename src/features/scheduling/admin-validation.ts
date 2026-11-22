@@ -34,10 +34,14 @@ export function validateOffering(value: unknown): Result<OfferingInput> {
   if (!integer(v.price_minor, 0, 1000000000)) return { error: "Enter a valid price in minor currency units." };
   if (!string(v.currency, 3) || !/^[A-Z]{3}$/.test(v.currency)) return { error: "Use a three-letter currency code." };
   if (typeof v.published !== "boolean") return { error: "Invalid visibility." };
+  if (typeof v.accepting_bookings !== "boolean") return { error: "Invalid booking acceptance." };
+  if (v.accepting_bookings && (!v.published || v.kind === "informational" || v.price_minor !== 0))
+    return { error: "Only published free classes or appointments can accept online bookings." };
   return { data: {
     ...(v.id ? { id: v.id as string } : {}),
     title: v.title.trim(), slug: v.slug, description: v.description.trim(),
     kind: v.kind, price_minor: v.price_minor, currency: v.currency, published: v.published,
+    accepting_bookings: v.accepting_bookings,
   } };
 }
 
@@ -53,6 +57,9 @@ export function validateSession(value: unknown, now = new Date()): Result<Sessio
   catch { return { error: "Invalid IANA time zone." }; }
   if (!integer(v.capacity, 1, 10000) || !integer(v.max_seats_per_booking, 1, v.capacity))
     return { error: "Capacity and seat limits must be positive, with seat limit at most capacity." };
+  if (v.resource_id !== null && (typeof v.resource_id !== "string" || !validId(v.resource_id)))
+    return { error: "Select a valid resource." };
+  if (v.resource_id === undefined) return {error:"Choose the session resource setting."};
   if (typeof v.available !== "boolean" || typeof v.requires_payment !== "boolean")
     return { error: "Invalid availability or payment setting." };
   return { data: {
@@ -60,6 +67,7 @@ export function validateSession(value: unknown, now = new Date()): Result<Sessio
     starts_at: v.starts_at, ends_at: v.ends_at, time_zone: v.time_zone,
     capacity: v.capacity, max_seats_per_booking: v.max_seats_per_booking,
     available: v.available, requires_payment: v.requires_payment,
+    resource_id: v.resource_id as string | null,
   } };
 }
 export function validateManualBooking(value: unknown): Result<ManualBookingInput> {

@@ -6,14 +6,15 @@ import type { Offering,Session,Reservation,BookingContact,BookingAudit } from "@
 export const metadata:Metadata={title:"Booking management",robots:{index:false,follow:false}};
 export default async function StaffBookingsPage(){
   const {auth}=await requireBookingAdmin();
-  const [offerings,sessions,reservations,contacts,audit]=await Promise.all([
+  const [offerings,sessions,reservations,contacts,audit,resources]=await Promise.all([
     auth.from("offerings").select("id,slug,title,description,kind,price_minor,currency,published,accepting_bookings").order("title"),
-    auth.from("booking_slots").select("id,offering_id,starts_at,ends_at,time_zone,capacity,max_seats_per_booking,available,requires_payment").order("starts_at"),
+    auth.from("booking_slots").select("id,offering_id,starts_at,ends_at,time_zone,capacity,max_seats_per_booking,available,requires_payment,resource_id").order("starts_at"),
     auth.from("bookings").select("id,offering_id,slot_id,seats,status,requires_payment,payment_order_id,created_at,expires_at,confirmed_at,cancelled_at,attendee_ref").order("created_at",{ascending:false}).limit(1000),
     auth.from("booking_contacts").select("booking_id,display_name,email").limit(1000),
     auth.from("booking_admin_audit").select("id,booking_id,action,actor_id,created_at").order("created_at",{ascending:false}).limit(1000),
+    auth.from("booking_resources").select("id,name,active").order("name"),
   ]);
-  const error=offerings.error||sessions.error||reservations.error||contacts.error||audit.error;
+  const error=offerings.error||sessions.error||reservations.error||contacts.error||audit.error||resources.error;
   const referenceNow = new Date().toISOString();
   return <section className="auth-page"><div className="page-container booking-admin-page">
     <div className="auth-dashboard-heading"><div>
@@ -23,7 +24,7 @@ export default async function StaffBookingsPage(){
     {error?<div className="auth-panel">
       <p role="alert" className="auth-error">Unable to load booking administration. Check the booking RLS migration and administrator MFA.</p>
     </div>:
-    <BookingWorkspace referenceNow={referenceNow}
+    <BookingWorkspace referenceNow={referenceNow} resources={resources.data??[]}
       offerings={(offerings.data??[]) as Offering[]}
       sessions={(sessions.data??[]) as Session[]}
       reservations={(reservations.data??[]) as Reservation[]}

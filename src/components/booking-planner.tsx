@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef,useState } from "react";
+import { useRouter } from "next/navigation";
+import { reserveFreeSession } from "@/app/book/actions";
 import { AppSelect } from "@/components/ui/app-select";
 import Link from "next/link";
 import {
@@ -22,41 +24,70 @@ function localDateLabel(day: string): string {
 }
 
 export function BookingPlanner({
-  offerings, slots, archivedCourses, initialMonth,
+  offerings, slots, archivedCourses, initialMonth, referenceNow, signedInEmail,
 }: {
   offerings: readonly BookingOffering[];
   slots: readonly BookingSlot[];
   archivedCourses: readonly ArchivedCourse[];
   initialMonth: string;
+  referenceNow: string;
+  signedInEmail: string | null;
 }) {
+  const router=useRouter();
+  const [busy,setBusy]=useState(false);
+  const [error,setError]=useState("");
+  const [confirmedId,setConfirmedId]=useState("");
+  const requestKey=useRef<string|null>(null);
   const [offeringId, setOfferingId] = useState(offerings[0]?.id ?? "");
   const [month, setMonth] = useState(initialMonth);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [slotId, setSlotId] = useState("");
   const [seats, setSeats] = useState(1);
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
 
   const offering = offerings.find((item) => item.id === offeringId) ?? null;
-  const allSlots = bookableSlots(offering, slots, new Date());
+  const allSlots = bookableSlots(offering, slots, new Date(referenceNow));
   const selectedSlots = selectedDay ? slotsOnDay(allSlots, selectedDay) : [];
   const selectedSlot = allSlots.find((item) => item.id === slotId) ?? null;
   const selectedDaySlots = selectedSlots.some((item) => item.id === slotId);
   const reviewReady = Boolean(selectedDaySlots && canReviewRequest({
-    offering, slot: selectedSlot, seats, name, email,
+    offering, slot: selectedSlot, seats, name, email:signedInEmail??"",
   }));
+  const maxSeats=Math.max(1,Math.min(
+    selectedSlot?.maxSeatsPerBooking??1,selectedSlot?.remainingSeats??selectedSlot?.capacity??1));
   const firstMonth = shiftMonth(initialMonth, -1);
+  function resetSelection(){setError("");setConfirmedId("");requestKey.current=null;}
+  async function confirmReservation(){
+    if(!reviewReady||busy)return;
+    setBusy(true);setError("");
+    try{
+      requestKey.current??=crypto.randomUUID().replaceAll("-","");
+      const result=await reserveFreeSession({
+        slot_id:slotId,name,seats,idempotency_key:requestKey.current,
+      });
+      if(!result.ok){
+        setError(result.error);
+        if(/no longer available/i.test(result.error)){setSlotId("");router.refresh();}
+        return;
+      }
+      setConfirmedId(result.id);
+      setSlotId("");setSelectedDay(null);
+      requestKey.current=null;
+      router.refresh();
+    }catch{setError("Unable to complete the reservation. Retry your selection.");}
+    finally{setBusy(false);}
+  }
   const lastMonth = shiftMonth(initialMonth, 12);
   const dates = monthCells(month);
 
   function chooseOffering(id: string) {
-    setOfferingId(id);
+    resetSelection();setOfferingId(id);
     setSelectedDay(null);
     setSlotId("");
     setSeats(1);
   }
   function changeMonth(delta: number) {
-    const next = shiftMonth(month, delta);
+    resetSelection();const next = shiftMonth(month, delta);
     if (next < firstMonth || next > lastMonth) return;
     setMonth(next);
     setSelectedDay(null);
@@ -64,12 +95,12 @@ export function BookingPlanner({
     setSeats(1);
   }
   function chooseDay(day: string) {
-    setSelectedDay(day);
+    resetSelection();setSelectedDay(day);
     setSlotId("");
     setSeats(1);
   }
   function chooseSlot(id: string) {
-    setSlotId(id);
+    resetSelection();setSlotId(id);
     setSeats(1);
   }
 
@@ -78,7 +109,7 @@ export function BookingPlanner({
       <div>
         <p className="booking-eyebrow">Classes and appointments</p>
         <h2>Find a session</h2>
-        <p>Browse confirmed sessions. Dates only appear when an offering has been approved for online booking.</p>
+        <p>Choose a session and reserve a free place. Paid bookings remain on the current booking site.</p>
       </div>
       <a className="outline-button" href={liveBookingUrl} rel="noopener noreferrer">Current booking site</a>
     </div>
@@ -153,26 +184,42 @@ export function BookingPlanner({
           <label htmlFor="booking-seats">Number of attendees</label>
           <AppSelect id="booking-seats" value={String(seats)} disabled={!selectedSlot}
             onChange={value=>setSeats(Number(value))}
-            options={Array.from({length:Math.max(1,selectedSlot?.maxSeatsPerBooking??1)},(_,index)=>({
+            options={Array.from({length:maxSeats},(_,index)=>({
               value:String(index+1),label:String(index+1),
             }))}/>
           <label htmlFor="booking-name">Full name</label>
           <input id="booking-name" type="text" autoComplete="name" maxLength={200}
             disabled={!selectedSlot} value={name} onChange={(event) => setName(event.target.value)}
             placeholder="Your name" />
-          <label htmlFor="booking-email">Email address</label>
-          <input id="booking-email" type="email" autoComplete="email" maxLength={254}
-            disabled={!selectedSlot} value={email} onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com" />
+          <label htmlFor="booking-email">Verified account email</label>
+          <input id="booking-email" type="email" readOnly value={signedInEmail??""}
+            placeholder="Sign in to reserve a place" />
         </div>
-        <p className="booking-availability-note">{reviewReady
-          ? "Your selection is ready to review once secure booking is connected."
-          : "This preview does not save attendee details, reserve seats, or take payment."}</p>
-        <button className="booking-reserve-button" disabled type="button">
-          Online booking not yet connected
-        </button>
-        <p className="booking-live-link">For now, <a href={liveBookingUrl} rel="noopener noreferrer">
-          book through the current EmpressVR website</a>.</p>
+        {confirmedId?<div className="auth-message" role="status">
+          <strong>Reservation confirmed.</strong>
+          <p>Your reference is {confirmedId}.</p>
+          <Link href="/account/bookings">View and manage your bookings</Link>
+        </div>:null}
+        {error?<p role="alert" className="auth-error">{error}</p>:null}
+        {!signedInEmail?<p className="booking-availability-note">
+          <Link href="/login?returnTo=/book">Sign in</Link> or <Link href="/signup">create an account</Link>
+          {" "}with a verified email to reserve a free session.
+        </p>:null}
+        {offering&&offering.priceMinor>0?<p className="booking-availability-note">
+          Paid bookings require checkout, which is not connected yet.
+        </p>:null}
+        {signedInEmail&&offering?.priceMinor===0&&selectedSlot?
+          <button className="booking-reserve-button" disabled={!reviewReady||busy}
+            type="button" onClick={()=>void confirmReservation()}>
+            {busy?"Confirming...":"Confirm free reservation"}
+          </button>:
+          <button className="booking-reserve-button" disabled type="button">
+            {signedInEmail?"Select an available free session":"Sign in to reserve"}
+          </button>}
+        <p className="booking-live-link">
+          Existing paid classes remain available through the{" "}
+          <a href={liveBookingUrl} rel="noopener noreferrer">current booking site</a>.
+        </p>
       </aside>
     </div>
     {archivedCourses.length ? <section className="booking-archived" aria-label="Previously offered courses">

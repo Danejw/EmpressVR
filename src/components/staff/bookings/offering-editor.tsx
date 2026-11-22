@@ -17,6 +17,7 @@ export function OfferingEditor({ offering, onSaved }: {
   const [description,setDescription] = useState(offering?.description??"");
   const [kind,setKind] = useState<Offering["kind"]>(offering?.kind??"class");
   const [published,setPublished] = useState(offering?.published??false);
+  const [accepting,setAccepting] = useState(offering?.accepting_bookings??false);
   const [price,setPrice] = useState(String((offering?.price_minor??0)/100));
   const [currency,setCurrency] = useState(offering?.currency??"GBP");
   const [busy,setBusy] = useState(false);
@@ -31,6 +32,7 @@ export function OfferingEditor({ offering, onSaved }: {
     try {
       const result=await saveOffering({
         ...(offering?{id:offering.id}:{}),title,slug,description,kind,published,
+        accepting_bookings:accepting,
         price_minor:Math.round(p*100),currency:currency.toUpperCase(),
       });
       if (!result.ok) {setError(result.error);return;}
@@ -51,7 +53,7 @@ export function OfferingEditor({ offering, onSaved }: {
       value={slug} onChange={event=>{setSlug(slugify(event.target.value));setEditedSlug(true);}}/>
     <label htmlFor="booking-offering-type">Type</label>
     <AppSelect id="booking-offering-type" value={kind}
-      onChange={value=>setKind(value as Offering["kind"])}
+      onChange={value=>{setKind(value as Offering["kind"]);if(value==="informational")setAccepting(false);}}
       options={[{value:"class",label:"Class"},{value:"appointment",label:"Appointment"},
         {value:"informational",label:"Informational"}]}/>
     <label htmlFor="booking-offering-description">Description</label>
@@ -60,14 +62,18 @@ export function OfferingEditor({ offering, onSaved }: {
     <div className="booking-editor-fields">
       <div><label htmlFor="booking-offering-price">Price</label>
         <input id="booking-offering-price" required type="number" min="0" max="10000000" step=".01"
-          value={price} onChange={event=>setPrice(event.target.value)}/></div>
+          value={price} onChange={event=>{setPrice(event.target.value);if(Number(event.target.value)!==0)setAccepting(false);}}/></div>
       <div><label htmlFor="booking-offering-currency">Currency</label>
         <input id="booking-offering-currency" required maxLength={3} pattern="[A-Z]{3}"
           value={currency} onChange={event=>setCurrency(event.target.value.toUpperCase())}/></div>
     </div>
     <label className="booking-switch"><input type="checkbox" checked={published}
-      onChange={event=>setPublished(event.target.checked)}/><span>Publish offering details</span></label>
-    <p className="auth-small">Publishing does not activate online reservations. Bookings remain disabled until the public booking integration is ready.</p>
+      onChange={event=>{setPublished(event.target.checked);if(!event.target.checked)setAccepting(false);}}/><span>Publish offering details</span></label>
+    <label className="booking-switch"><input type="checkbox" checked={accepting}
+      disabled={!offering || !published || kind==="informational" || Number(price)!==0}
+      onChange={event=>setAccepting(event.target.checked)}/>
+      <span>Accept free online reservations</span></label>
+    <p className="auth-small">Save the offering first, then enable free reservations after configuring its sessions. Paid bookings need Stripe.</p>
     <button className="pill-button" type="submit" disabled={busy}>{busy?"Saving...":"Save offering"}</button>
   </form>;
 }

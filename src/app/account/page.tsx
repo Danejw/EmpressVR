@@ -39,6 +39,7 @@ export default async function AccountPage({
     {status === "updated" ? <p role="status" className="auth-message">Profile updated.</p> : null}
     {status === "error" || status === "invalid" ?
       <p role="alert" className="auth-error">Unable to save that change. Try again.</p> : null}
+    <p><Link className="auth-link" href="/account/bookings">View my reservations</Link></p>
     <div className="auth-dashboard-grid">
       <section className="auth-panel">
         <h2>Your profile</h2>

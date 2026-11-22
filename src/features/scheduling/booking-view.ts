@@ -20,6 +20,7 @@ export type BookingSlot = Readonly<{
   maxSeatsPerBooking: number;
   available: boolean;
   requiresPayment: boolean;
+  remainingSeats?: number;
 }>;
 
 export type ArchivedCourse = Readonly<{
@@ -57,7 +58,10 @@ export function bookableSlots(
         end <= start || !Number.isSafeInteger(slot.capacity) || slot.capacity < 1 ||
         !Number.isSafeInteger(slot.maxSeatsPerBooking) ||
         slot.maxSeatsPerBooking < 1 || slot.maxSeatsPerBooking > slot.capacity ||
-        typeof slot.requiresPayment !== "boolean") return false;
+        typeof slot.requiresPayment !== "boolean" || slot.requiresPayment ||
+        (slot.remainingSeats !== undefined && (
+          !Number.isSafeInteger(slot.remainingSeats) || slot.remainingSeats < 1 ||
+          slot.remainingSeats > slot.capacity))) return false;
     try { dayInZone(slot.startsAt, slot.timeZone); }
     catch { return false; }
     return true;
