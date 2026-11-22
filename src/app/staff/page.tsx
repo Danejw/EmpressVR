@@ -47,6 +47,13 @@ export default async function StaffDashboard({
         </Link>
         <Link href="/staff/team/new" className="cms-dashboard-add" aria-label="Create team profile" title="Create team profile">+</Link>
       </div>
+      {role === "admin" ? <div className="cms-dashboard-row">
+        <Link href="/staff/bookings" className="cms-dashboard-link">
+          <strong>Bookings</strong><span>Manage reservations and schedules</span>
+        </Link>
+        <Link href="/staff/bookings" className="cms-dashboard-add"
+          aria-label="Open booking management" title="Open booking management">›</Link>
+      </div> : null}
     </nav>
     <Link href="/staff/security" className="auth-link">Account security</Link>
     {role === "admin" ? <details className="cms-dashboard-invitations" open={Boolean(invite)}>
