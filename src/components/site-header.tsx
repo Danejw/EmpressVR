@@ -3,6 +3,7 @@ import { siteSections } from "@/lib/site-sections";
 import { MediaImage } from "@/components/media-image";
 import { getPublicSiteMediaId } from "@/features/content/supabase-public";
 import { CartHeaderLink } from "@/components/cart-header-link";
+import { HeaderMenu } from "@/components/header-menu";
 import { getServerAuth } from "@/lib/auth/server";
 import { isStaffRole } from "@/lib/auth/permissions";
 
@@ -33,23 +34,15 @@ export async function SiteHeader() {
         <MediaImage assetId={logoId} alt="EmpressVR" width={210} height={53}
           className="site-brand-logo" loading="eager" />
       </Link>
-      <nav className="site-nav" aria-label="Primary navigation">
-        {siteSections.map(section => <Link key={section.slug} href={"/" + section.slug}>{section.title}</Link>)}
-        <Link href="/blog">Blog</Link>
-        <CartHeaderLink />
-        {accountLinks}
-      </nav>
-      <Link className="header-cta" href={schedule}>View Classes &amp; Socials</Link>
-      <details className="mobile-menu">
-        <summary aria-label="Open navigation">Menu <span aria-hidden="true">☰</span></summary>
-        <nav aria-label="Mobile navigation">
+      <div className="header-actions">
+        <Link className="header-cta" href={schedule}>View Classes &amp; Socials</Link>
+        <HeaderMenu>
           {siteSections.map(section => <Link key={section.slug} href={"/" + section.slug}>{section.title}</Link>)}
           <Link href="/blog">Blog</Link>
           <CartHeaderLink />
           {accountLinks}
-          <Link href={schedule}>View Classes &amp; Socials</Link>
-        </nav>
-      </details>
+        </HeaderMenu>
+      </div>
     </div>
   </header>;
 }

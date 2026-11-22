@@ -3,7 +3,9 @@ import { expect, test } from "@playwright/test";
 test("blog index is public and includes navigation", async ({ page }) => {
   await page.goto("/blog");
   await expect(page.getByRole("heading", { name: "Blog", exact: true })).toBeVisible();
-  await expect(page.locator(".site-nav a[href='/blog']")).toHaveAttribute("href", "/blog");
+  await page.locator(".header-menu summary").click();
+  await expect(page.getByRole("navigation",{name:"Primary navigation"})
+    .getByRole("link",{name:"Blog",exact:true})).toHaveAttribute("href","/blog");
 });
 
 test("unpublished or missing articles cannot be accessed publicly", async ({ page }) => {
@@ -28,6 +30,8 @@ test("unauthenticated media uploads are rejected without storing a file", async 
 
 test("public navigation shows sign-in, without exposing dashboard to visitors", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".site-nav a[href='/login']")).toHaveCount(1);
-  await expect(page.locator(".site-nav a[href='/staff']")).toHaveCount(0);
+  await page.locator(".header-menu summary").click();
+  const nav = page.getByRole("navigation",{name:"Primary navigation"});
+  await expect(nav.getByRole("link",{name:"Sign in"})).toHaveCount(1);
+  await expect(nav.locator('a[href="/staff"]')).toHaveCount(0);
 });

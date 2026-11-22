@@ -52,5 +52,7 @@ test("unauthenticated account and staff routes redirect to login", async ({ page
 
 test("login is visible in site navigation", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator('.site-nav a[href="/login"]')).toHaveAttribute("href", "/login");
+  await page.locator(".header-menu summary").click();
+  await expect(page.getByRole("navigation", {name:"Primary navigation"})
+    .getByRole("link", {name:"Sign in"})).toHaveAttribute("href","/login");
 });
