@@ -13,7 +13,7 @@ export function SessionEditor({ session, offerings, initialOfferingId, onSaved, 
   const [offeringId,setOfferingId] = useState(session?.offering_id??initialOfferingId??offerings[0]?.id??"");
   const [zone,setZone] = useState(session?.time_zone??"Europe/London");
   const [nowIso,setNowIso] = useState(referenceNow);
-  const timeZones = useMemo(supportedTimeZoneOptions, []);
+  const timeZones = useMemo(() => supportedTimeZoneOptions(), []);
   const [starts,setStarts] = useState(session?formatLocalInput(session.starts_at,session.time_zone):"");
   const [ends,setEnds] = useState(session?formatLocalInput(session.ends_at,session.time_zone):"");
   const minStart = minimumStartLocal(nowIso,zone);
