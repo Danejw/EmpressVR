@@ -2,7 +2,7 @@
 import { useCallback,useMemo,useState } from "react";
 import { useRouter } from "next/navigation";
 import { MonthGrid } from "@/components/calendar/month-grid";
-import { EditorPanel } from "@/components/staff/bookings/editor-panel";
+import { EditorPanel } from "@/components/staff/editor-panel";
 import { EventEditor } from "./event-editor";
 import type { StaffEvent } from "@/features/events/event-validation";
 import type { ContentImage } from "@/features/staff/editor-options";

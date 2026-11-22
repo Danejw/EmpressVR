@@ -153,7 +153,7 @@ The lists below show **all currently observed columns** in schema order, not jus
 #### `events`
 
 - **Primary key:** `id`. **RLS:** enabled.
-- **All columns (11):** `id`, `page_id`, `slug`, `title`, `start_at`, `end_at`, `status`, `date_review_required`, `featured_media_id`, `created_at`, `updated_at`.
+- **All columns (15):** `id`, `page_id`, `slug`, `title`, `start_at`, `end_at`, `status`, `date_review_required`, `featured_media_id`, `created_at`, `updated_at`, `time_zone`, `all_day`, `location`, `external_url`.
 - **Purpose:** Public event catalogue and archived date information; not a source of bookable capacity.
 - **FKs:** `featured_media_id` → `media_assets(id)`; `page_id` → `site_pages(id)`.
 
@@ -328,6 +328,8 @@ The lists below show **all currently observed columns** in schema order, not jus
 
 ## Domain rules and known boundaries
 
+**Events CMS:** Staff editors/admins manage `events` using MFA-gated RLS and the transactional `save_staff_event` function. Event descriptions are stored in linked `site_pages`; imported pages remain intact when legacy event details are edited. `time_zone` uses IANA identifiers and `all_day` distinguishes dates from timed occurrences. Both `/community` and `/events` display only verified, published events from Supabase. Google Calendar synchronization is a future one-way adapter.
+
 **Products vs offerings vs events.** `products` is the store's merchandise/digital-product catalogue, with media, sold-out state and Stripe references. `offerings` is the class/appointment catalogue, with price, publication and booking acceptance controls. `events` is website event content and is **not** a reservable session. A real occurrence belongs in `booking_slots`; a reserved seat belongs in `bookings`. `order_items` deliberately supports separate `product_id` and `offering_id` references, so payments can support both categories.
 
 **Current overlap, do not amplify:** Three legacy class listings appear in both `products` and `offerings` with the same titles and GBP prices, but **there is no FK linking the two catalogues**. Editing one does not synchronize the other. The live source classes were imported into `offerings` for staff booking work; they remain non-bookable (`accepting_bookings = false`). The Fox Mask STL remains only a store product. Treat this as a migration overlap, not a model for creating more copies. Preserve existing store URLs until the public booking/store cutover is explicitly approved.
@@ -346,7 +348,7 @@ The lists below show **all currently observed columns** in schema order, not jus
 
 ## Where to check implementation
 
-- **Authoritative schema history:** `supabase/migrations/`, particularly `20261120000000_content_media_foundation.sql`, `20261120000002_commerce_catalogs.sql`, `20261120000003_booking_reservations.sql`, `20261120000004_order_payment_ledger.sql`, `20261120000005_memberships_subscriptions.sql`, `20261120000008_backend_relationships.sql`, `20261121220615_member_staff_auth.sql`, `20261122010000_staff_projects_team_cms.sql`, and `20261122030000_booking_admin_workspace.sql`.
+- **Authoritative schema history:** `supabase/migrations/`, particularly `20261120000000_content_media_foundation.sql`, `20261120000002_commerce_catalogs.sql`, `20261120000003_booking_reservations.sql`, `20261120000004_order_payment_ledger.sql`, `20261120000005_memberships_subscriptions.sql`, `20261120000008_backend_relationships.sql`, `20261121220615_member_staff_auth.sql`, `20261122010000_staff_projects_team_cms.sql`, and `20261122030000_booking_admin_workspace.sql`, and `20261122040000_staff_events_management.sql`.
 - **Content queries:** `src/features/content/`, `src/features/blog/`, `src/features/commerce/store-catalog.ts`.
 - **Booking admin:** `src/app/staff/bookings/`, `src/components/staff/bookings/`, `src/features/scheduling/`.
 - **Authorization:** `src/lib/auth/` and `docs/authentication.md`.

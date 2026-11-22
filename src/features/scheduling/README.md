@@ -12,10 +12,11 @@ The `domain.test.ts` tests cover validation, time boundaries, transitions, idemp
 
 ## Community events calendar
 
-The `/community` page now includes a read-only Google Calendar events adapter and
-month-grid UI. It requires separate `GOOGLE_COMMUNITY_CALENDAR_ID` and OAuth
-credentials on server-capable hosting; the static GitHub Pages preview remains
-unconnected. See [Google Calendar setup](../../../docs/google-calendar.md).
+The `/community` page uses the shared published Supabase events catalogue and
+existing month-grid UI. Staff edit public events through `/staff/events`;
+the provider-independent calendar adapter prepares future one-way Google sync.
+No Google credentials or API writes are connected. See
+[Google Calendar integration](../../../docs/google-calendar.md).
 This does not enable booking writes or change existing Squarespace/Acuity links.
 
 ## Pre-backend booking UI
