@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AppSelect } from "@/components/ui/app-select";
 import Link from "next/link";
 import {
   bookableSlots, canReviewRequest, formatPrice, formatSlotTime,
@@ -150,11 +151,11 @@ export function BookingPlanner({
         <div className="booking-stage-heading"><span>04</span><h3>Attendee details</h3></div>
         <div className="booking-contact-fields">
           <label htmlFor="booking-seats">Number of attendees</label>
-          <select id="booking-seats" value={seats} disabled={!selectedSlot}
-            onChange={(event) => setSeats(Number(event.target.value))}>
-            {Array.from({ length: Math.max(1, selectedSlot?.maxSeatsPerBooking ?? 1) }, (_, index) =>
-              <option value={index + 1} key={index + 1}>{index + 1}</option>)}
-          </select>
+          <AppSelect id="booking-seats" value={String(seats)} disabled={!selectedSlot}
+            onChange={value=>setSeats(Number(value))}
+            options={Array.from({length:Math.max(1,selectedSlot?.maxSeatsPerBooking??1)},(_,index)=>({
+              value:String(index+1),label:String(index+1),
+            }))}/>
           <label htmlFor="booking-name">Full name</label>
           <input id="booking-name" type="text" autoComplete="name" maxLength={200}
             disabled={!selectedSlot} value={name} onChange={(event) => setName(event.target.value)}
