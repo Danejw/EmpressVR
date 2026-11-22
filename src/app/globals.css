@@ -24,16 +24,20 @@ a:hover { text-decoration-thickness: 2px; }
 .skip-link { position: absolute; left: -10000px; top: 10px; background: white; padding: 12px 16px; z-index: 99; }
 .skip-link:focus { left: 12px; }
 .site-header { position: relative; z-index: 20; background: white; color: var(--navy); border-bottom: 1px solid #eeeaf2; }
-.header-inner { min-height: 112px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.brand-link { display: block; flex: 0 0 auto; }
-.site-brand-logo { display: block; object-fit: contain; object-position: left center; width: clamp(135px, 14vw, 205px); height: auto; }
-.site-nav { display: flex; align-items: center; gap: clamp(13px, 1.65vw, 30px); white-space: nowrap; }
-.site-nav a { font-size: .88rem; font-weight: 500; }
-.site-nav a:hover { color: #9c238e; }
+.header-inner { min-height: 100px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.brand-link { display: block; flex: 0 1 auto; min-width: 0; }
+.site-brand-logo { display: block; object-fit: contain; object-position: left center; width: clamp(135px, 14vw, 205px); max-width: 100%; height: auto; }
+.header-actions { display: flex; align-items: center; justify-content: flex-end; gap: clamp(10px, 2vw, 24px); flex: 0 0 auto; }
 .header-cta, .outline-button { display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid var(--magenta); border-radius: 999px; color: #b432a8; padding: 13px 22px; text-align: center; font-weight: 600; font-size: .84rem; }
 .header-cta { white-space: nowrap; }
 .header-cta:hover, .outline-button:hover { background: var(--magenta); color: var(--navy); }
-.mobile-menu { display: none; }
+.header-menu { position: relative; flex: 0 0 auto; }
+.header-menu summary { display: grid; place-items: center; cursor: pointer; list-style: none; width: 48px; height: 48px; border-radius: 12px; color: var(--navy); }
+.header-menu summary::-webkit-details-marker { display: none; }
+.header-menu summary:hover, .header-menu[open] summary { background: #f1ecf5; }
+.header-menu nav { position: absolute; right: 0; top: calc(100% + 10px); width: min(310px, calc(100vw - 32px)); max-height: min(70vh, 600px); overflow-y: auto; background: white; box-shadow: 0 14px 36px #171d3a26; border: 1px solid #ebe5ef; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 2px; z-index: 30; }
+.header-menu nav a { display: block; padding: 9px 12px; border-radius: 7px; font-size: .91rem; font-weight: 500; line-height: 1.35; }
+.header-menu nav a:hover, .header-menu nav a:focus-visible { background: #f6eef8; color: #8c238e; }
 h1, h2, h3, h4 { font-family: var(--heading-font); line-height: 1.2; font-weight: 400; }
 h1 { font-size: clamp(3rem, 6vw, 5.3rem); }
 h2 { font-size: clamp(2.2rem, 4.1vw, 3.6rem); }
@@ -123,18 +127,12 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
 .footer-links { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; font-size: .93rem; }
 .footer-links a:hover { color: var(--magenta); }
 @media (max-width: 1180px) {
-  .header-inner { flex-wrap: wrap; padding-block: 18px; gap: 15px; }
-  .site-nav { gap: 16px; }
+  .header-inner { min-height: 84px; }
   .header-cta { padding: 10px 14px; }
 }
 @media (max-width: 900px) {
   .page-container { width: min(100% - 32px, 740px); }
-  .header-inner { min-height: 76px; flex-wrap: nowrap; }
-  .site-nav, .header-cta { display: none; }
-  .mobile-menu { display: block; position: relative; margin-left: auto; font-size: 1rem; }
-  .mobile-menu summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; }
-  .mobile-menu summary::-webkit-details-marker { display: none; }
-  .mobile-menu nav { position: absolute; width: min(300px, 90vw); right: 0; top: 34px; background: white; box-shadow: 0 14px 36px #171d3a26; border: 1px solid #ebe5ef; padding: 18px; display: flex; flex-direction: column; gap: 13px; z-index: 30; }
+  .header-inner { min-height: 76px; gap: 12px; }
   .feature-layout, .community-layout, .tarot-layout { grid-template-columns: 1fr; gap: 24px; }
   .hero-layout { grid-template-columns: 1fr; }
   .hero-message { padding: 65px 24px; }
@@ -147,6 +145,11 @@ h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); }
   .home-community, .home-tarot { padding-block: 65px; }
 }
 @media (max-width: 600px) {
+  .header-inner { min-height: 72px; gap: 8px; }
+  .site-brand-logo { width: clamp(90px, 25vw, 130px); }
+  .header-actions { gap: 5px; }
+  .header-cta { padding: 8px 9px; font-size: clamp(.63rem, 2.65vw, .77rem); }
+  .header-menu summary { width: 42px; height: 42px; }
   body { font-size: 16px; }
   .home-fundraiser, .home-tech, .intro-band, .legacy-page { padding-block: 42px; }
   .project-tile { grid-template-columns: 1fr; }
