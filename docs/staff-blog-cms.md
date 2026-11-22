@@ -13,7 +13,7 @@ on conflict (user_id) do update set role='admin';
 Do not assign roles by user-controlled email metadata. No auto-promotion of unverified users.
 
 ## Dashboard
-/ staff displays Blog Posts, Write a Post, Account Security and administrative invitations. Global navigation renders Sign in for visitors, Account for signed-in users and Dashboard for either staff role. This is a display convenience: authorization is enforced on the server and by RLS.
+/staff displays a compact Blog row with the item count and a separate + action that opens the existing new-post editor, a quiet Account security link, and collapsed admin-only invitations. Global navigation renders Sign in for visitors, Account for signed-in users and Dashboard for either staff role. This is a display convenience: authorization is enforced on the server and by RLS.
 
 ## Blog
 - /staff/blog lists published and draft posts for staff with MFA.
