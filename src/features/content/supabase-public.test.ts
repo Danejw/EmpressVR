@@ -56,6 +56,19 @@ describe("public Supabase content adapter", () => {
     expect(fallback).not.toHaveBeenCalled();
   });
 
+  it("uses only published offerings for the booking catalogue", async () => {
+    const request = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify([{ id: "offering", title: "VR Class", kind: "class" }]), { status: 200 }),
+    );
+    const fallback = vi.fn(() => []);
+    const rows = await fetchPublicRows("offerings", fallback, config, request);
+    expect(rows).toHaveLength(1);
+    const [url, init] = request.mock.calls[0];
+    expect(String(url)).toContain("/rest/v1/offerings?select=*&published=eq.true");
+    expect(init?.headers).toEqual({ apikey: config.publishableKey, Accept: "application/json" });
+    expect(fallback).not.toHaveBeenCalled();
+  });
+
   it("reads the current public image library and editable image slots", async () => {
     const request = vi.fn<typeof fetch>().mockResolvedValue(new Response("[]", { status: 200 }));
     await fetchPublicRows("media_assets", () => [], config, request);
